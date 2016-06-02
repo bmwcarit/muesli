@@ -10,6 +10,10 @@ set(
     ${MUESLI_MAJOR_VERSION}.${MUESLI_MINOR_VERSION}.${MUESLI_PATCH_VERSION}
 )
 
+# add a fake target which allows displaying the headers in the IDE
+FILE(GLOB_RECURSE MUESLI_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+add_custom_target(muesli_target_to_display_headers SOURCES ${MUESLI_HEADER_FILES})
+
 add_library(muesli INTERFACE)
 
 target_include_directories(
