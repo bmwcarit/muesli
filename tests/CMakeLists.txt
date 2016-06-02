@@ -3,6 +3,7 @@ include(AddGtestGmock)
 AddTest(
     muesli-unit-test
     TestMain.cpp
+    BaseArchiveTest.cpp
 )
 
 target_link_libraries(
