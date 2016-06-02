@@ -61,8 +61,8 @@ public:
     MOCK_METHOD1_T(save, void(Archive&));
 };
 
-
-// forward declaration is necessary since 'serialize' must be declared prior to using it as a friend within the class
+// forward declaration is necessary since 'serialize' must be declared prior to using it as a friend
+// within the class
 template <typename Archive>
 class MockClassWithFriendSerializeFunction;
 
@@ -77,8 +77,7 @@ template <typename Archive>
 class MockClassWithFriendSerializeFunction
 {
 public:
-    friend
-    void serialize <>(Archive&, MockClassWithFriendSerializeFunction&);
+    friend void serialize<>(Archive&, MockClassWithFriendSerializeFunction&);
 
     FRIEND_TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction);
     FRIEND_TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction);
@@ -86,7 +85,6 @@ public:
 private:
     MOCK_METHOD1_T(serializeCalled, void(Archive&));
 };
-
 
 template <typename Archive>
 class MockClassWithFriendLoadSaveFunction;
@@ -109,10 +107,8 @@ template <typename Archive>
 class MockClassWithFriendLoadSaveFunction
 {
 public:
-    friend
-    void load <>(Archive&, MockClassWithFriendLoadSaveFunction&);
-    friend
-    void save <>(Archive&, MockClassWithFriendLoadSaveFunction&);
+    friend void load<>(Archive&, MockClassWithFriendLoadSaveFunction&);
+    friend void save<>(Archive&, MockClassWithFriendLoadSaveFunction&);
 
     FRIEND_TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction);
     FRIEND_TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction);
@@ -121,7 +117,6 @@ private:
     MOCK_METHOD1_T(loadCalled, void(Archive&));
     MOCK_METHOD1_T(saveCalled, void(Archive&));
 };
-
 
 TEST_F(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
 {

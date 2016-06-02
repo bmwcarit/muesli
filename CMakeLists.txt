@@ -13,6 +13,7 @@ set(
 # add a fake target which allows displaying the headers in the IDE
 FILE(GLOB_RECURSE MUESLI_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 add_custom_target(muesli_target_to_display_headers SOURCES ${MUESLI_HEADER_FILES})
+AddClangFormat(muesli_target_to_display_headers)
 
 add_library(muesli INTERFACE)
 
