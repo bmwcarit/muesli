@@ -4,6 +4,7 @@ AddTest(
     muesli-unit-test
     TestMain.cpp
     BaseArchiveTest.cpp
+    OutputStreamTest.cpp
 )
 
 target_link_libraries(
