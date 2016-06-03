@@ -28,6 +28,7 @@ AddTest(
     muesli-unit-test
     TestMain.cpp
     BaseArchiveTest.cpp
+    JsonArchiveTest.cpp
     OutputStreamTest.cpp
     InputStreamTest.cpp
     StdOStreamWrapperTest.cpp

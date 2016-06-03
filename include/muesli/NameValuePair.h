@@ -20,8 +20,6 @@
 #ifndef MUESLI_NAMEVALUEPAIR_H_
 #define MUESLI_NAMEVALUEPAIR_H_
 
-#include <joynr/Util.h>
-
 namespace muesli
 {
 
