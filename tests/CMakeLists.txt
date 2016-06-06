@@ -33,6 +33,7 @@ AddTest(
     StdOStreamWrapperTest.cpp
     StdIStreamWrapperTest.cpp
     archives/json/TraitsTest.cpp
+    TypeRegistryTest.cpp
 )
 
 target_link_libraries(
