@@ -6,6 +6,7 @@ AddTest(
     BaseArchiveTest.cpp
     OutputStreamTest.cpp
     InputStreamTest.cpp
+    StdOStreamWrapperTest.cpp
 )
 
 target_link_libraries(
