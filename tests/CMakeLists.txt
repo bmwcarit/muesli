@@ -34,6 +34,12 @@ AddTest(
     StdIStreamWrapperTest.cpp
     archives/json/TraitsTest.cpp
     TypeRegistryTest.cpp
+    testtypes/TStruct.h
+    testtypes/TStruct.cpp
+    testtypes/TStructExtended.h
+    testtypes/TStructExtended.cpp
+    testtypes/TEnum.h
+    testtypes/TEnum.cpp
 )
 
 target_link_libraries(
@@ -53,4 +59,5 @@ target_include_directories(
     ${rapidjson_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}/../include"
 )
+
 AddClangFormat(muesli-unit-test)
