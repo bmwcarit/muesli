@@ -42,6 +42,7 @@
 #include <vector>
 #include <typeinfo>
 
+#include <muesli/TypeRegistry.h>
 #include <muesli/NameValuePair.h>
 
 // include complex Datatype headers.
@@ -245,6 +246,8 @@ std::size_t hash_value(const TStruct& tStructValue);
 } // namespace testtypes
 } // namespace tests
 } // namespace muesli
+
+MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TStruct, "muesli.tests.testtypes.TStruct")
 
 namespace std
 {

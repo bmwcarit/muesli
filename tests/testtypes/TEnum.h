@@ -25,6 +25,8 @@
 #include <string>
 #include <cstdint>
 
+#include "muesli/TypeRegistry.h"
+
 namespace muesli
 {
 namespace tests
@@ -112,6 +114,8 @@ void PrintTo(const muesli::tests::testtypes::TEnum::Enum& tEnumValue, ::std::ost
 } // namespace testtypes
 } // namespace tests
 } // namespace muesli
+
+MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TEnum::Enum, "muesli.tests.testtypes.TEnum")
 
 namespace std
 {

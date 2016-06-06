@@ -26,6 +26,8 @@
 #include <vector>
 #include <typeinfo>
 
+#include "muesli/TypeRegistry.h"
+
 // include complex Datatype headers.
 #include "testtypes/TStruct.h"
 #include "testtypes/TEnum.h"
@@ -174,8 +176,11 @@ private:
 std::size_t hash_value(const TStructExtended& tStructExtendedValue);
 
 } // namespace testtypes
-} // namespace types
-} // namespace joynr
+} // namespace tests
+} // namespace muesli
+
+MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TStructExtended,
+                     "muesli.tests.testtypes.TStructExtended")
 
 namespace std
 {
