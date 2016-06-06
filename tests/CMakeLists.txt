@@ -5,6 +5,7 @@ AddTest(
     TestMain.cpp
     BaseArchiveTest.cpp
     OutputStreamTest.cpp
+    InputStreamTest.cpp
 )
 
 target_link_libraries(
