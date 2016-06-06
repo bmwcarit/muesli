@@ -8,6 +8,7 @@ AddTest(
     InputStreamTest.cpp
     StdOStreamWrapperTest.cpp
     StdIStreamWrapperTest.cpp
+    archives/json/TraitsTest.cpp
 )
 
 target_link_libraries(
