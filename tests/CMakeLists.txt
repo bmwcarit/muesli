@@ -7,6 +7,7 @@ AddTest(
     OutputStreamTest.cpp
     InputStreamTest.cpp
     StdOStreamWrapperTest.cpp
+    StdIStreamWrapperTest.cpp
 )
 
 target_link_libraries(
