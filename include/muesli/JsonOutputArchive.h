@@ -28,6 +28,7 @@
 #include <rapidjson/writer.h>
 
 #include "BaseArchive.h"
+#include "TypeRegistry.h"
 #include "archives/json/detail/traits.h"
 
 namespace muesli
@@ -108,6 +109,8 @@ std::enable_if_t<json::detail::IsObject<T>::value>
 intro(JsonOutputArchive& archive, const T& value)
 {
     archive.startObject();
+    archive.writeKey("_typeName");
+    archive.writeValue(muesli::detail::RegisteredType<T>::name());
     std::ignore = value;
 }
 
