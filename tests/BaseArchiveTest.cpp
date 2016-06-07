@@ -20,31 +20,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <muesli/BaseArchive.h>
+#include "MockArchive.h"
 
 using namespace ::testing;
-
-class BaseArchiveTest : public ::testing::Test
-{
-};
-
-class MockInputArchive : public muesli::BaseArchive<muesli::tag::InputArchive, MockInputArchive>
-{
-public:
-    using Parent = muesli::BaseArchive<muesli::tag::InputArchive, MockInputArchive>;
-    MockInputArchive() : Parent(this)
-    {
-    }
-};
-
-class MockOutputArchive : public muesli::BaseArchive<muesli::tag::OutputArchive, MockOutputArchive>
-{
-public:
-    using Parent = muesli::BaseArchive<muesli::tag::OutputArchive, MockOutputArchive>;
-    MockOutputArchive() : Parent(this)
-    {
-    }
-};
 
 template <typename Archive>
 class MockClassWithSerializeMemberFunction
@@ -118,7 +96,7 @@ private:
     MOCK_METHOD1_T(saveCalled, void(Archive&));
 };
 
-TEST_F(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
+TEST(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
 {
     MockOutputArchive outputArchive;
     MockClassWithSerializeMemberFunction<MockOutputArchive> data;
@@ -126,7 +104,7 @@ TEST_F(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
     outputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, LoadClassWithSerializeMemberFunction)
+TEST(BaseArchiveTest, LoadClassWithSerializeMemberFunction)
 {
     MockInputArchive inputArchive;
     MockClassWithSerializeMemberFunction<MockInputArchive> data;
@@ -134,7 +112,7 @@ TEST_F(BaseArchiveTest, LoadClassWithSerializeMemberFunction)
     inputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
+TEST(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
 {
     MockOutputArchive outputArchive;
     MockClassWithLoadSaveMemberFunction<MockOutputArchive> data;
@@ -143,7 +121,7 @@ TEST_F(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
     outputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
+TEST(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
 {
     MockInputArchive inputArchive;
     MockClassWithLoadSaveMemberFunction<MockInputArchive> data;
@@ -152,7 +130,7 @@ TEST_F(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
     inputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, SaveClassWithFriendSerializeFunction)
+TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction)
 {
     MockOutputArchive outputArchive;
     MockClassWithFriendSerializeFunction<MockOutputArchive> data;
@@ -160,7 +138,7 @@ TEST_F(BaseArchiveTest, SaveClassWithFriendSerializeFunction)
     outputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, LoadClassWithFriendSerializeFunction)
+TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction)
 {
     MockInputArchive inputArchive;
     MockClassWithFriendSerializeFunction<MockInputArchive> data;
@@ -168,7 +146,7 @@ TEST_F(BaseArchiveTest, LoadClassWithFriendSerializeFunction)
     inputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
+TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
 {
     MockOutputArchive outputArchive;
     MockClassWithFriendLoadSaveFunction<MockOutputArchive> data;
@@ -177,7 +155,7 @@ TEST_F(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
     outputArchive(data);
 }
 
-TEST_F(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
+TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
 {
     MockInputArchive inputArchive;
     MockClassWithFriendLoadSaveFunction<MockInputArchive> data;

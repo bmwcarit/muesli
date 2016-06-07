@@ -42,6 +42,7 @@ AddTest(
     testtypes/TStructExtended.cpp
     testtypes/TEnum.h
     testtypes/TEnum.cpp
+    MockArchive.h
 )
 
 target_link_libraries(
