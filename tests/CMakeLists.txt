@@ -43,6 +43,8 @@ AddTest(
     testtypes/TEnum.h
     testtypes/TEnum.cpp
     MockArchive.h
+    TestUtil.h
+    TestUtilTest.cpp
 )
 
 target_link_libraries(

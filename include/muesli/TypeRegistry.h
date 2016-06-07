@@ -20,13 +20,111 @@
 #ifndef MUESLI_TYPEREGISTRY_H_
 #define MUESLI_TYPEREGISTRY_H_
 
+#include <unordered_map>
+#include <string>
+#include <functional>
+#include <typeindex>
+#include <type_traits>
+
+#include <boost/variant.hpp>
+#include <boost/mpl/vector.hpp>
+#include <boost/mpl/identity.hpp>
+#include <boost/mpl/transform.hpp>
+
+#include <muesli/ArchiveRegistry.h>
+
 namespace muesli
 {
 namespace detail
 {
 
-template <class T>
+template <typename RegisteredArchive>
+struct ExtractInputArchive
+{
+    using type = typename RegisteredArchive::InputArchive;
+};
+
+template <typename RegisteredArchive>
+struct ExtractOutputArchive
+{
+    using type = typename RegisteredArchive::OutputArchive;
+};
+
+template <template <typename> class Extractor,
+          template <typename> class Postprocess = boost::mpl::identity>
+using MakeArchiveVariant = typename boost::make_variant_over<
+        typename boost::mpl::transform<ExtensibleTypeSequence<RegisteredArchives>::type,
+                                       Postprocess<Extractor<boost::mpl::_1>>>::type>::type;
+
+using OutputArchiveVariant = MakeArchiveVariant<ExtractOutputArchive, std::add_lvalue_reference>;
+using InputArchiveVariant = MakeArchiveVariant<ExtractInputArchive, std::add_lvalue_reference>;
+
+} // namespace detail
+
+template <typename Base>
+class TypeRegistry
+{
+public:
+    using DeserializerFunction = std::function<std::unique_ptr<Base>(detail::InputArchiveVariant)>;
+    using SerializerFunction = std::function<void(detail::OutputArchiveVariant, Base*)>;
+
+    using InputMap = std::unordered_map<std::string, DeserializerFunction>;
+    using OutputMap = std::unordered_map<std::type_index, SerializerFunction>;
+
+    static InputMap& getInputRegistry()
+    {
+        static InputMap inputRegistry;
+        return inputRegistry;
+    }
+
+    static OutputMap& getOutputRegistry()
+    {
+        static OutputMap outputRegistry;
+        return outputRegistry;
+    }
+
+    struct Inserter
+    {
+        Inserter(const std::string& name,
+                 const std::type_index& typeIndex,
+                 DeserializerFunction deserializerFun,
+                 SerializerFunction serializerFun)
+        {
+            getInputRegistry().insert({name, deserializerFun});
+            getOutputRegistry().insert({typeIndex, serializerFun});
+        }
+    };
+};
+
+namespace detail
+{
+
+template <typename T>
 struct RegisteredType;
+
+template <typename Base, typename T>
+struct RegisteredPolymorphicType;
+
+template <typename Base, typename T>
+struct RegisteredPolymorphicTypeInstance
+{
+    static const typename ::muesli::TypeRegistry<Base>::Inserter instance;
+};
+
+template <typename Base, typename T>
+const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeInstance<
+        Base,
+        T>::instance(RegisteredType<T>::name(),
+                     typeid(T),
+                     [](InputArchiveVariant archive) {
+                         auto value = std::make_unique<T>();
+                         boost::apply_visitor([&value](auto& ar) { ar(*value); }, archive);
+                         return value;
+                     },
+                     [](OutputArchiveVariant archive, Base* ptr) {
+                         boost::apply_visitor(
+                                 [ptr](auto& ar) { ar(*(static_cast<T*>(ptr))); }, archive);
+                     });
 
 } // namespace detail
 } // namespace muesli
@@ -42,6 +140,28 @@ struct RegisteredType;
         static constexpr char const* name()                                                        \
         {                                                                                          \
             return Name;                                                                           \
+        }                                                                                          \
+    };                                                                                             \
+    } /* namespace detail */                                                                       \
+    } /* namespace muesli */
+
+#define MUESLI_REGISTER_POLYMORPHIC_TYPE(T, Base, Name)                                            \
+    MUESLI_REGISTER_TYPE(T, Name) /* register T as a "normal" type as well */                      \
+    namespace muesli                                                                               \
+    {                                                                                              \
+    namespace detail                                                                               \
+    {                                                                                              \
+    template <>                                                                                    \
+    struct RegisteredPolymorphicType<Base, T>                                                      \
+    {                                                                                              \
+        static_assert(std::is_polymorphic<Base>::value, "Base must be polymorphic");               \
+        static_assert(std::is_base_of<Base, T>::value, "Base must be a base class of T");          \
+                                                                                                   \
+        /* this function will never be called, it just forces instantation of the static object */ \
+        static const auto& dummy()                                                                 \
+        {                                                                                          \
+            assert(false);                                                                         \
+            return RegisteredPolymorphicTypeInstance<Base, T>::instance;                           \
         }                                                                                          \
     };                                                                                             \
     } /* namespace detail */                                                                       \
