@@ -181,6 +181,7 @@ template <typename Archive>
 void serialize(Archive& archive, TStructExtended& tStructExtended)
 {
     serialize(archive, static_cast<TStruct&>(tStructExtended));
+    archive(muesli::make_nvp("tEnum", tStructExtended.tEnum));
     archive(muesli::make_nvp("tInt32", tStructExtended.tInt32));
 }
 

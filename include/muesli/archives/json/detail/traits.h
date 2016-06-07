@@ -53,6 +53,10 @@ struct IsObject
     static constexpr bool value = !IsPrimitive<T>::value && !IsArray<T>::value;
 };
 
+// this traits class is used to get the wrapper class for an enum
+template <typename Enum>
+struct EnumTraits;
+
 } // namespace detail
 } // namespace json
 } // namespace muesli

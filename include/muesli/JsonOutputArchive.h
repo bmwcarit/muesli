@@ -69,6 +69,11 @@ public:
         writer.Int(int32Value);
     }
 
+    void writeValue(const std::uint32_t& uint32Value)
+    {
+        writer.Uint(uint32Value);
+    }
+
     void writeValue(const std::string& stringValue)
     {
         writer.String(stringValue.c_str(), static_cast<rapidjson::SizeType>(stringValue.size()));
@@ -166,9 +171,17 @@ void serialize(JsonOutputArchive& archive, const NameValuePair<T>& nameValuePair
 }
 
 template <typename T>
-void serialize(JsonOutputArchive& archive, const T& value)
+std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value>
+serialize(JsonOutputArchive& archive, const T& value)
 {
     archive.writeValue(value);
+}
+
+// generic serialization for generated Enum types
+template <typename Enum, typename Wrapper = typename json::detail::EnumTraits<Enum>::Wrapper>
+void save(muesli::JsonOutputArchive& archive, Enum value)
+{
+    archive.writeValue(Wrapper::getLiteral(value));
 }
 
 } // namespace muesli

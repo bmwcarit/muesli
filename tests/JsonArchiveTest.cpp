@@ -47,10 +47,20 @@ TEST_F(JsonArchiveTest, serializeStruct)
 
 TEST_F(JsonArchiveTest, serializeStructExtended)
 {
+    muesli::tests::testtypes::TStructExtended tStructExtended(
+            0.123456789, 64, "test string data", muesli::tests::testtypes::TEnum::TLITERALB, 32);
+    std::string expectedSerializedStructExtended(
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStructExtended",)"
+            R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data",)"
+            R"("tEnum":"TLITERALB",)"
+            R"("tInt32":32)"
+            R"(})");
+
     std::stringstream stream;
     muesli::JsonOutputArchive jsonOutputArchive(stream);
-    muesli::tests::testtypes::TStructExtended tStructExtended(
-            0.42, 42, "test string data", muesli::tests::testtypes::TEnum::TLITERALA, 43);
     jsonOutputArchive(tStructExtended);
-    std::cout << stream.str() << std::endl;
+    EXPECT_EQ(expectedSerializedStructExtended, stream.str());
 }
