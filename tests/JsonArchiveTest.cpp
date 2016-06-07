@@ -24,6 +24,8 @@
 #include <gmock/gmock.h>
 
 #include "testtypes/TStruct.h"
+#include "testtypes/TStructExtended.h"
+#include "testtypes/TEnum.h"
 
 #include "muesli/BaseArchive.h"
 #include "muesli/JsonOutputArchive.h"
@@ -40,5 +42,15 @@ TEST_F(JsonArchiveTest, serializeStruct)
     muesli::JsonOutputArchive jsonOutputArchive(stream);
     muesli::tests::testtypes::TStruct tStruct(0.42, 42, "test string data");
     jsonOutputArchive(tStruct);
+    std::cout << stream.str() << std::endl;
+}
+
+TEST_F(JsonArchiveTest, serializeStructExtended)
+{
+    std::stringstream stream;
+    muesli::JsonOutputArchive jsonOutputArchive(stream);
+    muesli::tests::testtypes::TStructExtended tStructExtended(
+            0.42, 42, "test string data", muesli::tests::testtypes::TEnum::TLITERALA, 43);
+    jsonOutputArchive(tStructExtended);
     std::cout << stream.str() << std::endl;
 }

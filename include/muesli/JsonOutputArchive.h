@@ -63,6 +63,12 @@ public:
     {
         writer.Int64(int64Value);
     }
+
+    void writeValue(const std::int32_t& int32Value)
+    {
+        writer.Int(int32Value);
+    }
+
     void writeValue(const std::string& stringValue)
     {
         writer.String(stringValue.c_str(), static_cast<rapidjson::SizeType>(stringValue.size()));

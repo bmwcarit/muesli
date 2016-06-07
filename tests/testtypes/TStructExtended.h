@@ -167,11 +167,22 @@ protected:
     }
 
 private:
+    // serialize TStructExtended with muesli
+    template <typename Archive>
+    friend void serialize(Archive& archive, TStructExtended& tStructExtended);
+
     // members
     muesli::tests::testtypes::TEnum::Enum tEnum;
     std::string getTEnumInternal() const;
     std::int32_t tInt32;
 };
+// serialize TStructExtended with muesli
+template <typename Archive>
+void serialize(Archive& archive, TStructExtended& tStructExtended)
+{
+    serialize(archive, static_cast<TStruct&>(tStructExtended));
+    archive(muesli::make_nvp("tInt32", tStructExtended.tInt32));
+}
 
 std::size_t hash_value(const TStructExtended& tStructExtendedValue);
 
