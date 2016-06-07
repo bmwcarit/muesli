@@ -23,6 +23,9 @@ target_include_directories(
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
     "$<INSTALL_INTERFACE:include>"
 )
+
+target_compile_definitions(muesli INTERFACE RAPIDJSON_HAS_STDSTRING)
+
 install(
     TARGETS muesli
     EXPORT JoynrTargets

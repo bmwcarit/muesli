@@ -58,7 +58,10 @@ target_include_directories(
     SYSTEM
     PRIVATE
     ${rapidjson_INCLUDE_DIRS}
-    "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+)
+
+target_link_libraries(muesli-unit-test
+    muesli
 )
 
 AddClangFormat(muesli-unit-test)

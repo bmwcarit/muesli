@@ -27,8 +27,9 @@
 #include "testtypes/TStructExtended.h"
 #include "testtypes/TEnum.h"
 
-#include "muesli/BaseArchive.h"
-#include "muesli/JsonOutputArchive.h"
+#include <muesli/BaseArchive.h>
+#include <muesli/JsonInputArchive.h>
+#include <muesli/JsonOutputArchive.h>
 
 // using namespace ::testing;
 
@@ -51,6 +52,11 @@ TEST_F(JsonArchiveTest, serializeStruct)
     muesli::JsonOutputArchive jsonOutputArchive(stream);
     jsonOutputArchive(tStruct);
     EXPECT_EQ(expectedSerializedStruct, stream.str());
+
+    muesli::JsonInputArchive jsonInputArchive(stream);
+    muesli::tests::testtypes::TStruct tStructDeserialized;
+    jsonInputArchive(tStructDeserialized);
+    EXPECT_EQ(tStruct, tStructDeserialized);
 }
 
 TEST_F(JsonArchiveTest, serializeStructExtended)
