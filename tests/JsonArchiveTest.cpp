@@ -38,11 +38,19 @@ class JsonArchiveTest : public ::testing::Test
 
 TEST_F(JsonArchiveTest, serializeStruct)
 {
+    muesli::tests::testtypes::TStruct tStruct(0.123456789, 64, "test string data");
+    std::string expectedSerializedStruct(
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data")"
+            R"(})");
+
     std::stringstream stream;
     muesli::JsonOutputArchive jsonOutputArchive(stream);
-    muesli::tests::testtypes::TStruct tStruct(0.42, 42, "test string data");
     jsonOutputArchive(tStruct);
-    std::cout << stream.str() << std::endl;
+    EXPECT_EQ(expectedSerializedStruct, stream.str());
 }
 
 TEST_F(JsonArchiveTest, serializeStructExtended)
