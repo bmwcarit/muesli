@@ -77,4 +77,9 @@ TEST_F(JsonArchiveTest, serializeStructExtended)
     muesli::JsonOutputArchive jsonOutputArchive(stream);
     jsonOutputArchive(tStructExtended);
     EXPECT_EQ(expectedSerializedStructExtended, stream.str());
+
+    muesli::JsonInputArchive jsonInputArchive(stream);
+    muesli::tests::testtypes::TStructExtended tStructExtendedDeserialized;
+    jsonInputArchive(tStructExtendedDeserialized);
+    EXPECT_EQ(tStructExtended, tStructExtendedDeserialized);
 }

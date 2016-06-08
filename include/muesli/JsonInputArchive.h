@@ -151,16 +151,20 @@ void serialize(JsonInputArchive& archive, NameValuePair<T>& nameValuePair)
 }
 
 template <typename T>
-<<<<<<< HEAD
-std::enable_if_t<json::detail::IsPrimitive<T>::value>
-serialize(JsonInputArchive& archive, T& value)
-=======
 std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> serialize(
         JsonInputArchive& archive,
         T& value)
->>>>>>> 53b91c8... fixup! add JSON input archive and read struct
 {
     archive.readValue(value);
+}
+
+// generic de-serialization for generated Enum types
+template <typename Enum, typename Wrapper = typename json::detail::EnumTraits<Enum>::Wrapper>
+void load(muesli::JsonInputArchive& archive, Enum& value)
+{
+    std::string enumStringValue;
+    archive.readValue(enumStringValue);
+    value = Wrapper::getEnum(enumStringValue);
 }
 
 } // namespace muesli
