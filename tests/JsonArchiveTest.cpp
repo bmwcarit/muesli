@@ -31,8 +31,6 @@
 #include <muesli/JsonInputArchive.h>
 #include <muesli/JsonOutputArchive.h>
 
-// using namespace ::testing;
-
 class JsonArchiveTest : public ::testing::Test
 {
 };

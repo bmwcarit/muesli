@@ -58,6 +58,11 @@ public:
         doubleValue = getNextValue().GetDouble();
     }
 
+    void readValue(std::int8_t& int8Value)
+    {
+        int8Value = getNextValue().GetInt();
+    }
+
     void readValue(std::int64_t& int64Value)
     {
         int64Value = getNextValue().GetInt64();

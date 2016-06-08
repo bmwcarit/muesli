@@ -29,6 +29,7 @@ AddTest(
     TestMain.cpp
     BaseArchiveTest.cpp
     JsonArchiveTest.cpp
+    JsonTest.cpp
     OutputStreamTest.cpp
     InputStreamTest.cpp
     StdOStreamWrapperTest.cpp
