@@ -45,6 +45,7 @@ AddTest(
     MockArchive.h
     TestUtil.h
     TestUtilTest.cpp
+    TraitsTest.cpp
 )
 
 target_link_libraries(

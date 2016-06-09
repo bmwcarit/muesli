@@ -45,10 +45,6 @@ public:
     {
     }
 
-    ~JsonOutputArchive()
-    {
-    }
-
     void writeKey(const std::string& key)
     {
         writer.Key(key.c_str(), static_cast<rapidjson::SizeType>(key.size()));
@@ -59,19 +55,31 @@ public:
         writer.Double(doubleValue);
     }
 
+    void writeValue(const float& floatValue)
+    {
+        writer.Double(floatValue);
+    }
+
     void writeValue(const std::int64_t& int64Value)
     {
         writer.Int64(int64Value);
     }
 
-    void writeValue(const std::int32_t& int32Value)
+    void writeValue(const std::uint64_t& uint64Value)
     {
-        writer.Int(int32Value);
+        writer.Uint64(uint64Value);
     }
 
-    void writeValue(const std::uint32_t& uint32Value)
+    template <typename T>
+    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> writeValue(const T& value)
     {
-        writer.Uint(uint32Value);
+        writer.Int(value);
+    }
+
+    template <typename T>
+    std::enable_if_t<json::detail::IsUnSignedIntegerUpTo32bit<T>::value> writeValue(const T& value)
+    {
+        writer.Uint(value);
     }
 
     void writeValue(const std::string& stringValue)

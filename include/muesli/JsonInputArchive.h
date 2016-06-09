@@ -54,38 +54,45 @@ public:
         this->nextKey = nextKey;
     }
 
-    void readValue(double& doubleValue)
+    void readValue(double& doubleValue) const
     {
         doubleValue = getNextValue().GetDouble();
     }
 
-    void readValue(std::int8_t& int8Value)
+    void readValue(float& floatValue) const
     {
-        int8Value = getNextValue().GetInt();
+        floatValue = getNextValue().GetFloat();
     }
 
-    void readValue(std::int64_t& int64Value)
+    template <typename T>
+    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
+    {
+        value = getNextValue().GetInt();
+    }
+
+    template <typename T>
+    std::enable_if_t<json::detail::IsUnSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
+    {
+        value = getNextValue().GetUint();
+    }
+
+    void readValue(std::int64_t& int64Value) const
     {
         int64Value = getNextValue().GetInt64();
     }
 
-    void readValue(std::int32_t& int32Value)
+    void readValue(std::uint64_t& uint64Value) const
     {
-        int32Value = getNextValue().GetInt();
+        uint64Value = getNextValue().GetUint64();
     }
 
-    void readValue(std::uint32_t& uint32Value)
-    {
-        uint32Value = getNextValue().GetUint();
-    }
-
-    void readValue(std::string& stringValue)
+    void readValue(std::string& stringValue) const
     {
         stringValue = getNextValue().GetString();
     }
 
 private:
-    rapidjson::Value& getNextValue()
+    rapidjson::Value& getNextValue() const
     {
         return document->operator[](nextKey);
     }
@@ -99,7 +106,6 @@ private:
 template <typename T>
 void intro(JsonInputArchive& archive, NameValuePair<T>& nameValuePair)
 {
-    //    archive.writeKey(nameValuePair.name);
 }
 
 template <typename T>
@@ -110,16 +116,12 @@ void outro(JsonInputArchive& archive, NameValuePair<T>& nameValuePair)
 template <typename T>
 std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonInputArchive& archive, T& value)
 {
-    //    archive.startObject();
-    //    archive.writeKey("_typeName");
-    //    archive.writeValue(muesli::detail::RegisteredType<T>::name());
     std::ignore = value;
 }
 
 template <typename T>
 std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonInputArchive& archive, const T& value)
 {
-    //    archive.endObject();
     std::ignore = value;
 }
 
@@ -138,14 +140,12 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive& ar
 template <typename T>
 std::enable_if_t<json::detail::IsArray<T>::value> intro(JsonInputArchive& archive, T& value)
 {
-    //    archive.startArray();
     std::ignore = value;
 }
 
 template <typename T>
 std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonInputArchive& archive, T& value)
 {
-    //    archive.endArray();
     std::ignore = value;
 }
 
@@ -164,7 +164,7 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value>
     archive.readValue(value);
 }
 
-// generic de-serialization for generated Enum types
+// generic de-serialization for enum types having a wrapper class
 template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
 void load(JsonInputArchive& archive, Enum& value)
 {

@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <muesli/Traits.h>
+
 namespace muesli
 {
 namespace json
@@ -51,6 +53,21 @@ template <typename T>
 struct IsObject
 {
     static constexpr bool value = !IsPrimitive<T>::value && !IsArray<T>::value;
+};
+
+// any signed integer which is below int64_t
+template <typename T>
+struct IsSignedIntegerUpTo32bit
+{
+    static constexpr bool value = TypeWithinList<T, std::int8_t, std::int16_t, std::int32_t>::value;
+};
+
+// any unsigned integer which is below uint64_t
+template <typename T>
+struct IsUnSignedIntegerUpTo32bit
+{
+    static constexpr bool value =
+            TypeWithinList<T, std::uint8_t, std::uint16_t, std::uint32_t>::value;
 };
 
 } // namespace detail

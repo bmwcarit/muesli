@@ -17,30 +17,17 @@
  * #L%
  */
 
-#ifndef MUESLI_TRAITS_H_
-#define MUESLI_TRAITS_H_
+#include <cstdint>
 
-#include <type_traits>
+#include <gtest/gtest.h>
 
-namespace muesli
+#include <muesli/Traits.h>
+
+TEST(TraitsTest, StaticAsserts)
 {
-
-// this traits class is used to get the wrapper class for an enum
-template <typename Enum>
-struct EnumTraits;
-
-template <typename...>
-struct TypeWithinList
-{
-    static constexpr bool value = false;
-};
-
-template <typename Needle, typename Head, typename... Haystack>
-struct TypeWithinList<Needle, Head, Haystack...>
-{
-    static constexpr bool value =
-            std::is_same<Needle, Head>::value || TypeWithinList<Needle, Haystack...>::value;
-};
-} // namespace muesli
-
-#endif // MUESLI_TRAITS_H_
+    using namespace muesli;
+    static_assert(TypeWithinList<std::int8_t, std::int16_t, std::int32_t, std::int8_t>::value,
+                  "type must be found in list");
+    static_assert(!TypeWithinList<std::int64_t, std::int16_t, std::int32_t, std::int8_t>::value,
+                  "type must NOT be found in list");
+}
