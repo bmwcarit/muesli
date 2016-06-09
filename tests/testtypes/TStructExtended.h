@@ -26,7 +26,8 @@
 #include <vector>
 #include <typeinfo>
 
-#include "muesli/TypeRegistry.h"
+#include <muesli/BaseClass.h>
+#include <muesli/TypeRegistry.h>
 
 // include complex Datatype headers.
 #include "testtypes/TStruct.h"
@@ -180,9 +181,9 @@ private:
 template <typename Archive>
 void serialize(Archive& archive, TStructExtended& tStructExtended)
 {
-    serialize(archive, static_cast<TStruct&>(tStructExtended));
-    archive(muesli::make_nvp("tEnum", tStructExtended.tEnum));
-    archive(muesli::make_nvp("tInt32", tStructExtended.tInt32));
+    archive(muesli::BaseClass<TStruct>(&tStructExtended),
+            muesli::make_nvp("tEnum", tStructExtended.tEnum),
+            muesli::make_nvp("tInt32", tStructExtended.tInt32));
 }
 
 std::size_t hash_value(const TStructExtended& tStructExtendedValue);

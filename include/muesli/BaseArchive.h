@@ -20,6 +20,8 @@
 #ifndef MUESLI_BASEARCHIVE_H_
 #define MUESLI_BASEARCHIVE_H_
 
+#include <muesli/BaseClass.h>
+
 namespace muesli
 {
 
@@ -49,7 +51,7 @@ public:
         // call handle() for each of the args
         static_assert(sizeof...(Ts) > 0, "at least one argument must be provided");
         using Expansion = int[];
-        Expansion{0, (handle(std::forward<Ts>(args)), void(), 0)...};
+        Expansion{0, (self.handle(std::forward<Ts>(args)), void(), 0)...};
     }
 
 private:
@@ -60,8 +62,15 @@ private:
     void handle(T&& arg)
     {
         intro(self, arg);
-        dispatch(arg);
+        self.dispatch(arg);
         outro(self, arg);
+    }
+
+    template <typename T>
+    void handle(BaseClass<T> arg)
+    {
+        // do no call intro/outro when serializing base classes
+        self.dispatch(*arg.wrapped);
     }
 
     // 'arg' has 'serialize' member function
@@ -73,9 +82,10 @@ private:
 
     // free function 'serialize' exists for 'arg'
     template <typename T, typename D = Derived>
-    auto dispatch(T&& arg) -> decltype(serialize(static_cast<D*>(this) -> self, arg), void())
+    auto dispatch(T&& arg)
+            -> decltype(serialize(static_cast<D*>(this) -> self, std::forward<T>(arg)), void())
     {
-        serialize(self, arg);
+        serialize(self, std::forward<T>(arg));
     }
 
     // 'Derived' is of category 'InputArchive', check if 'load' member function exists
@@ -88,10 +98,10 @@ private:
 
     // 'Derived' is of category 'InputArchive', check if free function 'load' exists
     template <typename T, typename D = Derived, typename C = Category>
-    auto dispatch(T&& arg) -> decltype(load(static_cast<D*>(this) -> self, arg),
+    auto dispatch(T&& arg) -> decltype(load(static_cast<D*>(this) -> self, std::forward<T>(arg)),
                                        EnableIfXArchive<tag::InputArchive, C>())
     {
-        load(self, arg);
+        load(self, std::forward<T>(arg));
     }
 
     // 'Derived' is of category 'OutputArchive', check if 'load' member function exists
@@ -104,10 +114,10 @@ private:
 
     // 'Derived' is of category 'OutputArchive', check if free function 'save' exists
     template <typename T, typename D = Derived, typename C = Category>
-    auto dispatch(T&& arg) -> decltype(save(static_cast<D*>(this) -> self, arg),
+    auto dispatch(T&& arg) -> decltype(save(static_cast<D*>(this) -> self, std::forward<T>(arg)),
                                        EnableIfXArchive<tag::OutputArchive, C>())
     {
-        save(self, arg);
+        save(self, std::forward<T>(arg));
     }
 
     Derived& self;

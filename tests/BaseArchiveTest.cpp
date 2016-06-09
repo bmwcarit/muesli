@@ -20,6 +20,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <muesli/BaseArchive.h>
+
 #include "MockArchive.h"
 
 using namespace ::testing;
@@ -59,10 +61,24 @@ public:
 
     FRIEND_TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction);
     FRIEND_TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction);
+    FRIEND_TEST(BaseArchiveTest, SerializingBaseClassCallsSerializeOfBaseClass);
 
 private:
     MOCK_METHOD1_T(serializeCalled, void(Archive&));
 };
+
+template <typename Archive>
+struct DerivedMockClassWithFriendSerializeFunction
+        : public MockClassWithFriendSerializeFunction<Archive>
+{
+};
+
+template <typename Archive>
+void serialize(Archive& archive, DerivedMockClassWithFriendSerializeFunction<Archive>& data)
+{
+    using Base = MockClassWithFriendSerializeFunction<Archive>;
+    archive(muesli::BaseClass<Base>(&data));
+}
 
 template <typename Archive>
 class MockClassWithFriendLoadSaveFunction;
@@ -162,4 +178,12 @@ TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
     EXPECT_CALL(data, loadCalled(Ref(inputArchive))).Times(1);
     EXPECT_CALL(data, saveCalled(Ref(inputArchive))).Times(0);
     inputArchive(data);
+}
+
+TEST(BaseArchiveTest, SerializingBaseClassCallsSerializeOfBaseClass)
+{
+    MockInputArchive inputArchive;
+    DerivedMockClassWithFriendSerializeFunction<MockInputArchive> derived;
+    EXPECT_CALL(derived, serializeCalled(Ref(inputArchive))).Times(1);
+    inputArchive(derived);
 }
