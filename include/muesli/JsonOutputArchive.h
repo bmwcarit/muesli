@@ -84,7 +84,7 @@ public:
 
     void writeValue(const std::string& stringValue)
     {
-        writer.String(stringValue.c_str(), static_cast<rapidjson::SizeType>(stringValue.size()));
+        writer.String(stringValue);
     }
 
     void startObject()
