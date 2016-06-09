@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
-#define MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
+#ifndef MUESLI_TRAITS_H_
+#define MUESLI_TRAITS_H_
 
 #include <type_traits>
 #include <string>
@@ -26,35 +26,11 @@
 
 namespace muesli
 {
-namespace json
-{
-namespace detail
-{
 
-template <typename T>
-struct IsArray : std::false_type
-{
-};
+// this traits class is used to get the wrapper class for an enum
+template <typename Enum>
+struct EnumTraits;
 
-template <typename T>
-struct IsArray<std::vector<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct IsPrimitive
-{
-    static constexpr bool value = std::is_same<std::string, T>::value || !std::is_class<T>::value;
-};
-
-template <typename T>
-struct IsObject
-{
-    static constexpr bool value = !IsPrimitive<T>::value && !IsArray<T>::value;
-};
-
-} // namespace detail
-} // namespace json
 } // namespace muesli
 
-#endif // MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
+#endif // MUESLI_TRAITS_H_

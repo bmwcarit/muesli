@@ -23,10 +23,9 @@
 #include <cstdint>
 #include <ostream>
 #include <string>
-#include <cstdint>
 
-#include "muesli/TypeRegistry.h"
-#include "muesli/archives/json/detail/traits.h"
+#include <muesli/TypeRegistry.h>
+#include <muesli/Traits.h>
 
 namespace muesli
 {
@@ -120,19 +119,12 @@ MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TEnum::Enum, "muesli.tests.testty
 
 namespace muesli
 {
-namespace json
-{
-namespace detail
-{
-
 template <>
 struct EnumTraits<muesli::tests::testtypes::TEnum::Enum>
 {
     using Wrapper = muesli::tests::testtypes::TEnum;
 };
 
-} // namespace detail
-} // namespace json
 } // namespace muesli
 
 namespace std

@@ -29,6 +29,7 @@
 
 #include <muesli/BaseArchive.h>
 #include <muesli/TypeRegistry.h>
+#include <muesli/Traits.h>
 #include <muesli/cereal/NameValuePair.h>
 #include <muesli/archives/json/detail/traits.h>
 
@@ -164,8 +165,8 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value>
 }
 
 // generic de-serialization for generated Enum types
-template <typename Enum, typename Wrapper = typename json::detail::EnumTraits<Enum>::Wrapper>
-void load(muesli::JsonInputArchive& archive, Enum& value)
+template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+void load(JsonInputArchive& archive, Enum& value)
 {
     std::string enumStringValue;
     archive.readValue(enumStringValue);
