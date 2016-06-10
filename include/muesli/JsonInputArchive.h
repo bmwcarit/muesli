@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <istream>
 #include <string>
+#include <stack>
 
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -42,11 +43,12 @@ public:
     JsonInputArchive(std::istream& iStream)
             : muesli::BaseArchive<muesli::tag::InputArchive, JsonInputArchive>(this),
               inStream(iStream),
-              document(std::make_shared<rapidjson::Document>()),
+              document(),
               nextKey()
     {
         rapidjson::IStreamWrapper streamWrapper(iStream);
-        document->ParseStream<0>(streamWrapper);
+        document.ParseStream<0>(streamWrapper);
+        stack.push(&document);
     }
 
     void setNextKey(const std::string& nextKey)
@@ -56,50 +58,64 @@ public:
 
     void readValue(double& doubleValue) const
     {
-        doubleValue = getNextValue().GetDouble();
+        doubleValue = getNextValue()->GetDouble();
     }
 
     void readValue(float& floatValue) const
     {
-        floatValue = getNextValue().GetFloat();
+        floatValue = getNextValue()->GetFloat();
     }
 
     template <typename T>
     std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
-        value = getNextValue().GetInt();
+        value = getNextValue()->GetInt();
     }
 
     template <typename T>
     std::enable_if_t<json::detail::IsUnSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
-        value = getNextValue().GetUint();
+        value = getNextValue()->GetUint();
     }
 
     void readValue(std::int64_t& int64Value) const
     {
-        int64Value = getNextValue().GetInt64();
+        int64Value = getNextValue()->GetInt64();
     }
 
     void readValue(std::uint64_t& uint64Value) const
     {
-        uint64Value = getNextValue().GetUint64();
+        uint64Value = getNextValue()->GetUint64();
     }
 
     void readValue(std::string& stringValue) const
     {
-        stringValue = getNextValue().GetString();
+        stringValue = getNextValue()->GetString();
+    }
+
+    void pushNode() {
+        if(!nextKey.empty())
+        {
+            stack.push(getNextValue());
+        }
+    }
+
+    void popNode() {
+        stack.pop();
     }
 
 private:
-    rapidjson::Value& getNextValue() const
+    rapidjson::Value* getNextValue() const
     {
-        return document->operator[](nextKey);
+        return &(stack.top()->operator[](nextKey));
+        //return document->operator[](nextKey);
     }
+
+    std::stack<rapidjson::Value*> stack;
 
 private:
     rapidjson::IStreamWrapper inStream;
-    std::shared_ptr<rapidjson::Document> document;
+    rapidjson::Document document;
     std::string nextKey;
 };
 
@@ -117,12 +133,14 @@ template <typename T>
 std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonInputArchive& archive, T& value)
 {
     std::ignore = value;
+    archive.pushNode();
 }
 
 template <typename T>
 std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonInputArchive& archive, const T& value)
 {
     std::ignore = value;
+    archive.popNode();
 }
 
 template <typename T>

@@ -81,3 +81,50 @@ TEST_F(JsonArchiveTest, serializeStructExtended)
     jsonInputArchive(tStructExtendedDeserialized);
     EXPECT_EQ(tStructExtended, tStructExtendedDeserialized);
 }
+
+struct TestStruct
+{
+    muesli::tests::testtypes::TStruct tstruct;
+
+    template <typename Archive>
+    void serialize(Archive& archive)
+    {
+        archive(muesli::make_nvp("tstruct", tstruct));
+    }
+
+    bool operator==(const TestStruct& other) const
+    {
+        return tstruct == other.tstruct;
+    }
+};
+
+MUESLI_REGISTER_TYPE(TestStruct, "TestStruct")
+
+TEST_F(JsonArchiveTest, serializeNestedStruct)
+{
+    muesli::tests::testtypes::TStruct tStruct(0.123456789, 64, "test string data");
+    TestStruct testStruct;
+    testStruct.tstruct = tStruct;
+    std::string expectedSerializedStruct(
+            R"({)"
+            R"("_typeName":"TestStruct",)"
+            R"("tstruct":)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data")"
+            R"(})"
+            R"(})");
+
+    std::stringstream stream;
+    muesli::JsonOutputArchive jsonOutputArchive(stream);
+    jsonOutputArchive(testStruct);
+    EXPECT_EQ(expectedSerializedStruct, stream.str());
+
+    muesli::JsonInputArchive jsonInputArchive(stream);
+    TestStruct tStructDeserialized;
+    jsonInputArchive(tStructDeserialized);
+    std::cout << stream.str() << std::endl;
+    EXPECT_EQ(testStruct, tStructDeserialized);
+}
