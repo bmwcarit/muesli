@@ -20,12 +20,16 @@
 #ifndef MUESLI_STDISTREAMWRAPPER_H
 #define MUESLI_STDISTREAMWRAPPER_H
 
+#include <iosfwd>
+
+#include "muesli/StreamRegistry.h"
+
 namespace muesli
 {
 
 /**
- * This template class provides a generic wrapper around streams which derive from std::istream in
- * order to implement the InputStream concept.
+ * This template class provides a generic wrapper around streams which derive from
+ * std::basic_istream in order to implement the InputStream concept.
  */
 template <typename Stream>
 class StdIStreamWrapper
@@ -55,5 +59,7 @@ private:
     Stream& stream;
 };
 } // namespace muesli
+
+MUESLI_REGISTER_INPUT_STREAM(muesli::StdIStreamWrapper<std::istream>);
 
 #endif // MUESLI_STDISTREAMWRAPPER_H

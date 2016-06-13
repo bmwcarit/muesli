@@ -20,12 +20,16 @@
 #ifndef MUESLI_STDOSTREAMWRAPPER_H
 #define MUESLI_STDOSTREAMWRAPPER_H
 
+#include <iosfwd>
+
+#include "muesli/StreamRegistry.h"
+
 namespace muesli
 {
 
 /**
- * This template class provides a generic wrapper around streams which derive from std::ostream in
- * order to implement the OutputStream concept.
+ * This template class provides a generic wrapper around streams which derive from
+ * std::basic_ostream in order to implement the OutputStream concept.
  */
 template <typename Stream>
 class StdOStreamWrapper
@@ -60,5 +64,8 @@ private:
     Stream& stream;
 };
 } // namespace muesli
+
+// register the common std::ostream case
+MUESLI_REGISTER_OUTPUT_STREAM(muesli::StdOStreamWrapper<std::ostream>);
 
 #endif // MUESLI_STDOSTREAMWRAPPER_H
