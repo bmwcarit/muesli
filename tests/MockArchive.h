@@ -24,10 +24,10 @@
 
 #include <muesli/BaseArchive.h>
 
-class MockInputArchive : public muesli::BaseArchive<muesli::tag::InputArchive, MockInputArchive>
+class MockInputArchive : public muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive>
 {
 public:
-    using Parent = muesli::BaseArchive<muesli::tag::InputArchive, MockInputArchive>;
+    using Parent = muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive>;
     MockInputArchive() : Parent(this)
     {
     }
@@ -35,10 +35,10 @@ public:
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
 
-class MockOutputArchive : public muesli::BaseArchive<muesli::tag::OutputArchive, MockOutputArchive>
+class MockOutputArchive : public muesli::BaseArchive<muesli::tags::OutputArchive, MockOutputArchive>
 {
 public:
-    using Parent = muesli::BaseArchive<muesli::tag::OutputArchive, MockOutputArchive>;
+    using Parent = muesli::BaseArchive<muesli::tags::OutputArchive, MockOutputArchive>;
     MockOutputArchive() : Parent(this)
     {
     }

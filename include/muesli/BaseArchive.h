@@ -20,20 +20,11 @@
 #ifndef MUESLI_BASEARCHIVE_H_
 #define MUESLI_BASEARCHIVE_H_
 
-#include <muesli/BaseClass.h>
+#include "muesli/BaseClass.h"
+#include "muesli/Tags.h"
 
 namespace muesli
 {
-
-namespace tag
-{
-struct InputArchive
-{
-};
-struct OutputArchive
-{
-};
-}
 
 template <typename ArchiveCategory, typename Derived>
 class BaseArchive
@@ -91,7 +82,7 @@ private:
     // 'Derived' is of category 'InputArchive', check if 'load' member function exists
     template <typename T, typename D = Derived, typename C = Category>
     auto dispatch(T&& arg) -> decltype(arg.load(static_cast<D*>(this) -> self),
-                                       EnableIfXArchive<tag::InputArchive, C>())
+                                       EnableIfXArchive<tags::InputArchive, C>())
     {
         arg.load(self);
     }
@@ -99,7 +90,7 @@ private:
     // 'Derived' is of category 'InputArchive', check if free function 'load' exists
     template <typename T, typename D = Derived, typename C = Category>
     auto dispatch(T&& arg) -> decltype(load(static_cast<D*>(this) -> self, std::forward<T>(arg)),
-                                       EnableIfXArchive<tag::InputArchive, C>())
+                                       EnableIfXArchive<tags::InputArchive, C>())
     {
         load(self, std::forward<T>(arg));
     }
@@ -107,7 +98,7 @@ private:
     // 'Derived' is of category 'OutputArchive', check if 'load' member function exists
     template <typename T, typename D = Derived, typename C = Category>
     auto dispatch(T&& arg) -> decltype(arg.save(static_cast<D*>(this) -> self),
-                                       EnableIfXArchive<tag::OutputArchive, C>())
+                                       EnableIfXArchive<tags::OutputArchive, C>())
     {
         arg.save(self);
     }
@@ -115,7 +106,7 @@ private:
     // 'Derived' is of category 'OutputArchive', check if free function 'save' exists
     template <typename T, typename D = Derived, typename C = Category>
     auto dispatch(T&& arg) -> decltype(save(static_cast<D*>(this) -> self, std::forward<T>(arg)),
-                                       EnableIfXArchive<tag::OutputArchive, C>())
+                                       EnableIfXArchive<tags::OutputArchive, C>())
     {
         save(self, std::forward<T>(arg));
     }

@@ -35,11 +35,11 @@
 namespace muesli
 {
 
-class JsonOutputArchive : public muesli::BaseArchive<muesli::tag::OutputArchive, JsonOutputArchive>
+class JsonOutputArchive : public muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive>
 {
 public:
     JsonOutputArchive(std::ostream& oStream)
-            : muesli::BaseArchive<muesli::tag::OutputArchive, JsonOutputArchive>(this),
+            : muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive>(this),
               outStream(oStream),
               writer(outStream)
     {

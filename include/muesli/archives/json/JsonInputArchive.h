@@ -37,11 +37,11 @@
 namespace muesli
 {
 
-class JsonInputArchive : public muesli::BaseArchive<muesli::tag::InputArchive, JsonInputArchive>
+class JsonInputArchive : public muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive>
 {
 public:
     JsonInputArchive(std::istream& iStream)
-            : muesli::BaseArchive<muesli::tag::InputArchive, JsonInputArchive>(this),
+            : muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive>(this),
               inStream(iStream),
               document(),
               nextKey()
