@@ -26,7 +26,7 @@
 #include <boost/concept_check.hpp>
 
 #include <muesli/concepts/OutputStream.h>
-#include <muesli/StdOStreamWrapper.h>
+#include "muesli/streams/StdOStreamWrapper.h"
 
 template <typename Stream>
 using StdOStreamWrapperTest = ::testing::Test;

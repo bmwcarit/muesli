@@ -25,8 +25,8 @@
 #include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
 
-#include <muesli/concepts/InputStream.h>
-#include <muesli/StdIStreamWrapper.h>
+#include "muesli/concepts/InputStream.h"
+#include "muesli/streams/StdIStreamWrapper.h"
 
 template <typename Stream>
 using StdIStreamWrapperTest = ::testing::Test;
