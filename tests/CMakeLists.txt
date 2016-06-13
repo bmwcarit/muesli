@@ -46,6 +46,7 @@ AddTest(
     TestUtil.h
     TestUtilTest.cpp
     TraitsTest.cpp
+    IncrementalTypeListTest.cpp
 )
 
 target_link_libraries(
