@@ -22,6 +22,8 @@
 
 #include <gmock/gmock.h>
 
+#include "muesli/StreamRegistry.h"
+
 // implements OutputStream concept
 class MockOutputStream
 {
@@ -32,6 +34,8 @@ public:
     MOCK_METHOD0(flush, void());
 };
 
+MUESLI_REGISTER_OUTPUT_STREAM(MockOutputStream);
+
 // implements InputStream concept
 class MockInputStream
 {
@@ -40,5 +44,7 @@ public:
     MOCK_METHOD0(get, char());
     MOCK_METHOD2(get, void(char* s, std::size_t size));
 };
+
+MUESLI_REGISTER_INPUT_STREAM(MockInputStream);
 
 #endif // MUESLI_TESTS_MOCKSTREAM_H_
