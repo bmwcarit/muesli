@@ -16,8 +16,8 @@
  * limitations under the License.
  * #L%
  */
-#ifndef MUESLI_JSONINPUTARCHIVE_H_
-#define MUESLI_JSONINPUTARCHIVE_H_
+#ifndef MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_
+#define MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_
 
 #include <cstdint>
 #include <istream>
@@ -93,14 +93,15 @@ public:
         stringValue = getNextValue()->GetString();
     }
 
-    void pushNode() {
-        if(!nextKey.empty())
-        {
+    void pushNode()
+    {
+        if (!nextKey.empty()) {
             stack.push(getNextValue());
         }
     }
 
-    void popNode() {
+    void popNode()
+    {
         stack.pop();
     }
 
@@ -108,7 +109,7 @@ private:
     rapidjson::Value* getNextValue() const
     {
         return &(stack.top()->operator[](nextKey));
-        //return document->operator[](nextKey);
+        // return document->operator[](nextKey);
     }
 
     std::stack<rapidjson::Value*> stack;
@@ -193,4 +194,4 @@ void load(JsonInputArchive& archive, Enum& value)
 
 } // namespace muesli
 
-#endif // MUESLI_JSONINPUTARCHIVE_H_
+#endif // MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_

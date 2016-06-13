@@ -16,8 +16,8 @@
  * limitations under the License.
  * #L%
  */
-#ifndef JSON_OUTPUT_ARCHIVE_H
-#define JSON_OUTPUT_ARCHIVE_H
+#ifndef MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
+#define MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
 
 #include <cstdint>
 #include <ostream>
@@ -190,4 +190,4 @@ void save(JsonOutputArchive& archive, Enum value)
 
 } // namespace muesli
 
-#endif // JSON_OUTPUT_ARCHIVE_H
+#endif // MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_

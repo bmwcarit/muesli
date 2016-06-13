@@ -28,8 +28,8 @@
 #include "testtypes/TEnum.h"
 
 #include <muesli/BaseArchive.h>
-#include <muesli/JsonInputArchive.h>
-#include <muesli/JsonOutputArchive.h>
+#include <muesli/archives/json/JsonInputArchive.h>
+#include <muesli/archives/json/JsonOutputArchive.h>
 
 class JsonArchiveTest : public ::testing::Test
 {
