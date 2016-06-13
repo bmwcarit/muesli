@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_STDOSTREAMWRAPPER_H
-#define MUESLI_STDOSTREAMWRAPPER_H
+#ifndef MUESLI_STDOSTREAMWRAPPER_H_
+#define MUESLI_STDOSTREAMWRAPPER_H_
 
 #include <iosfwd>
 
@@ -68,4 +68,4 @@ private:
 // register the common std::ostream case
 MUESLI_REGISTER_OUTPUT_STREAM(muesli::StdOStreamWrapper<std::ostream>);
 
-#endif // MUESLI_STDOSTREAMWRAPPER_H
+#endif // MUESLI_STDOSTREAMWRAPPER_H_

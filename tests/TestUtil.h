@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_TESTS_TESTUTIL_H
-#define MUESLI_TESTS_TESTUTIL_H
+#ifndef MUESLI_TESTS_TESTUTIL_H_
+#define MUESLI_TESTS_TESTUTIL_H_
 
 namespace muesli
 {
@@ -32,4 +32,4 @@ constexpr bool stringEqual(const char* lhs, const char* rhs)
 }
 } // namespace test_util
 } // namespace muesli
-#endif // MUESLI_TESTS_TESTUTIL_H
+#endif // MUESLI_TESTS_TESTUTIL_H_

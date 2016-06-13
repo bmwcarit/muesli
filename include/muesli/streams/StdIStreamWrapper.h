@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_STDISTREAMWRAPPER_H
-#define MUESLI_STDISTREAMWRAPPER_H
+#ifndef MUESLI_STDISTREAMWRAPPER_H_
+#define MUESLI_STDISTREAMWRAPPER_H_
 
 #include <iosfwd>
 
@@ -76,4 +76,4 @@ private:
 
 MUESLI_REGISTER_INPUT_STREAM(muesli::StdIStreamWrapper<std::istream>);
 
-#endif // MUESLI_STDISTREAMWRAPPER_H
+#endif // MUESLI_STDISTREAMWRAPPER_H_
