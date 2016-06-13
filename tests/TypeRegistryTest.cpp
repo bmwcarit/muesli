@@ -20,31 +20,14 @@
 #include <gtest/gtest.h>
 #include <boost/mpl/vector.hpp>
 
-#include <muesli/ArchiveRegistry.h>
+#include "MockArchive.h"
+#include "MockStream.h"
+
+#include "muesli/TypeRegistry.h"
 
 #include "TestUtil.h"
-#include "MockArchive.h"
 
 using namespace testing;
-
-struct RegisterMockArchive
-{
-    using OutputArchive = MockOutputArchive;
-    using InputArchive = MockInputArchive;
-};
-
-namespace muesli
-{
-template <>
-struct ExtensibleTypeSequence<RegisteredArchives>
-{
-    // for this test, ignore all registered archives in favor of the mock archives
-    using type = boost::mpl::vector<RegisterMockArchive>;
-};
-} // namespace muesli
-
-// has to be included AFTER modifying RegisteredArchives
-#include <muesli/TypeRegistry.h>
 
 struct NonPolymorphicType
 {
@@ -55,8 +38,7 @@ MUESLI_REGISTER_TYPE(NonPolymorphicType, "NonPolymorphicType")
 TEST(TypeRegistryTest, RegisteredNameIsCorrectForNonPolymorphicType)
 {
     static_assert(muesli::test_util::stringEqual(
-                          "NonPolymorphicType",
-                          muesli::detail::RegisteredType<NonPolymorphicType>::name()),
+                          "NonPolymorphicType", muesli::RegisteredType<NonPolymorphicType>::name()),
                   "typenames must match");
 }
 
@@ -94,12 +76,15 @@ MUESLI_REGISTER_TYPE(PolymorphicBase, "PolymorphicBase")
 MUESLI_REGISTER_POLYMORPHIC_TYPE(PolymorphicDerived1, PolymorphicBase, "PolymorphicDerived1")
 MUESLI_REGISTER_POLYMORPHIC_TYPE(PolymorphicDerived2, PolymorphicBase, "PolymorphicDerived2")
 
+using MockOutputArchiveImpl = MockOutputArchive<MockOutputStream>;
+using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
+
 TEST(TypeRegistryTest, RegisteredNameIsCorrectForPolymorphicType)
 {
-    static_assert(muesli::test_util::stringEqual(
-                          "PolymorphicDerived1",
-                          muesli::detail::RegisteredType<PolymorphicDerived1>::name()),
-                  "typenames must match");
+    static_assert(
+            muesli::test_util::stringEqual(
+                    "PolymorphicDerived1", muesli::RegisteredType<PolymorphicDerived1>::name()),
+            "typenames must match");
 }
 
 TEST(TypeRegistryTest, PolymorphicTypeInputRegistry)
@@ -107,7 +92,7 @@ TEST(TypeRegistryTest, PolymorphicTypeInputRegistry)
     auto& inputRegistry = muesli::TypeRegistry<PolymorphicBase>::getInputRegistry();
     ASSERT_EQ(2, inputRegistry.size());
 
-    MockInputArchive inputArchive;
+    MockInputArchiveImpl inputArchive;
 
     auto derived1Fun = inputRegistry.find("PolymorphicDerived1");
     ASSERT_NE(inputRegistry.cend(), derived1Fun);
@@ -127,7 +112,7 @@ TEST(TypeRegistryTest, PolymorphicTypeOutputRegistry)
     auto& outputRegistry = muesli::TypeRegistry<PolymorphicBase>::getOutputRegistry();
     ASSERT_EQ(2, outputRegistry.size());
 
-    MockOutputArchive outputArchive;
+    MockOutputArchiveImpl outputArchive;
     std::unique_ptr<PolymorphicBase> derived1 = std::make_unique<PolymorphicDerived1>();
     auto derived1Fun = outputRegistry.find(typeid(*derived1));
     ASSERT_NE(outputRegistry.cend(), derived1Fun);

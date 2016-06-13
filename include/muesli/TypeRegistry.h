@@ -27,38 +27,60 @@
 #include <type_traits>
 
 #include <boost/variant.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/identity.hpp>
 #include <boost/mpl/transform.hpp>
 
-#include <muesli/ArchiveRegistry.h>
+#include "muesli/detail/FlattenMplSequence.h"
+#include "muesli/detail/IncrementalTypeList.h"
+#include "muesli/Tags.h"
+
+#include "muesli/TypeRegistryFwd.h"
 
 namespace muesli
 {
 namespace detail
 {
 
-template <typename RegisteredArchive>
-struct ExtractInputArchive
+template <typename Stream, typename RegisteredArchive>
+struct ApplyStream
 {
-    using type = typename RegisteredArchive::InputArchive;
+    // get actual Archive template out of TemplateHolder
+    // instantiate the combination of Archive template and concrete Stream implementation
+    using type = typename RegisteredArchive::template type<Stream>;
 };
 
-template <typename RegisteredArchive>
-struct ExtractOutputArchive
+template <typename RegisteredArchive, typename RegisteredStreams>
+struct CartesianStreamProduct
 {
-    using type = typename RegisteredArchive::OutputArchive;
+    // iterate over registered streams
+    using type =
+            typename boost::mpl::transform<RegisteredStreams,
+                                           ApplyStream<boost::mpl::_1, RegisteredArchive>>::type;
 };
 
-template <template <typename> class Extractor,
-          template <typename> class Postprocess = boost::mpl::identity>
-using MakeArchiveVariant = typename boost::make_variant_over<
-        typename boost::mpl::transform<ExtensibleTypeSequence<RegisteredArchives>::type,
-                                       Postprocess<Extractor<boost::mpl::_1>>>::type>::type;
+// iterate over registered archives
+template <typename RegisteredArchives, typename RegisteredStreams>
+using CartesianStreamArchiveProduct = typename boost::mpl::transform<
+        RegisteredArchives,
+        CartesianStreamProduct<boost::mpl::_1, RegisteredStreams>>::type;
 
-using OutputArchiveVariant = MakeArchiveVariant<ExtractOutputArchive, std::add_lvalue_reference>;
-using InputArchiveVariant = MakeArchiveVariant<ExtractInputArchive, std::add_lvalue_reference>;
+// flatten nested type lists
+template <typename RegisteredArchives, typename RegisteredStreams>
+using FlatCartesianStreamArchiveProduct = typename FlattenMplSequence<
+        typename CartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>::type>::type;
 
+template <typename RegisteredArchives, typename RegisteredStreams>
+using MakeArchiveVariant = typename boost::make_variant_over<typename boost::mpl::transform<
+        FlatCartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>,
+        std::add_lvalue_reference<boost::mpl::_1>>::type>::type;
+
+using RegisteredOutputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputStream);
+using RegisteredInputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputStream);
+
+using RegisteredOutputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputArchive);
+using RegisteredInputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputArchive);
+
+using OutputArchiveVariant = MakeArchiveVariant<RegisteredOutputArchives, RegisteredOutputStreams>;
+using InputArchiveVariant = MakeArchiveVariant<RegisteredInputArchives, RegisteredInputStreams>;
 } // namespace detail
 
 template <typename Base>
@@ -99,9 +121,6 @@ public:
 namespace detail
 {
 
-template <typename T>
-struct RegisteredType;
-
 template <typename Base, typename T>
 struct RegisteredPolymorphicType;
 
@@ -114,7 +133,7 @@ struct RegisteredPolymorphicTypeInstance
 template <typename Base, typename T>
 const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeInstance<
         Base,
-        T>::instance(RegisteredType<T>::name(),
+        T>::instance(muesli::RegisteredType<T>::name(),
                      typeid(T),
                      [](InputArchiveVariant archive) {
                          auto value = std::make_unique<T>();
@@ -132,8 +151,6 @@ const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeI
 #define MUESLI_REGISTER_TYPE(T, Name)                                                              \
     namespace muesli                                                                               \
     {                                                                                              \
-    namespace detail                                                                               \
-    {                                                                                              \
     template <>                                                                                    \
     struct RegisteredType<T>                                                                       \
     {                                                                                              \
@@ -142,7 +159,6 @@ const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeI
             return Name;                                                                           \
         }                                                                                          \
     };                                                                                             \
-    } /* namespace detail */                                                                       \
     } /* namespace muesli */
 
 #define MUESLI_REGISTER_POLYMORPHIC_TYPE(T, Base, Name)                                            \

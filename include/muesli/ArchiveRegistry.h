@@ -20,38 +20,38 @@
 #ifndef MUESLI_ARCHIVEREGISTRY_H_
 #define MUESLI_ARCHIVEREGISTRY_H_
 
+#include "muesli/detail/IncrementalTypeList.h"
+#include "muesli/Tags.h"
+
 namespace muesli
 {
-
-/** this type sequence can be extended/modified through specialization:
- *  @code
- *  #include <boost/mpl/joint_view.hpp>
- *
- *  template<>
- *  struct ExtensibleTypeSequence<MyTypeList>
- *  {
- *      using AdditionalTypes = boost::mpl::vector<Foo, Bar>;
- *      using type = boost::mpl::joint_view<AdditionalTypes, MyTypeList::type>;
- *  };
- *  @endcode
- */
-template <typename Sequence>
-struct ExtensibleTypeSequence
+namespace detail
 {
-    using type = Sequence;
-};
-
-class JsonOutputArchive;
-class JsonInputArchive;
-
-struct RegisterJsonArchive
-{
-    using OutputArchive = JsonOutputArchive;
-    using InputArchive = JsonInputArchive;
-};
-
-using RegisteredArchives = boost::mpl::vector<RegisterJsonArchive>;
-
+// wrapper which holds a template as its `type`
+template <template <typename...> class T>
+struct TemplateHolder;
+} // namespace detail
 } // namespace muesli
+
+#define MUESLI_REGISTER_ARCHIVE(Tag, Archive)                                                      \
+    namespace muesli                                                                               \
+    {                                                                                              \
+    namespace detail                                                                               \
+    {                                                                                              \
+    template <>                                                                                    \
+    struct TemplateHolder<Archive>                                                                 \
+    {                                                                                              \
+        template <typename T>                                                                      \
+        using type = Archive<T>;                                                                   \
+    };                                                                                             \
+    } /*namespace detail */                                                                        \
+    } /*namespace muesli */                                                                        \
+    MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag, muesli::detail::TemplateHolder<Archive>)
+
+#define MUESLI_REGISTER_INPUT_ARCHIVE(Archive)                                                     \
+    MUESLI_REGISTER_ARCHIVE(muesli::tags::InputArchive, Archive)
+
+#define MUESLI_REGISTER_OUTPUT_ARCHIVE(Archive)                                                    \
+    MUESLI_REGISTER_ARCHIVE(muesli::tags::OutputArchive, Archive)
 
 #endif // MUESLI_ARCHIVEREGISTRY_H_
