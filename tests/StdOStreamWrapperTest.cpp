@@ -25,7 +25,7 @@
 #include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
 
-#include <muesli/concepts/OutputStream.h>
+#include "muesli/concepts/OutputStream.h"
 #include "muesli/streams/StdOStreamWrapper.h"
 
 template <typename Stream>
@@ -35,13 +35,13 @@ using StdOStreamTypes = ::testing::Types<std::ofstream, std::stringstream, std::
 
 TYPED_TEST_CASE(StdOStreamWrapperTest, StdOStreamTypes);
 
-TYPED_TEST(StdOStreamWrapperTest, ConceptCheck)
+TYPED_TEST(StdOStreamWrapperTest, conceptCheck)
 {
     using WrappedStream = muesli::StdOStreamWrapper<TypeParam>;
     BOOST_CONCEPT_ASSERT((muesli::concepts::OutputStream<WrappedStream>));
 }
 
-TEST(StdOStreamWrapperTest, WriteCharacterWiseToStringStreamThroughWrapper)
+TEST(StdOStreamWrapperTest, writeCharacterWiseToStringStreamThroughWrapper)
 {
     using WrappedOStream = muesli::StdOStreamWrapper<std::stringstream>;
     const std::string expectedStr = "TEST";
@@ -53,7 +53,7 @@ TEST(StdOStreamWrapperTest, WriteCharacterWiseToStringStreamThroughWrapper)
     EXPECT_EQ(expectedStr, stream.str());
 }
 
-TEST(StdOStreamWrapperTest, WriteMultipleCharactersToStringStreamThroughWrapper)
+TEST(StdOStreamWrapperTest, writeMultipleCharactersToStringStreamThroughWrapper)
 {
     using WrappedOStream = muesli::StdOStreamWrapper<std::stringstream>;
     const std::string expectedStr = "TEST";

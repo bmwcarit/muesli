@@ -60,9 +60,9 @@ class MockClassWithFriendSerializeFunction
 public:
     friend void serialize<>(Archive&, MockClassWithFriendSerializeFunction&);
 
-    FRIEND_TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction);
-    FRIEND_TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction);
-    FRIEND_TEST(BaseArchiveTest, SerializingBaseClassCallsSerializeOfBaseClass);
+    FRIEND_TEST(BaseArchiveTest, saveClassWithFriendSerializeFunction);
+    FRIEND_TEST(BaseArchiveTest, loadClassWithFriendSerializeFunction);
+    FRIEND_TEST(BaseArchiveTest, serializingBaseClassCallsSerializeOfBaseClass);
 
 private:
     MOCK_METHOD1_T(serializeCalled, void(Archive&));
@@ -105,8 +105,8 @@ public:
     friend void load<>(Archive&, MockClassWithFriendLoadSaveFunction&);
     friend void save<>(Archive&, MockClassWithFriendLoadSaveFunction&);
 
-    FRIEND_TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction);
-    FRIEND_TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction);
+    FRIEND_TEST(BaseArchiveTest, saveClassWithFriendLoadSaveFunction);
+    FRIEND_TEST(BaseArchiveTest, loadClassWithFriendLoadSaveFunction);
 
 private:
     MOCK_METHOD1_T(loadCalled, void(Archive&));
@@ -116,7 +116,7 @@ private:
 using MockOutputArchiveImpl = MockOutputArchive<MockOutputStream>;
 using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
 
-TEST(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
+TEST(BaseArchiveTest, saveClassWithSerializeMemberFunction)
 {
     MockOutputArchiveImpl outputArchive;
     MockClassWithSerializeMemberFunction<MockOutputArchiveImpl> data;
@@ -124,7 +124,7 @@ TEST(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
     outputArchive(data);
 }
 
-TEST(BaseArchiveTest, LoadClassWithSerializeMemberFunction)
+TEST(BaseArchiveTest, loadClassWithSerializeMemberFunction)
 {
     MockInputArchiveImpl inputArchive;
     MockClassWithSerializeMemberFunction<MockInputArchiveImpl> data;
@@ -132,7 +132,7 @@ TEST(BaseArchiveTest, LoadClassWithSerializeMemberFunction)
     inputArchive(data);
 }
 
-TEST(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
+TEST(BaseArchiveTest, saveClassWithWithLoadSaveMemberFunction)
 {
     MockOutputArchiveImpl outputArchive;
     MockClassWithLoadSaveMemberFunction<MockOutputArchiveImpl> data;
@@ -141,7 +141,7 @@ TEST(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
     outputArchive(data);
 }
 
-TEST(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
+TEST(BaseArchiveTest, loadClassWithWithLoadSaveMemberFunction)
 {
     MockInputArchiveImpl inputArchive;
     MockClassWithLoadSaveMemberFunction<MockInputArchiveImpl> data;
@@ -150,7 +150,7 @@ TEST(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
     inputArchive(data);
 }
 
-TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction)
+TEST(BaseArchiveTest, saveClassWithFriendSerializeFunction)
 {
     MockOutputArchiveImpl outputArchive;
     MockClassWithFriendSerializeFunction<MockOutputArchiveImpl> data;
@@ -158,7 +158,7 @@ TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction)
     outputArchive(data);
 }
 
-TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction)
+TEST(BaseArchiveTest, loadClassWithFriendSerializeFunction)
 {
     MockInputArchiveImpl inputArchive;
     MockClassWithFriendSerializeFunction<MockInputArchiveImpl> data;
@@ -166,7 +166,7 @@ TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction)
     inputArchive(data);
 }
 
-TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
+TEST(BaseArchiveTest, saveClassWithFriendLoadSaveFunction)
 {
     MockOutputArchiveImpl outputArchive;
     MockClassWithFriendLoadSaveFunction<MockOutputArchiveImpl> data;
@@ -175,7 +175,7 @@ TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
     outputArchive(data);
 }
 
-TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
+TEST(BaseArchiveTest, loadClassWithFriendLoadSaveFunction)
 {
     MockInputArchiveImpl inputArchive;
     MockClassWithFriendLoadSaveFunction<MockInputArchiveImpl> data;
@@ -184,7 +184,7 @@ TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
     inputArchive(data);
 }
 
-TEST(BaseArchiveTest, SerializingBaseClassCallsSerializeOfBaseClass)
+TEST(BaseArchiveTest, serializingBaseClassCallsSerializeOfBaseClass)
 {
     MockInputArchiveImpl inputArchive;
     DerivedMockClassWithFriendSerializeFunction<MockInputArchiveImpl> derived;

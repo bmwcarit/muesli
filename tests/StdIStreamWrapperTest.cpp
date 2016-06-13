@@ -34,13 +34,13 @@ using StdIStreamWrapperTest = ::testing::Test;
 using StdIStreamTypes = ::testing::Types<std::ifstream, std::stringstream, std::istringstream>;
 TYPED_TEST_CASE(StdIStreamWrapperTest, StdIStreamTypes);
 
-TYPED_TEST(StdIStreamWrapperTest, ConceptCheck)
+TYPED_TEST(StdIStreamWrapperTest, conceptCheck)
 {
     using WrappedIStream = muesli::StdIStreamWrapper<TypeParam>;
     BOOST_CONCEPT_ASSERT((muesli::concepts::InputStream<WrappedIStream>));
 }
 
-TEST(StdIStreamWrapperTest, ReadCharacterWiseFromStringStreamThroughWrapper)
+TEST(StdIStreamWrapperTest, readCharacterWiseFromStringStreamThroughWrapper)
 {
     using WrappedIStream = muesli::StdIStreamWrapper<std::stringstream>;
     const std::string expectedStr = "TEST";
@@ -51,7 +51,7 @@ TEST(StdIStreamWrapperTest, ReadCharacterWiseFromStringStreamThroughWrapper)
     }
 }
 
-TEST(StdIStreamWrapperTest, ReadMultipleCharactersFromStringStreamThroughWrapper)
+TEST(StdIStreamWrapperTest, readMultipleCharactersFromStringStreamThroughWrapper)
 {
     using WrappedIStream = muesli::StdIStreamWrapper<std::stringstream>;
     const std::string expectedStr = "TEST";

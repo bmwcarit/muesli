@@ -35,7 +35,7 @@ struct NonPolymorphicType
 
 MUESLI_REGISTER_TYPE(NonPolymorphicType, "NonPolymorphicType")
 
-TEST(TypeRegistryTest, RegisteredNameIsCorrectForNonPolymorphicType)
+TEST(TypeRegistryTest, registeredNameIsCorrectForNonPolymorphicType)
 {
     static_assert(muesli::test_util::stringEqual(
                           "NonPolymorphicType", muesli::RegisteredType<NonPolymorphicType>::name()),
@@ -79,7 +79,7 @@ MUESLI_REGISTER_POLYMORPHIC_TYPE(PolymorphicDerived2, PolymorphicBase, "Polymorp
 using MockOutputArchiveImpl = MockOutputArchive<MockOutputStream>;
 using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
 
-TEST(TypeRegistryTest, RegisteredNameIsCorrectForPolymorphicType)
+TEST(TypeRegistryTest, registeredNameIsCorrectForPolymorphicType)
 {
     static_assert(
             muesli::test_util::stringEqual(
@@ -87,7 +87,7 @@ TEST(TypeRegistryTest, RegisteredNameIsCorrectForPolymorphicType)
             "typenames must match");
 }
 
-TEST(TypeRegistryTest, PolymorphicTypeInputRegistry)
+TEST(TypeRegistryTest, polymorphicTypeInputRegistry)
 {
     auto& inputRegistry = muesli::TypeRegistry<PolymorphicBase>::getInputRegistry();
     ASSERT_EQ(2, inputRegistry.size());
@@ -107,7 +107,7 @@ TEST(TypeRegistryTest, PolymorphicTypeInputRegistry)
     EXPECT_EQ(typeid(PolymorphicDerived2), typeid(*p2));
 }
 
-TEST(TypeRegistryTest, PolymorphicTypeOutputRegistry)
+TEST(TypeRegistryTest, polymorphicTypeOutputRegistry)
 {
     auto& outputRegistry = muesli::TypeRegistry<PolymorphicBase>::getOutputRegistry();
     ASSERT_EQ(2, outputRegistry.size());

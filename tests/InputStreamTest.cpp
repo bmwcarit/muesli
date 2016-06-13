@@ -24,7 +24,7 @@
 #include <muesli/concepts/InputStream.h>
 #include "MockStream.h"
 
-TEST(InputStreamTest, ConceptCheck)
+TEST(InputStreamTest, conceptCheck)
 {
     BOOST_CONCEPT_ASSERT((muesli::concepts::InputStream<MockInputStream>));
 }
