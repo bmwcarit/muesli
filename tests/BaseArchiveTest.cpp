@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <muesli/BaseArchive.h>
+#include "muesli/BaseArchive.h"
 
 #include "MockArchive.h"
 #include "MockStream.h"

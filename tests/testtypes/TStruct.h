@@ -42,8 +42,8 @@
 #include <vector>
 #include <typeinfo>
 
-#include <muesli/TypeRegistry.h>
-#include <muesli/NameValuePair.h>
+#include "muesli/TypeRegistry.h"
+#include "muesli/NameValuePair.h"
 
 // include complex Datatype headers.
 

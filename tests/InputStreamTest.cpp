@@ -21,7 +21,7 @@
 #include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
 
-#include <muesli/concepts/InputStream.h>
+#include "muesli/concepts/InputStream.h"
 #include "MockStream.h"
 
 TEST(InputStreamTest, conceptCheck)

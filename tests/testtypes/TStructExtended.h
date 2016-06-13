@@ -26,8 +26,8 @@
 #include <vector>
 #include <typeinfo>
 
-#include <muesli/BaseClass.h>
-#include <muesli/TypeRegistry.h>
+#include "muesli/BaseClass.h"
+#include "muesli/TypeRegistry.h"
 
 // include complex Datatype headers.
 #include "testtypes/TStruct.h"

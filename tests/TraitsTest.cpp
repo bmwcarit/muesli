@@ -21,7 +21,7 @@
 
 #include <gtest/gtest.h>
 
-#include <muesli/Traits.h>
+#include "muesli/Traits.h"
 
 TEST(TraitsTest, StaticAsserts)
 {

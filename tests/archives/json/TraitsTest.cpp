@@ -23,7 +23,7 @@
 
 #include <gtest/gtest.h>
 
-#include <muesli/archives/json/detail/traits.h>
+#include "muesli/archives/json/detail/traits.h"
 
 class SomeClass
 {

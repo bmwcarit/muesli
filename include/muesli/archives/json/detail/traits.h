@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include <muesli/Traits.h>
+#include "muesli/Traits.h"
 
 namespace muesli
 {
