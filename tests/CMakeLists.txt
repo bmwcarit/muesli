@@ -47,6 +47,7 @@ AddTest(
     TestUtilTest.cpp
     TraitsTest.cpp
     IncrementalTypeListTest.cpp
+    MockStream.h
 )
 
 target_link_libraries(

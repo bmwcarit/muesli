@@ -22,15 +22,7 @@
 #include <boost/concept_check.hpp>
 
 #include <muesli/concepts/InputStream.h>
-
-// implements InputStream concept
-class MockInputStream
-{
-public:
-    using Char = char;
-    MOCK_METHOD0(get, char());
-    MOCK_METHOD2(get, void(char* s, std::size_t size));
-};
+#include "MockStream.h"
 
 TEST(InputStreamTest, ConceptCheck)
 {

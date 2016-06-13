@@ -17,13 +17,28 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
-#include <boost/concept_check.hpp>
+#ifndef MUESLI_TESTS_MOCKSTREAM_H_
+#define MUESLI_TESTS_MOCKSTREAM_H_
 
-#include "muesli/concepts/OutputStream.h"
-#include "MockStream.h"
+#include <gmock/gmock.h>
 
-TEST(OutputStreamTest, ConceptCheck)
+// implements OutputStream concept
+class MockOutputStream
 {
-    BOOST_CONCEPT_ASSERT((muesli::concepts::OutputStream<MockOutputStream>));
-}
+public:
+    using Char = char;
+    MOCK_METHOD1(put, void(char c));
+    MOCK_METHOD2(write, void(const char* s, std::size_t size));
+    MOCK_METHOD0(flush, void());
+};
+
+// implements InputStream concept
+class MockInputStream
+{
+public:
+    using Char = char;
+    MOCK_METHOD0(get, char());
+    MOCK_METHOD2(get, void(char* s, std::size_t size));
+};
+
+#endif // MUESLI_TESTS_MOCKSTREAM_H_
