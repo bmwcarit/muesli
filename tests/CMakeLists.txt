@@ -37,11 +37,8 @@ AddTest(
     archives/json/TraitsTest.cpp
     TypeRegistryTest.cpp
     testtypes/TStruct.h
-    testtypes/TStruct.cpp
     testtypes/TStructExtended.h
-    testtypes/TStructExtended.cpp
     testtypes/TEnum.h
-    testtypes/TEnum.cpp
     MockArchive.h
     TestUtil.h
     TestUtilTest.cpp

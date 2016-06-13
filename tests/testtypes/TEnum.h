@@ -59,12 +59,12 @@ struct TEnum
      * @brief MAJOR_VERSION The major version of this struct as specified in the
      * type collection or interface in the Franca model.
      */
-    static const std::uint32_t MAJOR_VERSION;
+    static const std::uint32_t MAJOR_VERSION = 49;
     /**
      * @brief MINOR_VERSION The minor version of this struct as specified in the
      * type collection or interface in the Franca model.
      */
-    static const std::uint32_t MINOR_VERSION;
+    static const std::uint32_t MINOR_VERSION = 13;
 
     /** @brief Constructor */
     TEnum() = delete;
@@ -80,21 +80,51 @@ struct TEnum
      * @param tEnumValue The ordinal number
      * @return The string representing the enum for the given ordinal number
      */
-    static std::string getLiteral(const TEnum::Enum& tEnumValue);
+    static std::string getLiteral(const TEnum::Enum& tEnumValue)
+    {
+        std::string literal;
+        switch (tEnumValue) {
+        case TLITERALA:
+            literal = std::string("TLITERALA");
+            break;
+        case TLITERALB:
+            literal = std::string("TLITERALB");
+            break;
+        }
+        if (literal.empty()) {
+            throw std::invalid_argument("TEnum: No literal found for value \"" +
+                                        std::to_string(tEnumValue) + "\"");
+        }
+        return literal;
+    }
 
     /**
      * @brief Get the matching enum for a string
      * @param tEnumString The string representing the enum value
      * @return The enum value representing the string
      */
-    static TEnum::Enum getEnum(const std::string& tEnumString);
+    static TEnum::Enum getEnum(const std::string& tEnumString)
+    {
+        if (tEnumString == std::string("TLITERALA")) {
+            return TLITERALA;
+        }
+        if (tEnumString == std::string("TLITERALB")) {
+            return TLITERALB;
+        }
+        std::stringstream errorMessage(tEnumString);
+        errorMessage << " is unknown literal for TEnum";
+        throw std::invalid_argument(errorMessage.str());
+    }
 
     /**
      * @brief Get the matching ordinal number for an enum
      * @param tEnumValue The enum
      * @return The ordinal number representing the enum
      */
-    static std::uint32_t getOrdinal(TEnum::Enum tEnumValue);
+    static std::uint32_t getOrdinal(TEnum::Enum tEnumValue)
+    {
+        return static_cast<std::uint32_t>(tEnumValue);
+    }
 
     /**
      * @brief Get the typeName of the enumeration type
@@ -109,7 +139,11 @@ struct TEnum
  * @param messagingQos The current object instance
  * @param os The output stream to send the output to
  */
-void PrintTo(const muesli::tests::testtypes::TEnum::Enum& tEnumValue, ::std::ostream* os);
+inline void PrintTo(const muesli::tests::testtypes::TEnum::Enum& tEnumValue, ::std::ostream* os)
+{
+    *os << "TEnum::" << TEnum::getLiteral(tEnumValue) << " (" << TEnum::getOrdinal(tEnumValue)
+        << ")";
+}
 
 } // namespace testtypes
 } // namespace tests
@@ -126,30 +160,5 @@ struct EnumTraits<muesli::tests::testtypes::TEnum::Enum>
 };
 
 } // namespace muesli
-
-namespace std
-{
-
-/**
- * @brief Function object that implements a hash function for joynr::types::testtypes::TEnum.
- *
- * Used by the unordered associative containers std::unordered_set, std::unordered_multiset,
- * std::unordered_map, std::unordered_multimap as default hash function.
- */
-template <>
-struct hash<muesli::tests::testtypes::TEnum::Enum>
-{
-
-    /**
-     * @brief method overriding default implementation of operator ()
-     * @param tEnumValue the operators argument
-     * @return the ordinal number representing the enum value
-     */
-    std::size_t operator()(const muesli::tests::testtypes::TEnum::Enum& tEnumValue) const
-    {
-        return muesli::tests::testtypes::TEnum::getOrdinal(tEnumValue);
-    }
-};
-} // namespace std
 
 #endif // MUESLI_TESTS_TESTTYPES_TENUM_H

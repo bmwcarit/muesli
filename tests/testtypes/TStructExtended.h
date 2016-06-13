@@ -51,18 +51,20 @@ public:
      * @brief MAJOR_VERSION The major version of this struct as specified in the
      * type collection or interface in the Franca model.
      */
-    static const std::uint32_t MAJOR_VERSION;
+    static const std::uint32_t MAJOR_VERSION = 49;
     /**
      * @brief MINOR_VERSION The minor version of this struct as specified in the
      * type collection or interface in the Franca model.
      */
-    static const std::uint32_t MINOR_VERSION;
+    static const std::uint32_t MINOR_VERSION = 13;
 
     // general methods
 
     // default constructor
     /** @brief Constructor */
-    TStructExtended();
+    TStructExtended() : TStruct(), tEnum(/* should have enum default value here */), tInt32(-1)
+    {
+    }
 
     // constructor setting all fields
     /**
@@ -72,7 +74,10 @@ public:
                              const std::int64_t& tInt64,
                              const std::string& tString,
                              const muesli::tests::testtypes::TEnum::Enum& tEnum,
-                             const std::int32_t& tInt32);
+                             const std::int32_t& tInt32)
+            : TStruct(tDouble, tInt64, tString), tEnum(tEnum), tInt32(tInt32)
+    {
+    }
 
     /** @brief Copy constructor */
     TStructExtended(const TStructExtended&) = default;
@@ -87,13 +92,18 @@ public:
      * @brief Stringifies the class
      * @return stringified class content
      */
-    std::string toString() const override;
-
-    /**
-     * @brief Returns a hash code value for this object
-     * @return a hash code value for this object.
-     */
-    std::size_t hashCode() const override;
+    std::string toString() const
+    {
+        std::ostringstream typeAsString;
+        typeAsString << "TStructExtended{";
+        typeAsString << muesli::tests::testtypes::TStruct::toString();
+        typeAsString << ", ";
+        typeAsString << "tEnum:" + getTEnumInternal();
+        typeAsString << ", ";
+        typeAsString << "tInt32:" + std::to_string(getTInt32());
+        typeAsString << "}";
+        return typeAsString.str();
+    }
 
     /**
      * @brief assigns an object
@@ -106,11 +116,6 @@ public:
      * @return reference to the object assigned to
      */
     TStructExtended& operator=(TStructExtended&&) = default;
-
-    /**
-     * @return a copy of this object
-     */
-    std::unique_ptr<TStruct> clone() const override;
 
     // getters
     /**
@@ -174,9 +179,19 @@ private:
 
     // members
     muesli::tests::testtypes::TEnum::Enum tEnum;
-    std::string getTEnumInternal() const;
+    std::string getTEnumInternal() const
+    {
+        return muesli::tests::testtypes::TEnum::getLiteral(this->tEnum);
+    }
     std::int32_t tInt32;
 };
+
+// printing TStructExtended with google-test and google-mock
+inline void PrintTo(const TStructExtended& tStructExtended, ::std::ostream* os)
+{
+    *os << "TStructExtended::" << tStructExtended.toString();
+}
+
 // serialize TStructExtended with muesli
 template <typename Archive>
 void serialize(Archive& archive, TStructExtended& tStructExtended)
@@ -194,32 +209,5 @@ std::size_t hash_value(const TStructExtended& tStructExtendedValue);
 
 MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TStructExtended,
                      "muesli.tests.testtypes.TStructExtended")
-
-namespace std
-{
-
-/**
- * @brief Function object that implements a hash function for
- *joynr::types::testtypes::TStructExtended.
- *
- * Used by the unordered associative containers std::unordered_set, std::unordered_multiset,
- * std::unordered_map, std::unordered_multimap as default hash function.
- */
-template <>
-struct hash<muesli::tests::testtypes::TStructExtended>
-{
-
-    /**
-     * @brief method overriding default implementation of operator ()
-     * @param tStructExtendedValue the operators argument
-     * @return the ordinal number representing the enum value
-     */
-    std::size_t operator()(
-            const muesli::tests::testtypes::TStructExtended& tStructExtendedValue) const
-    {
-        return muesli::tests::testtypes::hash_value(tStructExtendedValue);
-    }
-};
-} // namespace std
 
 #endif // MUESLI_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_
