@@ -31,11 +31,7 @@
 #include <muesli/archives/json/JsonInputArchive.h>
 #include <muesli/archives/json/JsonOutputArchive.h>
 
-class JsonArchiveTest : public ::testing::Test
-{
-};
-
-TEST_F(JsonArchiveTest, serializeStruct)
+TEST(JsonArchiveTest, serializeStruct)
 {
     muesli::tests::testtypes::TStruct tStruct(0.123456789, 64, "test string data");
     std::string expectedSerializedStruct(
@@ -57,7 +53,7 @@ TEST_F(JsonArchiveTest, serializeStruct)
     EXPECT_EQ(tStruct, tStructDeserialized);
 }
 
-TEST_F(JsonArchiveTest, serializeStructExtended)
+TEST(JsonArchiveTest, serializeStructExtended)
 {
     muesli::tests::testtypes::TStructExtended tStructExtended(
             0.123456789, 64, "test string data", muesli::tests::testtypes::TEnum::TLITERALB, 32);
@@ -100,7 +96,7 @@ struct TestStruct
 
 MUESLI_REGISTER_TYPE(TestStruct, "TestStruct")
 
-TEST_F(JsonArchiveTest, serializeNestedStruct)
+TEST(JsonArchiveTest, serializeNestedStruct)
 {
     muesli::tests::testtypes::TStruct tStruct(0.123456789, 64, "test string data");
     TestStruct testStruct;
