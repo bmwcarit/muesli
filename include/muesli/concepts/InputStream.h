@@ -21,6 +21,7 @@
 #define MUESLI_CONCEPTS_INPUTSTREAM_H_
 
 #include <boost/concept_check.hpp>
+#include <cstddef>
 
 namespace muesli
 {
@@ -35,16 +36,22 @@ struct InputStream
     BOOST_CONCEPT_USAGE(InputStream)
     {
         // extract single character from stream
-        Char c = stream.get();
+        c = stream.get();
 
         // extract `size` characters from stream
         stream.get(s, size);
+
+        c = stream.peek();
+
+        pos = stream.tell();
     }
 
 private:
     Stream stream;
     Char* s;
+    Char c;
     std::size_t size;
+    std::size_t pos;
 };
 
 } // namespace concepts

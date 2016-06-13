@@ -51,6 +51,20 @@ public:
         stream.get(s, size);
     }
 
+    std::size_t tell() const
+    {
+        return stream.tellg();
+    }
+
+    Char peek() const
+    {
+        typename Stream::int_type res = stream.peek();
+        if (res != Stream::traits_type::eof()) {
+            return static_cast<Char>(res);
+        }
+        return '\0';
+    }
+
     // non-copyable
     StdIStreamWrapper(const StdIStreamWrapper&) = delete;
     StdIStreamWrapper& operator=(const StdIStreamWrapper&) = delete;

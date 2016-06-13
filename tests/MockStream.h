@@ -43,6 +43,8 @@ public:
     using Char = char;
     MOCK_METHOD0(get, char());
     MOCK_METHOD2(get, void(char* s, std::size_t size));
+    MOCK_METHOD0(peek, char());
+    MOCK_METHOD0(tell, std::size_t());
 };
 
 MUESLI_REGISTER_INPUT_STREAM(MockInputStream);
