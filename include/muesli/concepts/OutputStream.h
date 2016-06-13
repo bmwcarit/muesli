@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_INPUTSTREAM_H
-#define MUESLI_INPUTSTREAM_H
+#ifndef MUESLI_CONCEPTS_OUTPUTSTREAM_H_
+#define MUESLI_CONCEPTS_OUTPUTSTREAM_H_
 
 #include <boost/concept_check.hpp>
 
@@ -28,26 +28,30 @@ namespace concepts
 {
 
 template <class Stream>
-struct InputStream
+struct OutputStream
 {
     using Char = typename Stream::Char;
 
-    BOOST_CONCEPT_USAGE(InputStream)
+    BOOST_CONCEPT_USAGE(OutputStream)
     {
-        // extract single character from stream
-        Char c = stream.get();
+        // insert a single character `c` into `stream`
+        stream.put(c);
 
-        // extract `size` characters from stream
-        stream.get(s, size);
+        // insert `size` characters pointed to by `s` into `stream`
+        stream.write(s, size);
+
+        stream.flush();
     }
 
 private:
     Stream stream;
-    Char* s;
+    Char c;
+
+    const Char* s;
     std::size_t size;
 };
 
 } // namespace concepts
 } // namespace muesli
 
-#endif // MUESLI_INPUTSTREAM_H
+#endif // MUESLI_CONCEPTS_OUTPUTSTREAM_H_

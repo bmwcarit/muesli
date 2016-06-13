@@ -25,7 +25,7 @@
 #include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
 
-#include <muesli/OutputStream.h>
+#include <muesli/concepts/OutputStream.h>
 #include <muesli/StdOStreamWrapper.h>
 
 template <typename Stream>

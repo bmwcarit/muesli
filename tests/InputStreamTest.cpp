@@ -21,7 +21,7 @@
 #include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
 
-#include <muesli/InputStream.h>
+#include <muesli/concepts/InputStream.h>
 
 // implements InputStream concept
 class MockInputStream
