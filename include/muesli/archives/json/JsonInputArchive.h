@@ -28,26 +28,30 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/document.h>
 
-#include <muesli/BaseArchive.h>
-#include <muesli/TypeRegistry.h>
-#include <muesli/Traits.h>
-#include <muesli/cereal/NameValuePair.h>
-#include <muesli/archives/json/detail/traits.h>
+#include "muesli/BaseArchive.h"
+#include "muesli/Traits.h"
+#include "muesli/ArchiveRegistry.h"
+#include "muesli/cereal/NameValuePair.h"
+#include "muesli/archives/json/detail/traits.h"
+#include "muesli/concepts/InputStream.h"
+
+#include "detail/RapidJsonInputStreamAdapter.h"
 
 namespace muesli
 {
 
-class JsonInputArchive : public muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive>
+template <typename InputStream>
+class JsonInputArchive
+        : public muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive<InputStream>>
 {
+    using Parent = muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive<InputStream>>;
+
 public:
-    JsonInputArchive(std::istream& iStream)
-            : muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive>(this),
-              inStream(iStream),
-              document(),
-              nextKey()
+    JsonInputArchive(InputStream& stream) : Parent(this), document(), nextKey()
     {
-        rapidjson::IStreamWrapper streamWrapper(iStream);
-        document.ParseStream<0>(streamWrapper);
+        using AdaptedStream = json::detail::RapidJsonInputStreamAdapter<InputStream>;
+        AdaptedStream adaptedStream(stream);
+        document.ParseStream<0>(adaptedStream);
         stack.push(&document);
     }
 
@@ -115,77 +119,84 @@ private:
     std::stack<rapidjson::Value*> stack;
 
 private:
-    rapidjson::IStreamWrapper inStream;
     rapidjson::Document document;
     std::string nextKey;
 };
 
-template <typename T>
-void intro(JsonInputArchive& archive, NameValuePair<T>& nameValuePair)
+template <typename InputStream, typename T>
+void intro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
 }
 
-template <typename T>
-void outro(JsonInputArchive& archive, NameValuePair<T>& nameValuePair)
+template <typename InputStream, typename T>
+void outro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonInputArchive& archive, T& value)
+template <typename InputStream, typename T>
+std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonInputArchive<InputStream>& archive,
+                                                         T& value)
 {
     std::ignore = value;
     archive.pushNode();
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonInputArchive& archive, const T& value)
+template <typename InputStream, typename T>
+std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonInputArchive<InputStream>& archive,
+                                                         const T& value)
 {
     std::ignore = value;
     archive.popNode();
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(JsonInputArchive& archive, T& value)
+template <typename InputStream, typename T>
+std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(JsonInputArchive<InputStream>& archive,
+                                                            T& value)
 {
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive& archive, T& value)
+template <typename InputStream, typename T>
+std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<InputStream>& archive,
+                                                            T& value)
 {
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> intro(JsonInputArchive& archive, T& value)
+template <typename InputStream, typename T>
+std::enable_if_t<json::detail::IsArray<T>::value> intro(JsonInputArchive<InputStream>& archive,
+                                                        T& value)
 {
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonInputArchive& archive, T& value)
+template <typename InputStream, typename T>
+std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonInputArchive<InputStream>& archive,
+                                                        T& value)
 {
     std::ignore = value;
 }
 
-template <typename T>
-void serialize(JsonInputArchive& archive, NameValuePair<T>& nameValuePair)
+template <typename InputStream, typename T>
+void serialize(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
     archive.setNextKey(nameValuePair.name);
     archive(nameValuePair.value);
 }
 
-template <typename T>
+template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> serialize(
-        JsonInputArchive& archive,
+        JsonInputArchive<InputStream>& archive,
         T& value)
 {
     archive.readValue(value);
 }
 
 // generic de-serialization for enum types having a wrapper class
-template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
-void load(JsonInputArchive& archive, Enum& value)
+template <typename InputStream,
+          typename Enum,
+          typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+void load(JsonInputArchive<InputStream>& archive, Enum& value)
 {
     std::string enumStringValue;
     archive.readValue(enumStringValue);
@@ -193,5 +204,7 @@ void load(JsonInputArchive& archive, Enum& value)
 }
 
 } // namespace muesli
+
+MUESLI_REGISTER_INPUT_ARCHIVE(muesli::JsonInputArchive);
 
 #endif // MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_

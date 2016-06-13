@@ -23,13 +23,23 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "muesli/archives/json/JsonInputArchive.h"
+#include "muesli/archives/json/JsonOutputArchive.h"
+
+#include "muesli/streams/StdIStreamWrapper.h"
+#include "muesli/streams/StdOStreamWrapper.h"
+
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
 #include "testtypes/TEnum.h"
 
-#include <muesli/BaseArchive.h>
-#include <muesli/archives/json/JsonInputArchive.h>
-#include <muesli/archives/json/JsonOutputArchive.h>
+#include "muesli/TypeRegistry.h"
+
+using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
+using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
+
+using JsonOutputArchiveImpl = muesli::JsonOutputArchive<OutputStreamImpl>;
+using JsonInputArchiveImpl = muesli::JsonInputArchive<InputStreamImpl>;
 
 TEST(JsonArchiveTest, serializeStruct)
 {
@@ -43,11 +53,14 @@ TEST(JsonArchiveTest, serializeStruct)
             R"(})");
 
     std::stringstream stream;
-    muesli::JsonOutputArchive jsonOutputArchive(stream);
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
     jsonOutputArchive(tStruct);
     EXPECT_EQ(expectedSerializedStruct, stream.str());
+    std::cout << stream.str();
 
-    muesli::JsonInputArchive jsonInputArchive(stream);
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     muesli::tests::testtypes::TStruct tStructDeserialized;
     jsonInputArchive(tStructDeserialized);
     EXPECT_EQ(tStruct, tStructDeserialized);
@@ -68,11 +81,13 @@ TEST(JsonArchiveTest, serializeStructExtended)
             R"(})");
 
     std::stringstream stream;
-    muesli::JsonOutputArchive jsonOutputArchive(stream);
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
     jsonOutputArchive(tStructExtended);
     EXPECT_EQ(expectedSerializedStructExtended, stream.str());
 
-    muesli::JsonInputArchive jsonInputArchive(stream);
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     muesli::tests::testtypes::TStructExtended tStructExtendedDeserialized;
     jsonInputArchive(tStructExtendedDeserialized);
     EXPECT_EQ(tStructExtended, tStructExtendedDeserialized);
@@ -114,11 +129,13 @@ TEST(JsonArchiveTest, serializeNestedStruct)
             R"(})");
 
     std::stringstream stream;
-    muesli::JsonOutputArchive jsonOutputArchive(stream);
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
     jsonOutputArchive(testStruct);
     EXPECT_EQ(expectedSerializedStruct, stream.str());
 
-    muesli::JsonInputArchive jsonInputArchive(stream);
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     TestStruct tStructDeserialized;
     jsonInputArchive(tStructDeserialized);
     std::cout << stream.str() << std::endl;

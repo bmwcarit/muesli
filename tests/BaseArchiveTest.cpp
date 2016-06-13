@@ -23,6 +23,7 @@
 #include <muesli/BaseArchive.h>
 
 #include "MockArchive.h"
+#include "MockStream.h"
 
 using namespace ::testing;
 
@@ -112,26 +113,29 @@ private:
     MOCK_METHOD1_T(saveCalled, void(Archive&));
 };
 
+using MockOutputArchiveImpl = MockOutputArchive<MockOutputStream>;
+using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
+
 TEST(BaseArchiveTest, SaveClassWithSerializeMemberFunction)
 {
-    MockOutputArchive outputArchive;
-    MockClassWithSerializeMemberFunction<MockOutputArchive> data;
+    MockOutputArchiveImpl outputArchive;
+    MockClassWithSerializeMemberFunction<MockOutputArchiveImpl> data;
     EXPECT_CALL(data, serialize(Ref(outputArchive))).Times(1);
     outputArchive(data);
 }
 
 TEST(BaseArchiveTest, LoadClassWithSerializeMemberFunction)
 {
-    MockInputArchive inputArchive;
-    MockClassWithSerializeMemberFunction<MockInputArchive> data;
+    MockInputArchiveImpl inputArchive;
+    MockClassWithSerializeMemberFunction<MockInputArchiveImpl> data;
     EXPECT_CALL(data, serialize(Ref(inputArchive))).Times(1);
     inputArchive(data);
 }
 
 TEST(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
 {
-    MockOutputArchive outputArchive;
-    MockClassWithLoadSaveMemberFunction<MockOutputArchive> data;
+    MockOutputArchiveImpl outputArchive;
+    MockClassWithLoadSaveMemberFunction<MockOutputArchiveImpl> data;
     EXPECT_CALL(data, save(Ref(outputArchive))).Times(1);
     EXPECT_CALL(data, load(Ref(outputArchive))).Times(0);
     outputArchive(data);
@@ -139,8 +143,8 @@ TEST(BaseArchiveTest, SaveClassWithWithLoadSaveMemberFunction)
 
 TEST(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
 {
-    MockInputArchive inputArchive;
-    MockClassWithLoadSaveMemberFunction<MockInputArchive> data;
+    MockInputArchiveImpl inputArchive;
+    MockClassWithLoadSaveMemberFunction<MockInputArchiveImpl> data;
     EXPECT_CALL(data, load(Ref(inputArchive))).Times(1);
     EXPECT_CALL(data, save(Ref(inputArchive))).Times(0);
     inputArchive(data);
@@ -148,24 +152,24 @@ TEST(BaseArchiveTest, LoadClassWithWithLoadSaveMemberFunction)
 
 TEST(BaseArchiveTest, SaveClassWithFriendSerializeFunction)
 {
-    MockOutputArchive outputArchive;
-    MockClassWithFriendSerializeFunction<MockOutputArchive> data;
+    MockOutputArchiveImpl outputArchive;
+    MockClassWithFriendSerializeFunction<MockOutputArchiveImpl> data;
     EXPECT_CALL(data, serializeCalled(Ref(outputArchive))).Times(1);
     outputArchive(data);
 }
 
 TEST(BaseArchiveTest, LoadClassWithFriendSerializeFunction)
 {
-    MockInputArchive inputArchive;
-    MockClassWithFriendSerializeFunction<MockInputArchive> data;
+    MockInputArchiveImpl inputArchive;
+    MockClassWithFriendSerializeFunction<MockInputArchiveImpl> data;
     EXPECT_CALL(data, serializeCalled(Ref(inputArchive))).Times(1);
     inputArchive(data);
 }
 
 TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
 {
-    MockOutputArchive outputArchive;
-    MockClassWithFriendLoadSaveFunction<MockOutputArchive> data;
+    MockOutputArchiveImpl outputArchive;
+    MockClassWithFriendLoadSaveFunction<MockOutputArchiveImpl> data;
     EXPECT_CALL(data, saveCalled(Ref(outputArchive))).Times(1);
     EXPECT_CALL(data, loadCalled(Ref(outputArchive))).Times(0);
     outputArchive(data);
@@ -173,8 +177,8 @@ TEST(BaseArchiveTest, SaveClassWithFriendLoadSaveFunction)
 
 TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
 {
-    MockInputArchive inputArchive;
-    MockClassWithFriendLoadSaveFunction<MockInputArchive> data;
+    MockInputArchiveImpl inputArchive;
+    MockClassWithFriendLoadSaveFunction<MockInputArchiveImpl> data;
     EXPECT_CALL(data, loadCalled(Ref(inputArchive))).Times(1);
     EXPECT_CALL(data, saveCalled(Ref(inputArchive))).Times(0);
     inputArchive(data);
@@ -182,8 +186,8 @@ TEST(BaseArchiveTest, LoadClassWithFriendLoadSaveFunction)
 
 TEST(BaseArchiveTest, SerializingBaseClassCallsSerializeOfBaseClass)
 {
-    MockInputArchive inputArchive;
-    DerivedMockClassWithFriendSerializeFunction<MockInputArchive> derived;
+    MockInputArchiveImpl inputArchive;
+    DerivedMockClassWithFriendSerializeFunction<MockInputArchiveImpl> derived;
     EXPECT_CALL(derived, serializeCalled(Ref(inputArchive))).Times(1);
     inputArchive(derived);
 }

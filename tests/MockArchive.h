@@ -21,13 +21,21 @@
 #define MUESLI_TESTS_MOCKARCHIVE_H_
 
 #include <gmock/gmock.h>
+#include <boost/concept_check.hpp>
 
-#include <muesli/BaseArchive.h>
+#include "muesli/concepts/InputStream.h"
+#include "muesli/concepts/OutputStream.h"
+#include "muesli/BaseArchive.h"
+#include "muesli/ArchiveRegistry.h"
 
-class MockInputArchive : public muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive>
+template <typename InputStream>
+class MockInputArchive
+        : public muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive<InputStream>>
 {
+    BOOST_CONCEPT_ASSERT((muesli::concepts::InputStream<InputStream>));
+
 public:
-    using Parent = muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive>;
+    using Parent = muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive<InputStream>>;
     MockInputArchive() : Parent(this)
     {
     }
@@ -35,16 +43,25 @@ public:
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
 
-class MockOutputArchive : public muesli::BaseArchive<muesli::tags::OutputArchive, MockOutputArchive>
+MUESLI_REGISTER_INPUT_ARCHIVE(MockInputArchive);
+
+template <typename OutputStream>
+class MockOutputArchive
+        : public muesli::BaseArchive<muesli::tags::OutputArchive, MockOutputArchive<OutputStream>>
 {
+    BOOST_CONCEPT_ASSERT((muesli::concepts::OutputStream<OutputStream>));
+
 public:
-    using Parent = muesli::BaseArchive<muesli::tags::OutputArchive, MockOutputArchive>;
+    using Parent =
+            muesli::BaseArchive<muesli::tags::OutputArchive, MockOutputArchive<OutputStream>>;
     MockOutputArchive() : Parent(this)
     {
     }
     MOCK_METHOD1(serializeString, void(std::string&));
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
+
+MUESLI_REGISTER_OUTPUT_ARCHIVE(MockOutputArchive);
 
 template <typename Archive>
 void serialize(Archive& ar, std::string& val)

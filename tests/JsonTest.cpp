@@ -24,14 +24,23 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "muesli/archives/json/JsonInputArchive.h"
+#include "muesli/archives/json/JsonOutputArchive.h"
+
+#include "muesli/streams/StdIStreamWrapper.h"
+#include "muesli/streams/StdOStreamWrapper.h"
+
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
 #include "testtypes/TEnum.h"
 
-#include "muesli/BaseArchive.h"
-#include "muesli/archives/json/JsonInputArchive.h"
-#include "muesli/archives/json/JsonOutputArchive.h"
-#include "muesli/archives/json/detail/traits.h"
+#include "muesli/TypeRegistry.h"
+
+using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
+using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
+
+using JsonOutputArchiveImpl = muesli::JsonOutputArchive<OutputStreamImpl>;
+using JsonInputArchiveImpl = muesli::JsonInputArchive<InputStreamImpl>;
 
 template <typename T>
 struct TestStruct
@@ -83,10 +92,12 @@ TYPED_TEST(JsonTest, serialize)
         testStruct.value = param.first;
 
         std::stringstream stream;
-        muesli::JsonOutputArchive jsonOutputArchive(stream);
+        OutputStreamImpl outputStreamWrapper(stream);
+        JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
         jsonOutputArchive(testStruct);
         std::cout << "JSON for TestStruct : " << stream.str() << std::endl;
-        muesli::JsonInputArchive jsonInputArchive(stream);
+        InputStreamImpl inputStreamWrapper(stream);
+        JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
         jsonInputArchive(deserializedTestStruct);
         compareValues(param.second, deserializedTestStruct.value);
     }

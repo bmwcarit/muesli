@@ -27,21 +27,28 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include <muesli/BaseArchive.h>
-#include <muesli/TypeRegistry.h>
-#include <muesli/Traits.h>
-#include <muesli/archives/json/detail/traits.h>
+#include "muesli/BaseArchive.h"
+#include "muesli/Traits.h"
+#include "muesli/TypeRegistryFwd.h"
+#include "muesli/ArchiveRegistry.h"
+#include "muesli/archives/json/detail/traits.h"
+#include "muesli/concepts/OutputStream.h"
+
+#include "detail/RapidJsonOutputStreamAdapter.h"
 
 namespace muesli
 {
 
-class JsonOutputArchive : public muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive>
+template <typename OutputStream>
+class JsonOutputArchive
+        : public muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive<OutputStream>>
 {
+    using Parent =
+            muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive<OutputStream>>;
+
 public:
-    JsonOutputArchive(std::ostream& oStream)
-            : muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive>(this),
-              outStream(oStream),
-              writer(outStream)
+    JsonOutputArchive(OutputStream& stream)
+            : Parent(this), outputStream(stream), writer(outputStream)
     {
     }
 
@@ -108,86 +115,97 @@ public:
     }
 
 private:
-    rapidjson::OStreamWrapper outStream;
-    rapidjson::Writer<rapidjson::OStreamWrapper> writer;
+    using AdaptedStream = json::detail::RapidJsonOutputStreamAdapter<OutputStream>;
+    AdaptedStream outputStream;
+    rapidjson::Writer<AdaptedStream> writer;
 };
 
-template <typename T>
-void intro(JsonOutputArchive& archive, const NameValuePair<T>& nameValuePair)
+template <typename OutputStream, typename T>
+void intro(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
     archive.writeKey(nameValuePair.name);
 }
 
-template <typename T>
-void outro(JsonOutputArchive& archive, const NameValuePair<T>& nameValuePair)
+template <typename OutputStream, typename T>
+void outro(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonOutputArchive& archive, const T& value)
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonOutputArchive<OutputStream>& archive,
+                                                         const T& value)
 {
     archive.startObject();
     archive.writeKey("_typeName");
-    archive.writeValue(muesli::detail::RegisteredType<T>::name());
+    archive.writeValue(muesli::RegisteredType<T>::name());
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonOutputArchive& archive, const T& value)
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonOutputArchive<OutputStream>& archive,
+                                                         const T& value)
 {
     archive.endObject();
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(JsonOutputArchive& archive,
-                                                            const T& value)
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(
+        JsonOutputArchive<OutputStream>& archive,
+        const T& value)
 {
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonOutputArchive& archive,
-                                                            const T& value)
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(
+        JsonOutputArchive<OutputStream>& archive,
+        const T& value)
 {
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> intro(JsonOutputArchive& archive, const T& value)
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsArray<T>::value> intro(JsonOutputArchive<OutputStream>& archive,
+                                                        const T& value)
 {
     archive.startArray();
     std::ignore = value;
 }
 
-template <typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonOutputArchive& archive, const T& value)
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonOutputArchive<OutputStream>& archive,
+                                                        const T& value)
 {
     archive.endArray();
     std::ignore = value;
 }
 
-template <typename T>
-void serialize(JsonOutputArchive& archive, const NameValuePair<T>& nameValuePair)
+template <typename OutputStream, typename T>
+void serialize(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
     archive(nameValuePair.value);
 }
 
-template <typename T>
+template <typename OutputStream, typename T>
 std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> serialize(
-        JsonOutputArchive& archive,
+        JsonOutputArchive<OutputStream>& archive,
         const T& value)
 {
     archive.writeValue(value);
 }
 
 // generic serialization for generated Enum types
-template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
-void save(JsonOutputArchive& archive, Enum value)
+template <typename OutputStream,
+          typename Enum,
+          typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+void save(JsonOutputArchive<OutputStream>& archive, Enum value)
 {
     archive.writeValue(Wrapper::getLiteral(value));
 }
 
 } // namespace muesli
+
+MUESLI_REGISTER_OUTPUT_ARCHIVE(muesli::JsonOutputArchive);
 
 #endif // MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
