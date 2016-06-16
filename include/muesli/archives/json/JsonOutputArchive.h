@@ -182,13 +182,13 @@ std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonOutputArchive<Output
 }
 
 template <typename OutputStream, typename T>
-void serialize(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
+void save(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
     archive(nameValuePair.value);
 }
 
 template <typename OutputStream, typename T>
-std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> serialize(
+std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> save(
         JsonOutputArchive<OutputStream>& archive,
         const T& value)
 {
