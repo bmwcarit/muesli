@@ -178,14 +178,14 @@ std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonInputArchive<InputSt
 }
 
 template <typename InputStream, typename T>
-void serialize(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
+void load(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
     archive.setNextKey(nameValuePair.name);
     archive(nameValuePair.value);
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> serialize(
+std::enable_if_t<json::detail::IsPrimitive<T>::value && !std::is_enum<T>::value> load(
         JsonInputArchive<InputStream>& archive,
         T& value)
 {
