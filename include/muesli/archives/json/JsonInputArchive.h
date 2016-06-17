@@ -25,6 +25,7 @@
 #include <string>
 #include <stack>
 #include <vector>
+#include <tuple>
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>
 
@@ -41,6 +42,7 @@
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/exceptions/UnknownTypeException.h"
 #include "muesli/SkipIntroOutroWrapper.h"
+#include "muesli/exceptions/ParseException.h"
 
 #include "detail/RapidJsonInputStreamAdapter.h"
 
@@ -305,6 +307,43 @@ void load(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePai
 {
     archive.setNextKey(nameValuePair.name);
     archive(nameValuePair.value);
+}
+
+template <typename InputStream, std::size_t Index, typename TupleType, typename T, typename ... Ts>
+void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
+{
+    archive.setNextIndex(Index);
+    archive(std::get<Index>(tuple));
+
+    loadTupleElement<InputStream, Index + 1, TupleType, Ts...>(archive, tuple);
+}
+
+template<typename InputStream, typename TupleType, std::size_t Index>
+void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
+{
+    archive.setNextIndex(Index);
+    archive(std::get<Index>(tuple));
+}
+
+template<typename InputStream, typename TupleType, std::size_t ... Indicies>
+void loadTuple(JsonInputArchive<InputStream>& archive, TupleType& tuple, std::index_sequence<Indicies...>)
+{
+    using Expansion = int[];
+    Expansion{0, (loadTupleElement<InputStream, TupleType, Indicies>(archive, tuple), 0)...};
+}
+
+template<typename InputStream, typename ... Ts>
+void load(JsonInputArchive<InputStream>& archive, std::tuple<Ts...>& tuple)
+{
+    const std::size_t arraySize = archive.getArraySize();
+
+    if(arraySize != sizeof...(Ts)) {
+        throw exceptions::ParseException("Failed to load tuple. Persisted tuple size is " +
+                                         std::to_string(arraySize) + ". Expected tuple size is " +
+                                         std::to_string(sizeof...(Ts)));
+    }
+
+    loadTuple(archive, tuple, std::index_sequence_for<Ts...>{});
 }
 
 template <typename InputStream, typename T>
