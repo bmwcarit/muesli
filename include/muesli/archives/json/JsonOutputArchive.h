@@ -182,6 +182,15 @@ std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonOutputArchive<Output
 }
 
 template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsArray<T>::value> save(JsonOutputArchive<OutputStream>& archive, const T& array)
+{
+    for (auto element : array) {
+        archive(element);
+    }
+}
+
+
+template <typename OutputStream, typename T>
 void save(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
     archive(nameValuePair.value);

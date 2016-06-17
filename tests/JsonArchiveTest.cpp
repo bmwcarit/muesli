@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -57,7 +58,7 @@ TEST(JsonArchiveTest, serializeStruct)
     JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
     jsonOutputArchive(tStruct);
     EXPECT_EQ(expectedSerializedStruct, stream.str());
-    std::cout << stream.str();
+    std::cout << stream.str() << std::endl;
 
     InputStreamImpl inputStreamWrapper(stream);
     JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
@@ -140,4 +141,40 @@ TEST(JsonArchiveTest, serializeNestedStruct)
     jsonInputArchive(tStructDeserialized);
     std::cout << stream.str() << std::endl;
     EXPECT_EQ(testStruct, tStructDeserialized);
+}
+
+TEST(JsonArchiveTest, serializeVectorOfStruct)
+{
+    std::vector<muesli::tests::testtypes::TStruct> tStructs = {
+            muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data"),
+            muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")};
+
+    std::string expectedSerializedStructs(
+            R"([)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data")"
+            R"(},)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.987654321,)"
+            R"("tInt64":-64,)"
+            R"("tString":"second test string")"
+            R"(})"
+            R"(])");
+
+    std::stringstream stream;
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
+    jsonOutputArchive(tStructs);
+    EXPECT_EQ(expectedSerializedStructs, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    std::vector<muesli::tests::testtypes::TStruct> tStructsDeserialized;
+    jsonInputArchive(tStructsDeserialized);
+    EXPECT_EQ(tStructs, tStructsDeserialized);
 }

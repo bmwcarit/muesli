@@ -23,6 +23,7 @@
 #include <istream>
 #include <string>
 #include <stack>
+#include <vector>
 
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -47,7 +48,13 @@ class JsonInputArchive
     using Parent = muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive<InputStream>>;
 
 public:
-    JsonInputArchive(InputStream& stream) : Parent(this), document(), nextKey()
+    JsonInputArchive(InputStream& stream)
+            : Parent(this),
+              document(),
+              nextKey(),
+              nextKeyValid(false),
+              nextIndex(0),
+              nextIndexValid(false)
     {
         using AdaptedStream = json::detail::RapidJsonInputStreamAdapter<InputStream>;
         AdaptedStream adaptedStream(stream);
@@ -58,6 +65,13 @@ public:
     void setNextKey(const std::string& nextKey)
     {
         this->nextKey = nextKey;
+        this->nextKeyValid = true;
+    }
+
+    void setNextIndex(const std::size_t nextIndex)
+    {
+        this->nextIndex = nextIndex;
+        this->nextIndexValid = true;
     }
 
     void readValue(double& doubleValue) const
@@ -97,30 +111,46 @@ public:
         stringValue = getNextValue()->GetString();
     }
 
+    std::size_t getArraySize() const
+    {
+        assert(stack.top()->IsArray());
+        return stack.top()->Size();
+    }
+
     void pushNode()
     {
-        if (!nextKey.empty()) {
-            stack.push(getNextValue());
+        rapidjson::Document::GenericValue* nextValue = getNextValue();
+        if (nextValue != nullptr) {
+            stack.push(nextValue);
         }
     }
 
     void popNode()
     {
         stack.pop();
+        nextKeyValid = false;
+        nextIndexValid = false;
     }
 
 private:
-    rapidjson::Value* getNextValue() const
+    rapidjson::Document::GenericValue* getNextValue() const
     {
-        return &(stack.top()->operator[](nextKey));
-        // return document->operator[](nextKey);
+        if (stack.top()->IsArray() && nextIndexValid) {
+            return &(stack.top()->operator[](nextIndex));
+        } else if (stack.top()->IsObject() && nextKeyValid) {
+            return &(stack.top()->operator[](nextKey));
+        }
+        return nullptr;
     }
 
-    std::stack<rapidjson::Value*> stack;
+    std::stack<rapidjson::Document::GenericValue*> stack;
 
 private:
     rapidjson::Document document;
     std::string nextKey;
+    bool nextKeyValid;
+    std::size_t nextIndex;
+    bool nextIndexValid;
 };
 
 template <typename InputStream, typename T>
@@ -134,16 +164,18 @@ void outro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePa
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonInputArchive<InputStream>& archive,
-                                                         T& value)
+std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value> intro(
+        JsonInputArchive<InputStream>& archive,
+        T& value)
 {
     std::ignore = value;
     archive.pushNode();
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsObject<T>::value> outro(JsonInputArchive<InputStream>& archive,
-                                                         const T& value)
+std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value> outro(
+        JsonInputArchive<InputStream>& archive,
+        const T& value)
 {
     std::ignore = value;
     archive.popNode();
@@ -164,17 +196,14 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<Inp
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> intro(JsonInputArchive<InputStream>& archive,
-                                                        T& value)
+void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
 {
-    std::ignore = value;
-}
-
-template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> outro(JsonInputArchive<InputStream>& archive,
-                                                        T& value)
-{
-    std::ignore = value;
+    std::size_t arraySize = archive.getArraySize();
+    array.resize(arraySize);
+    for (std::size_t i = 0; i < arraySize; i++) {
+        archive.setNextIndex(i);
+        archive(array[i]);
+    }
 }
 
 template <typename InputStream, typename T>
