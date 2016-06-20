@@ -178,3 +178,28 @@ TEST(JsonArchiveTest, serializeVectorOfStruct)
     jsonInputArchive(tStructsDeserialized);
     EXPECT_EQ(tStructs, tStructsDeserialized);
 }
+
+TEST(JsonArchiveTest, serializeVectorOfEnums)
+{
+    std::vector<muesli::tests::testtypes::TEnum::Enum> tEnums = {
+            muesli::tests::testtypes::TEnum::TLITERALA, muesli::tests::testtypes::TEnum::TLITERALB};
+
+    std::string expectedSerializedEnums(
+            R"([)"
+            R"("TLITERALA",)"
+            R"("TLITERALB")"
+            R"(])");
+
+    std::stringstream stream;
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
+    jsonOutputArchive(tEnums);
+    EXPECT_EQ(expectedSerializedEnums, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    std::vector<muesli::tests::testtypes::TEnum::Enum> tEnumsDeserialized;
+    jsonInputArchive(tEnumsDeserialized);
+    EXPECT_EQ(tEnums, tEnumsDeserialized);
+}

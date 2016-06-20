@@ -43,6 +43,8 @@ using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
 using JsonOutputArchiveImpl = muesli::JsonOutputArchive<OutputStreamImpl>;
 using JsonInputArchiveImpl = muesli::JsonInputArchive<InputStreamImpl>;
 
+using TEnum = muesli::tests::testtypes::TEnum;
+
 template <typename T>
 struct TestStruct
 {
@@ -85,7 +87,8 @@ using PrimitiveTypes = ::testing::Types<std::int8_t,
                                         double,
                                         std::string,
                                         std::vector<std::int32_t>,
-                                        std::vector<std::string>>;
+                                        std::vector<std::string>,
+                                        std::vector<TEnum::Enum>>;
 
 TYPED_TEST_CASE(JsonTest, PrimitiveTypes);
 
@@ -159,3 +162,14 @@ struct TestParams<std::vector<std::string>>
 };
 using ArrayOfStringStruct = TestStruct<std::vector<std::string>>;
 MUESLI_REGISTER_TYPE(ArrayOfStringStruct, "TestStruct")
+
+template <>
+struct TestParams<std::vector<TEnum::Enum>>
+{
+    std::vector<std::pair<std::vector<TEnum::Enum>, std::vector<TEnum::Enum>>> params = {
+            {std::vector<TEnum::Enum>(), std::vector<TEnum::Enum>()},
+            {{TEnum::TLITERALA}, {TEnum::TLITERALA}},
+            {{TEnum::TLITERALA, TEnum::TLITERALB}, {TEnum::TLITERALA, TEnum::TLITERALB}}};
+};
+using ArrayOfEnumStruct = TestStruct<std::vector<TEnum::Enum>>;
+MUESLI_REGISTER_TYPE(ArrayOfEnumStruct, "TestStruct")
