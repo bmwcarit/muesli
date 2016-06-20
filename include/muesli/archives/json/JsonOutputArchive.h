@@ -139,8 +139,7 @@ std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonOutputArchive<Outpu
                                                          const T& value)
 {
     archive.startObject();
-    archive.writeKey("_typeName");
-    archive.writeValue(muesli::RegisteredType<T>::name());
+    archive(muesli::make_nvp("_typeName", muesli::RegisteredType<T>::name()));
     std::ignore = value;
 }
 
