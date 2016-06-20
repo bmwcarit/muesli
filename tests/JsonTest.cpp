@@ -20,6 +20,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -79,16 +80,20 @@ void compareValues(const double& expected, const double& actual)
 template <typename T>
 using JsonTest = ::testing::Test;
 
-using PrimitiveTypes = ::testing::Types<std::int8_t, std::int32_t, double, std::string>;
+using PrimitiveTypes = ::testing::Types<std::int8_t,
+                                        std::int32_t,
+                                        double,
+                                        std::string,
+                                        std::vector<std::int32_t>,
+                                        std::vector<std::string>>;
 
 TYPED_TEST_CASE(JsonTest, PrimitiveTypes);
 
 TYPED_TEST(JsonTest, serialize)
 {
-    TestStruct<TypeParam> testStruct, deserializedTestStruct;
-
     TestParams<TypeParam> testParams;
     for (std::pair<TypeParam, TypeParam> param : testParams.params) {
+        TestStruct<TypeParam> testStruct, deserializedTestStruct;
         testStruct.value = param.first;
 
         std::stringstream stream;
@@ -132,3 +137,25 @@ struct TestParams<std::string>
 };
 using StringStruct = TestStruct<std::string>;
 MUESLI_REGISTER_TYPE(StringStruct, "TestStruct")
+
+template <>
+struct TestParams<std::vector<std::int32_t>>
+{
+    std::vector<std::pair<std::vector<std::int32_t>, std::vector<std::int32_t>>> params = {
+            {std::vector<std::int32_t>(), std::vector<std::int32_t>()},
+            {{0}, {0}},
+            {{0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}}};
+};
+using ArrayOfInt32Struct = TestStruct<std::vector<std::int32_t>>;
+MUESLI_REGISTER_TYPE(ArrayOfInt32Struct, "TestStruct")
+
+template <>
+struct TestParams<std::vector<std::string>>
+{
+    std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> params = {
+            {std::vector<std::string>(), std::vector<std::string>()},
+            {{"Test String 1"}, {"Test String 1"}},
+            {{"", "Test String 1", "Test String 2"}, {"", "Test String 1", "Test String 2"}}};
+};
+using ArrayOfStringStruct = TestStruct<std::vector<std::string>>;
+MUESLI_REGISTER_TYPE(ArrayOfStringStruct, "TestStruct")
