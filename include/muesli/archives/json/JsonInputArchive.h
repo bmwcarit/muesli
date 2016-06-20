@@ -24,6 +24,7 @@
 #include <string>
 #include <stack>
 #include <vector>
+#include <boost/lexical_cast.hpp>
 
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -117,10 +118,31 @@ public:
         stringValue = getNextValue()->GetString();
     }
 
+    template <typename T>
+    void readKey(T& key) const
+    {
+        key = boost::lexical_cast<T>(nextKey);
+    }
+
+    void readKey(std::string& key) const
+    {
+        key = nextKey;
+    }
+
     std::size_t getArraySize() const
     {
         assert(stack.top()->IsArray());
         return stack.top()->Size();
+    }
+
+    rapidjson::Document::ConstMemberIterator getMemberBegin() const
+    {
+        return stack.top()->MemberBegin();
+    }
+
+    rapidjson::Document::ConstMemberIterator getMemberEnd() const
+    {
+        return stack.top()->MemberEnd();
     }
 
     void pushNode()
@@ -209,6 +231,24 @@ void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
     for (std::size_t i = 0; i < arraySize; i++) {
         archive.setNextIndex(i);
         archive(array[i]);
+    }
+}
+
+template <typename InputStream, typename Map>
+auto load(JsonInputArchive<InputStream>& archive, Map& map)
+        -> decltype(typename Map::mapped_type(), void())
+{
+    using T = typename Map::key_type;
+    for (rapidjson::Document::ConstMemberIterator itr = archive.getMemberBegin();
+         itr != archive.getMemberEnd();
+         ++itr) {
+        std::string keyString(itr->name.GetString());
+        if (keyString != "_typeName") {
+            archive.setNextKey(std::move(keyString));
+            T key;
+            archive.readKey(key);
+            archive(map[key]);
+        }
     }
 }
 

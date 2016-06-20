@@ -203,3 +203,84 @@ TEST(JsonArchiveTest, serializeVectorOfEnums)
     jsonInputArchive(tEnumsDeserialized);
     EXPECT_EQ(tEnums, tEnumsDeserialized);
 }
+
+class TIntegerKeyMap : public std::map<std::int32_t, std::string>
+{
+};
+
+MUESLI_REGISTER_TYPE(TIntegerKeyMap, "TIntegerKeyMap")
+
+class TStructMap : public std::map<std::string, muesli::tests::testtypes::TStruct>
+{
+};
+
+MUESLI_REGISTER_TYPE(TStructMap, "TStructMap")
+
+TEST(JsonArchiveTest, serializeIntegerMap)
+{
+    TIntegerKeyMap expectedMap;
+    expectedMap.insert({1, "StringValue1"});
+    expectedMap.insert({2, "StringValue2"});
+
+    std::string expectedSerializedMap(
+            R"({)"
+            R"("_typeName":"TIntegerKeyMap",)"
+            R"("1":"StringValue1",)"
+            R"("2":"StringValue2")"
+            R"(})");
+
+    std::stringstream stream;
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
+    jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    TIntegerKeyMap mapDeserialized;
+    jsonInputArchive(mapDeserialized);
+    EXPECT_EQ(expectedMap, mapDeserialized);
+}
+
+TEST(JsonArchiveTest, serializeStructMap)
+{
+    TStructMap expectedMap;
+
+    expectedMap.insert(
+            {"key1", muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data")});
+    expectedMap.insert(
+            {"key2", muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")});
+
+    std::string expectedSerializedMap(
+            R"({)"
+            R"("_typeName":"TStructMap",)"
+            R"("key1":)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data")"
+            R"(},)"
+            R"("key2":)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.987654321,)"
+            R"("tInt64":-64,)"
+            R"("tString":"second test string")"
+            R"(})"
+            R"(})");
+
+    std::stringstream stream;
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
+    jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    TStructMap mapDeserialized;
+    jsonInputArchive(mapDeserialized);
+    EXPECT_EQ(expectedMap, mapDeserialized);
+}

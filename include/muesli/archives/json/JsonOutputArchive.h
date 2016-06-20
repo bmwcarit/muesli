@@ -20,14 +20,17 @@
 #define MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
 
 #include <cstdint>
+#include <map>
 #include <ostream>
 #include <string>
+#include <boost/lexical_cast.hpp>
 
 #include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
 #include "muesli/BaseArchive.h"
+#include "muesli/NameValuePair.h"
 #include "muesli/Traits.h"
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/ArchiveRegistry.h"
@@ -189,6 +192,14 @@ std::enable_if_t<json::detail::IsArray<T>::value> save(JsonOutputArchive<OutputS
     }
 }
 
+template <typename OutputStream, typename Map>
+auto save(JsonOutputArchive<OutputStream>& archive, const Map& map) -> decltype(typename Map::mapped_type(), void())
+{
+    for (const auto& entry : map) {
+        auto value(entry.second);
+        archive(muesli::make_nvp(boost::lexical_cast<std::string>(entry.first), value));
+    }
+}
 
 template <typename OutputStream, typename T>
 void save(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
