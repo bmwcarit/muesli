@@ -50,6 +50,12 @@ private:
     using EnableIfXArchive = std::enable_if_t<std::is_same<CheckCategory, C>::value>;
 
     template <typename T>
+    T& discardConstQualifier(const T& value)
+    {
+        return const_cast<T&>(value);
+    }
+
+    template <typename T>
     void handle(T&& arg)
     {
         intro(self, arg);
@@ -66,17 +72,17 @@ private:
 
     // 'arg' has 'serialize' member function
     template <typename T, typename D = Derived>
-    auto dispatch(T&& arg) -> decltype(arg.serialize(static_cast<D*>(this) -> self), void())
+    auto dispatch(T&& arg) -> decltype(discardConstQualifier(arg).serialize(static_cast<D*>(this) -> self), void())
     {
-        arg.serialize(self);
+        discardConstQualifier(arg).serialize(self);
     }
 
     // free function 'serialize' exists for 'arg'
     template <typename T, typename D = Derived>
     auto dispatch(T&& arg)
-            -> decltype(serialize(static_cast<D*>(this) -> self, std::forward<T>(arg)), void())
+            -> decltype(serialize(static_cast<D*>(this) -> self, discardConstQualifier(arg)), void())
     {
-        serialize(self, std::forward<T>(arg));
+        serialize(self, discardConstQualifier(arg));
     }
 
     // 'Derived' is of category 'InputArchive', check if 'load' member function exists
