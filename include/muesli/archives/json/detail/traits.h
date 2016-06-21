@@ -70,6 +70,16 @@ struct IsUnSignedIntegerUpTo32bit
             TypeWithinList<T, std::uint8_t, std::uint16_t, std::uint32_t>::value;
 };
 
+template <typename T, typename Enable = void>
+struct IsMap : std::false_type
+{
+};
+
+template <typename T>
+struct IsMap<T, typename T::mapped_type> : std::true_type
+{
+};
+
 } // namespace detail
 } // namespace json
 } // namespace muesli
