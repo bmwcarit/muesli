@@ -124,6 +124,12 @@ public:
         key = boost::lexical_cast<T>(nextKey);
     }
 
+    template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+    std::enable_if_t<std::is_enum<Enum>::value> readKey(Enum& key)
+    {
+        key = Wrapper::getEnum(nextKey);
+    }
+
     void readKey(std::string& key) const
     {
         key = nextKey;

@@ -191,12 +191,28 @@ std::enable_if_t<json::detail::IsArray<T>::value> save(JsonOutputArchive<OutputS
     }
 }
 
+template <typename T>
+std::enable_if_t<std::is_same<std::string, T>::value, std::string> toString(const T& key) {
+    return key;
+}
+
+template <typename Enum,
+          typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+std::enable_if_t<std::is_enum<Enum>::value, std::string> toString(const Enum& key) {
+    return Wrapper::getLiteral(key);
+}
+
+template <typename T>
+std::enable_if_t<!std::is_same<std::string, T>::value && !std::is_enum<T>::value && json::detail::IsPrimitive<T>::value, std::string> toString(const T& key) {
+    return boost::lexical_cast<std::string>(key);
+}
+
 template <typename OutputStream, typename Map>
 auto save(JsonOutputArchive<OutputStream>& archive, const Map& map) -> decltype(typename Map::mapped_type(), void())
 {
     for (const auto& entry : map) {
         auto value(entry.second);
-        archive(muesli::make_nvp(boost::lexical_cast<std::string>(entry.first), value));
+        archive(muesli::make_nvp(toString(entry.first), value));
     }
 }
 

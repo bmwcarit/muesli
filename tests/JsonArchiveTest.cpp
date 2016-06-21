@@ -216,6 +216,13 @@ class TStructMap : public std::map<std::string, muesli::tests::testtypes::TStruc
 
 MUESLI_REGISTER_TYPE(TStructMap, "TStructMap")
 
+class TEnumKeyMap
+        : public std::map<muesli::tests::testtypes::TEnum::Enum, muesli::tests::testtypes::TStruct>
+{
+};
+
+MUESLI_REGISTER_TYPE(TEnumKeyMap, "TEnumKeyMap")
+
 TEST(JsonArchiveTest, serializeIntegerMap)
 {
     TIntegerKeyMap expectedMap;
@@ -281,6 +288,48 @@ TEST(JsonArchiveTest, serializeStructMap)
     InputStreamImpl inputStreamWrapper(stream);
     JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     TStructMap mapDeserialized;
+    jsonInputArchive(mapDeserialized);
+    EXPECT_EQ(expectedMap, mapDeserialized);
+}
+
+TEST(JsonArchiveTest, serializeEnumKeyMap)
+{
+    TEnumKeyMap expectedMap;
+
+    expectedMap.insert({muesli::tests::testtypes::TEnum::TLITERALA,
+                        muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data")});
+    expectedMap.insert({muesli::tests::testtypes::TEnum::TLITERALB,
+                        muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")});
+
+    std::string expectedSerializedMap(
+            R"({)"
+            R"("_typeName":"TEnumKeyMap",)"
+            R"("TLITERALA":)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data")"
+            R"(},)"
+            R"("TLITERALB":)"
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            R"("tDouble":0.987654321,)"
+            R"("tInt64":-64,)"
+            R"("tString":"second test string")"
+            R"(})"
+            R"(})");
+
+    std::stringstream stream;
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
+    jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    TEnumKeyMap mapDeserialized;
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
 }
