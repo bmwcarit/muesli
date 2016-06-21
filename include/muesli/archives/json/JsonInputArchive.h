@@ -68,6 +68,12 @@ public:
         this->nextKeyValid = true;
     }
 
+    void setNextKey(std::string&& nextKey)
+    {
+        this->nextKey = std::move(nextKey);
+        this->nextKeyValid = true;
+    }
+
     void setNextIndex(const std::size_t nextIndex)
     {
         this->nextIndex = nextIndex;
