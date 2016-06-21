@@ -123,23 +123,6 @@ public:
         stringValue = getNextValue()->GetString();
     }
 
-    template <typename T>
-    void readKey(T& key) const
-    {
-        key = boost::lexical_cast<T>(nextKey);
-    }
-
-    template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
-    std::enable_if_t<std::is_enum<Enum>::value> readKey(Enum& key)
-    {
-        key = Wrapper::getEnum(nextKey);
-    }
-
-    void readKey(std::string& key) const
-    {
-        key = nextKey;
-    }
-
     std::size_t getArraySize() const
     {
         assert(stack.top()->IsArray());
@@ -251,6 +234,30 @@ void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
     }
 }
 
+namespace detail
+{
+template <typename T>
+std::enable_if_t<!std::is_enum<T>::value && !std::is_same<T, std::string>::value> stringToType(
+        const std::string& string,
+        T& type)
+{
+    type = boost::lexical_cast<T>(string);
+}
+
+template <typename T>
+std::enable_if_t<std::is_same<T, std::string>::value> stringToType(const std::string& string,
+                                                                   T& type)
+{
+    type = string;
+}
+
+template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+std::enable_if_t<std::is_enum<Enum>::value> stringToType(const std::string& literal, Enum& enumValue)
+{
+    enumValue = Wrapper::getEnum(literal);
+}
+} // namespace detail
+
 template <typename InputStream, typename Map>
 std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStream>& archive,
                                                        Map& map)
@@ -259,13 +266,16 @@ std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStr
     for (rapidjson::Document::ConstMemberIterator itr = archive.getMemberBegin();
          itr != archive.getMemberEnd();
          ++itr) {
+
         std::string keyString(itr->name.GetString());
-        if (keyString != "_typeName") {
-            archive.setNextKey(std::move(keyString));
-            T key;
-            archive.readKey(key);
-            archive(map[std::move(key)]);
+        if (keyString == "_typeName") {
+            continue;
         }
+
+        T key;
+        detail::stringToType(keyString, key);
+        archive.setNextKey(std::move(keyString));
+        archive(map[key]);
     }
 }
 
