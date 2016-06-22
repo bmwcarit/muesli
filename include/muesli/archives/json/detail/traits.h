@@ -23,6 +23,7 @@
 #include <type_traits>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "muesli/Traits.h"
 
@@ -50,9 +51,25 @@ struct IsPrimitive
 };
 
 template <typename T>
+struct IsPointer : std::false_type
+{
+};
+
+template <typename T>
+struct IsPointer<std::shared_ptr<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsPointer<std::unique_ptr<T>> : std::true_type
+{
+};
+
+template <typename T>
 struct IsObject
 {
-    static constexpr bool value = !IsPrimitive<T>::value && !IsArray<T>::value;
+    static constexpr bool value =
+            !IsPointer<T>::value && !IsPrimitive<T>::value && !IsArray<T>::value;
 };
 
 // any signed integer which is below int64_t
