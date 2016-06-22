@@ -47,6 +47,10 @@ AddTest(
     MockStream.h
 )
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set_target_properties(muesli-unit-test PROPERTIES COMPILE_FLAGS "-Wall -g -Wextra -pedantic -Wno-effc++")
+endif()
+
 target_link_libraries(
     muesli-unit-test
     ${GTEST_LIBRARIES}
