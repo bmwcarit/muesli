@@ -34,6 +34,7 @@
 #include "muesli/Tags.h"
 
 #include "muesli/TypeRegistryFwd.h"
+#include "muesli/SkipIntroOutroWrapper.h"
 
 namespace muesli
 {
@@ -88,7 +89,7 @@ class TypeRegistry
 {
 public:
     using DeserializerFunction = std::function<std::unique_ptr<Base>(detail::InputArchiveVariant)>;
-    using SerializerFunction = std::function<void(detail::OutputArchiveVariant, Base*)>;
+    using SerializerFunction = std::function<void(detail::OutputArchiveVariant, const Base*)>;
 
     using InputMap = std::unordered_map<std::string, DeserializerFunction>;
     using OutputMap = std::unordered_map<std::type_index, SerializerFunction>;
@@ -137,12 +138,14 @@ const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeI
                      typeid(T),
                      [](InputArchiveVariant archive) {
                          auto value = std::make_unique<T>();
-                         boost::apply_visitor([&value](auto& ar) { ar(*value); }, archive);
+                         boost::apply_visitor(
+                                 [&value](auto& ar) { ar(SkipIntroOutroWrapper<T>(value.get())); },
+                                 archive);
                          return value;
                      },
-                     [](OutputArchiveVariant archive, Base* ptr) {
+                     [](OutputArchiveVariant archive, const Base* ptr) {
                          boost::apply_visitor(
-                                 [ptr](auto& ar) { ar(*(static_cast<T*>(ptr))); }, archive);
+                                 [ptr](auto& ar) { ar(*(static_cast<const T*>(ptr))); }, archive);
                      });
 
 } // namespace detail

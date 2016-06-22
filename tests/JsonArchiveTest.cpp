@@ -59,6 +59,25 @@ struct NestedStruct
 };
 MUESLI_REGISTER_TYPE(NestedStruct, "NestedStruct");
 
+struct NestedStructPolymorphic
+{
+    std::shared_ptr<muesli::tests::testtypes::TStruct> tStruct;
+
+    template <typename Archive>
+    void serialize(Archive& archive)
+    {
+        archive(muesli::make_nvp("tStruct", tStruct));
+    }
+
+    bool operator==(const NestedStructPolymorphic& other) const
+    {
+        // value comparison
+        return *tStruct == *(other.tStruct);
+    }
+};
+// register with same name as above in order to use the same string comparison of expected JSON
+MUESLI_REGISTER_TYPE(NestedStructPolymorphic, "NestedStruct");
+
 class JsonArchiveTest : public ::testing::Test
 {
 public:
@@ -354,4 +373,31 @@ TEST_F(JsonArchiveTest, serializeEnumValueMap)
     TEnumValueMap mapDeserialized;
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
+}
+
+TEST_F(JsonArchiveTest, polymorphismBase)
+{
+    NestedStructPolymorphic tNestedStructPolymorphic = {
+            std::make_shared<muesli::tests::testtypes::TStruct>(tStruct)};
+    jsonOutputArchive(tNestedStructPolymorphic);
+    EXPECT_EQ(expectedSerializedNestedStruct, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
+    jsonInputArchive(tNestedStructPolymorphicDeserialized);
+    EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
+}
+
+TEST_F(JsonArchiveTest, polymorphismDerived)
+{
+    NestedStructPolymorphic tNestedStructPolymorphic = {
+            std::make_shared<muesli::tests::testtypes::TStructExtended>(tStructExtended)};
+    jsonOutputArchive(tNestedStructPolymorphic);
+    EXPECT_EQ(expectedSerializedNestedExtendedStruct, stream.str());
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
+    jsonInputArchive(tNestedStructPolymorphicDeserialized);
+    EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
 }

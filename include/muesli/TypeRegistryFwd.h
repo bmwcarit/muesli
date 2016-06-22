@@ -26,6 +26,9 @@ namespace muesli
 template <typename T>
 struct RegisteredType;
 
+template <typename Base>
+class TypeRegistry;
+
 } // namespace muesli
 
 #endif // MUESLI_TYPEREGISTRYFWD_H_

@@ -21,10 +21,12 @@
 
 #include <cstdint>
 #include <istream>
+#include <memory>
 #include <string>
 #include <stack>
 #include <vector>
 #include <boost/lexical_cast.hpp>
+#include <boost/type_index.hpp>
 
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -36,6 +38,9 @@
 #include "muesli/cereal/NameValuePair.h"
 #include "muesli/archives/json/detail/traits.h"
 #include "muesli/concepts/InputStream.h"
+#include "muesli/TypeRegistryFwd.h"
+#include "muesli/exceptions/UnknownTypeException.h"
+#include "muesli/SkipIntroOutroWrapper.h"
 
 #include "detail/RapidJsonInputStreamAdapter.h"
 
@@ -198,18 +203,18 @@ void outro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePa
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value> intro(
-        JsonInputArchive<InputStream>& archive,
-        T& value)
+std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value ||
+                 json::detail::IsPointer<T>::value>
+intro(JsonInputArchive<InputStream>& archive, T& value)
 {
     std::ignore = value;
     archive.pushNode();
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value> outro(
-        JsonInputArchive<InputStream>& archive,
-        const T& value)
+std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value ||
+                 json::detail::IsPointer<T>::value>
+outro(JsonInputArchive<InputStream>& archive, const T& value)
 {
     std::ignore = value;
     archive.popNode();
@@ -282,6 +287,61 @@ void load(JsonInputArchive<InputStream>& archive, Enum& value)
     std::string enumStringValue;
     archive.readValue(enumStringValue);
     value = Wrapper::getEnum(enumStringValue);
+}
+
+namespace detail
+{
+// generic de-serialization for non-polymorphic pointer types
+template <typename T, typename InputStream>
+std::enable_if_t<!std::is_polymorphic<T>::value, std::unique_ptr<T>> loadPointer(
+        JsonInputArchive<InputStream>& archive)
+{
+    auto ptr = std::make_unique<T>();
+    archive(SkipIntroOutroWrapper<T>(ptr.get()));
+    return ptr;
+}
+
+// generic de-serialization for non-polymorphic pointer types
+template <typename Base, typename InputStream>
+std::enable_if_t<std::is_polymorphic<Base>::value, std::unique_ptr<Base>> loadPointer(
+        JsonInputArchive<InputStream>& archive)
+{
+    std::unique_ptr<Base> ptr = nullptr;
+    archive.setNextKey("_typeName");
+    static const std::string baseTypeName = RegisteredType<Base>::name();
+    std::string typeName;
+    archive.readValue(typeName);
+    if (baseTypeName == typeName) {
+        ptr = std::make_unique<Base>();
+        archive(SkipIntroOutroWrapper<Base>(ptr.get()));
+    } else {
+        // lookup in type registry
+        auto& inputRegistry = TypeRegistry<Base>::getInputRegistry();
+        auto inputFunction = inputRegistry.find(typeName);
+        if (inputFunction != inputRegistry.cend()) {
+            ptr = inputFunction->second(archive);
+        } else {
+            throw exceptions::UnknownTypeException(
+                    std::string("could not find input serializer for " +
+                                boost::typeindex::type_id_runtime(ptr).pretty_name()));
+        }
+    }
+    return ptr;
+}
+} // namespace detail
+
+template <typename InputStream, typename T>
+void load(JsonInputArchive<InputStream>& archive, std::shared_ptr<T>& ptr)
+{
+    // forward to raw pointer implementation
+    ptr = std::move(detail::loadPointer<T>(archive));
+}
+
+template <typename InputStream, typename T>
+void load(JsonInputArchive<InputStream>& archive, std::unique_ptr<T>& ptr)
+{
+    // forward to raw pointer implementation
+    ptr = std::move(detail::loadPointer<T>(archive));
 }
 
 } // namespace muesli

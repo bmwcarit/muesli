@@ -207,7 +207,8 @@ std::size_t hash_value(const TStructExtended& tStructExtendedValue);
 } // namespace tests
 } // namespace muesli
 
-MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TStructExtended,
-                     "muesli.tests.testtypes.TStructExtended")
+MUESLI_REGISTER_POLYMORPHIC_TYPE(muesli::tests::testtypes::TStructExtended,
+                                 muesli::tests::testtypes::TStruct,
+                                 "muesli.tests.testtypes.TStructExtended")
 
 #endif // MUESLI_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_

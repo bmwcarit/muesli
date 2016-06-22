@@ -21,6 +21,7 @@
 #define MUESLI_BASEARCHIVE_H_
 
 #include "muesli/BaseClass.h"
+#include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
 
 namespace muesli
@@ -64,9 +65,16 @@ private:
     }
 
     template <typename T>
-    void handle(BaseClass<T> arg)
+    void handle(BaseClass<T>&& arg)
     {
         // do no call intro/outro when serializing base classes
+        self.dispatch(*arg.wrapped);
+    }
+
+    template <typename T>
+    void handle(SkipIntroOutroWrapper<T>&& arg)
+    {
+        // do no call intro/outro for the wrapped element
         self.dispatch(*arg.wrapped);
     }
 

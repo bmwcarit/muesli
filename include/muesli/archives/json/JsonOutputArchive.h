@@ -21,9 +21,11 @@
 
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include <boost/type_index.hpp>
 
 #include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -36,6 +38,7 @@
 #include "muesli/ArchiveRegistry.h"
 #include "muesli/archives/json/detail/traits.h"
 #include "muesli/concepts/OutputStream.h"
+#include "muesli/exceptions/UnknownTypeException.h"
 
 #include "detail/RapidJsonOutputStreamAdapter.h"
 
@@ -244,6 +247,55 @@ template <typename OutputStream,
 void save(JsonOutputArchive<OutputStream>& archive, Enum value)
 {
     archive.writeValue(Wrapper::getLiteral(value));
+}
+
+namespace detail
+{
+// generic serialization for non-polymorphic pointer types
+template <typename OutputStream, typename T>
+std::enable_if_t<!std::is_polymorphic<T>::value> savePointer(
+        JsonOutputArchive<OutputStream>& archive,
+        const T* ptr)
+{
+    archive(*ptr);
+}
+
+// generic serialization for non-polymorphic pointer types
+template <typename OutputStream, typename Base>
+std::enable_if_t<std::is_polymorphic<Base>::value> savePointer(
+        JsonOutputArchive<OutputStream>& archive,
+        const Base* ptr)
+{
+    const std::type_info& ptrInfo = typeid(*ptr);
+    static const std::type_info& typeInfo = typeid(Base);
+
+    auto& outputRegistry = muesli::TypeRegistry<Base>::getOutputRegistry();
+    if (ptrInfo == typeInfo) {
+        archive(*ptr);
+    } else {
+        // lookup in type registry
+        auto outputFunction = outputRegistry.find(ptrInfo);
+        if (outputFunction != outputRegistry.cend()) {
+            outputFunction->second(archive, ptr);
+        } else {
+            throw exceptions::UnknownTypeException(
+                    std::string("could not find output serializer for " +
+                                boost::typeindex::type_id_runtime(ptr).pretty_name()));
+        }
+    }
+}
+} // detail
+
+template <typename OutputStream, typename T>
+void save(JsonOutputArchive<OutputStream>& archive, const std::shared_ptr<T>& ptr)
+{
+    detail::savePointer(archive, ptr.get());
+}
+
+template <typename OutputStream, typename T>
+void save(JsonOutputArchive<OutputStream>& archive, const std::unique_ptr<T>& ptr)
+{
+    detail::savePointer(archive, ptr.get());
 }
 
 } // namespace muesli
