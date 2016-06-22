@@ -258,7 +258,7 @@ auto load(JsonInputArchive<InputStream>& archive, Map& map)
             archive.setNextKey(std::move(keyString));
             T key;
             archive.readKey(key);
-            archive(map[key]);
+            archive(map[std::move(key)]);
         }
     }
 }
