@@ -195,11 +195,15 @@ private:
 template <typename InputStream, typename T>
 void intro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
+    std::ignore = archive;
+    std::ignore = nameValuePair;
 }
 
 template <typename InputStream, typename T>
 void outro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
+    std::ignore = archive;
+    std::ignore = nameValuePair;
 }
 
 template <typename InputStream, typename T>
@@ -224,6 +228,7 @@ template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(JsonInputArchive<InputStream>& archive,
                                                             T& value)
 {
+    std::ignore = archive;
     std::ignore = value;
 }
 
@@ -231,6 +236,7 @@ template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<InputStream>& archive,
                                                             T& value)
 {
+    std::ignore = archive;
     std::ignore = value;
 }
 
