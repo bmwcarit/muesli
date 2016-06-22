@@ -74,6 +74,6 @@ private:
 };
 } // namespace muesli
 
-MUESLI_REGISTER_INPUT_STREAM(muesli::StdIStreamWrapper<std::istream>);
+MUESLI_REGISTER_INPUT_STREAM(muesli::StdIStreamWrapper<std::istream>)
 
 #endif // MUESLI_STDISTREAMWRAPPER_H_

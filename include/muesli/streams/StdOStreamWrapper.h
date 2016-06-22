@@ -66,6 +66,6 @@ private:
 } // namespace muesli
 
 // register the common std::ostream case
-MUESLI_REGISTER_OUTPUT_STREAM(muesli::StdOStreamWrapper<std::ostream>);
+MUESLI_REGISTER_OUTPUT_STREAM(muesli::StdOStreamWrapper<std::ostream>)
 
 #endif // MUESLI_STDOSTREAMWRAPPER_H_

@@ -346,6 +346,6 @@ void load(JsonInputArchive<InputStream>& archive, std::unique_ptr<T>& ptr)
 
 } // namespace muesli
 
-MUESLI_REGISTER_INPUT_ARCHIVE(muesli::JsonInputArchive);
+MUESLI_REGISTER_INPUT_ARCHIVE(muesli::JsonInputArchive)
 
 #endif // MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_

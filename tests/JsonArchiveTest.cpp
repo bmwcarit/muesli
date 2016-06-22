@@ -57,7 +57,7 @@ struct NestedStruct
         return tStruct == other.tStruct;
     }
 };
-MUESLI_REGISTER_TYPE(NestedStruct, "NestedStruct");
+MUESLI_REGISTER_TYPE(NestedStruct, "NestedStruct")
 
 struct NestedStructPolymorphic
 {
@@ -76,7 +76,7 @@ struct NestedStructPolymorphic
     }
 };
 // register with same name as above in order to use the same string comparison of expected JSON
-MUESLI_REGISTER_TYPE(NestedStructPolymorphic, "NestedStruct");
+MUESLI_REGISTER_TYPE(NestedStructPolymorphic, "NestedStruct")
 
 class JsonArchiveTest : public ::testing::Test
 {

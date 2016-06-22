@@ -34,7 +34,7 @@ public:
     MOCK_METHOD0(flush, void());
 };
 
-MUESLI_REGISTER_OUTPUT_STREAM(MockOutputStream);
+MUESLI_REGISTER_OUTPUT_STREAM(MockOutputStream)
 
 // implements InputStream concept
 class MockInputStream
@@ -47,6 +47,6 @@ public:
     MOCK_METHOD0(tell, std::size_t());
 };
 
-MUESLI_REGISTER_INPUT_STREAM(MockInputStream);
+MUESLI_REGISTER_INPUT_STREAM(MockInputStream)
 
 #endif // MUESLI_TESTS_MOCKSTREAM_H_

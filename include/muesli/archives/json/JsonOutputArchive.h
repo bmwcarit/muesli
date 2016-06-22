@@ -300,6 +300,6 @@ void save(JsonOutputArchive<OutputStream>& archive, const std::unique_ptr<T>& pt
 
 } // namespace muesli
 
-MUESLI_REGISTER_OUTPUT_ARCHIVE(muesli::JsonOutputArchive);
+MUESLI_REGISTER_OUTPUT_ARCHIVE(muesli::JsonOutputArchive)
 
 #endif // MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_

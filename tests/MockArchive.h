@@ -43,7 +43,7 @@ public:
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
 
-MUESLI_REGISTER_INPUT_ARCHIVE(MockInputArchive);
+MUESLI_REGISTER_INPUT_ARCHIVE(MockInputArchive)
 
 template <typename OutputStream>
 class MockOutputArchive
@@ -61,7 +61,7 @@ public:
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
 
-MUESLI_REGISTER_OUTPUT_ARCHIVE(MockOutputArchive);
+MUESLI_REGISTER_OUTPUT_ARCHIVE(MockOutputArchive)
 
 template <typename Archive>
 void serialize(Archive& ar, std::string& val)

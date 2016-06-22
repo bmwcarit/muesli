@@ -46,8 +46,8 @@ static_assert(boost::mpl::equal<MUESLI_GET_INCREMENTAL_TYPELIST(Tag1), boost::mp
 static_assert(boost::mpl::equal<MUESLI_GET_INCREMENTAL_TYPELIST(Tag2), boost::mpl::vector<>>::value,
               "list must be empty");
 
-MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag1, Foo1);
-MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag2, Bar1);
+MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag1, Foo1)
+MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag2, Bar1)
 
 static_assert(
         boost::mpl::equal<MUESLI_GET_INCREMENTAL_TYPELIST(Tag1), boost::mpl::vector<Foo1>>::value,
@@ -56,8 +56,8 @@ static_assert(
         boost::mpl::equal<MUESLI_GET_INCREMENTAL_TYPELIST(Tag2), boost::mpl::vector<Bar1>>::value,
         "lists must match");
 
-MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag1, Foo2);
-MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag2, Bar2);
+MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag1, Foo2)
+MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag2, Bar2)
 
 static_assert(boost::mpl::equal<MUESLI_GET_INCREMENTAL_TYPELIST(Tag1),
                                 boost::mpl::vector<Foo1, Foo2>>::value,
