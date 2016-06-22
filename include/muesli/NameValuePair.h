@@ -23,120 +23,119 @@
 namespace muesli
 {
 
-  //! For holding name value pairs
-  /*! This pairs a name (some string) with some value such that an archive
-      can potentially take advantage of the pairing.
+//! For holding name value pairs
+/*! This pairs a name (some string) with some value such that an archive
+    can potentially take advantage of the pairing.
 
-      In serialization functions, NameValuePairs are usually created like so:
-      @code{.cpp}
-      struct MyStruct
+    In serialization functions, NameValuePairs are usually created like so:
+    @code{.cpp}
+    struct MyStruct
+    {
+      int a, b, c, d, e;
+
+      template<class Archive>
+      void serialize(Archive & archive)
       {
-        int a, b, c, d, e;
+        archive( MUESLI_NVP(a),
+                 MUESLI_NVP(b),
+                 MUESLI_NVP(c),
+                 MUESLI_NVP(d),
+                 MUESLI_NVP(e) );
+      }
+    };
+    @endcode
 
-        template<class Archive>
-        void serialize(Archive & archive)
-        {
-          archive( CEREAL_NVP(a),
-                   CEREAL_NVP(b),
-                   CEREAL_NVP(c),
-                   CEREAL_NVP(d),
-                   CEREAL_NVP(e) );
-        }
-      };
-      @endcode
+    Alternatively, you can give you data members custom names like so:
+    @code{.cpp}
+    struct MyStruct
+    {
+      int a, b, my_embarrassing_variable_name, d, e;
 
-      Alternatively, you can give you data members custom names like so:
-      @code{.cpp}
-      struct MyStruct
+      template<class Archive>
+      void serialize(Archive & archive)
       {
-        int a, b, my_embarrassing_variable_name, d, e;
+        archive( MUESLI_NVP(a),
+                 MUESLI_NVP(b),
+                 muesli::make_nvp("var", my_embarrassing_variable_name) );
+                 MUESLI_NVP(d),
+                 MUESLI_NVP(e) );
+      }
+    };
+    @endcode
 
-        template<class Archive>
-        void serialize(Archive & archive)
-        {
-          archive( CEREAL_NVP(a),
-                   CEREAL_NVP(b),
-                   cereal::make_nvp("var", my_embarrassing_variable_name) );
-                   CEREAL_NVP(d),
-                   CEREAL_NVP(e) );
-        }
-      };
-      @endcode
+    There is a slight amount of overhead to creating NameValuePairs, so there
+    is a third method which will elide the names when they are not used by
+    the Archive:
 
-      There is a slight amount of overhead to creating NameValuePairs, so there
-      is a third method which will elide the names when they are not used by
-      the Archive:
+    @code{.cpp}
+    struct MyStruct
+    {
+      int a, b;
 
-      @code{.cpp}
-      struct MyStruct
+      template<class Archive>
+      void serialize(Archive & archive)
       {
-        int a, b;
+        archive( muesli::make_nvp<Archive>(a),
+                 muesli::make_nvp<Archive>(b) );
+      }
+    };
+    @endcode
 
-        template<class Archive>
-        void serialize(Archive & archive)
-        {
-          archive( cereal::make_nvp<Archive>(a),
-                   cereal::make_nvp<Archive>(b) );
-        }
-      };
-      @endcode
+    This third method is generally only used when providing generic type
+    support.  Users writing their own serialize functions will normally
+    explicitly control whether they want to use NVPs or not.
 
-      This third method is generally only used when providing generic type
-      support.  Users writing their own serialize functions will normally
-      explicitly control whether they want to use NVPs or not.
+    @internal */
+template <class T>
+class NameValuePair
+{
+private:
+    // If we get passed an array, keep the type as is, otherwise store
+    // a reference if we were passed an l value reference, else copy the value
+    using Type = typename std::conditional<
+            std::is_array<typename std::remove_reference<T>::type>::value,
+            typename std::remove_cv<T>::type,
+            typename std::conditional<std::is_lvalue_reference<T>::value,
+                                      T,
+                                      typename std::decay<T>::type>::type>::type;
 
-      @internal */
-  template <class T>
-  class NameValuePair
-  {
-    private:
-      // If we get passed an array, keep the type as is, otherwise store
-      // a reference if we were passed an l value reference, else copy the value
-      using Type = typename std::conditional<std::is_array<typename std::remove_reference<T>::type>::value,
-                                             typename std::remove_cv<T>::type,
-                                             typename std::conditional<std::is_lvalue_reference<T>::value,
-                                                                       T,
-                                                                       typename std::decay<T>::type>::type>::type;
+    NameValuePair& operator=(NameValuePair const&) = delete;
 
-//      // prevent nested nvps
-//      static_assert( !joynr::util::IsDerivedFromTemplate<NameValuePair, T>::value,
-//                     "Cannot pair a name to a NameValuePair" );
+public:
+    //! Constructs a new NameValuePair
+    /*! @param n The name of the pair
+        @param v The value to pair.  Ideally this should be an l-value reference so that
+                 the value can be both loaded and saved to.  If you pass an r-value reference,
+                 the NameValuePair will store a copy of it instead of a reference.  Thus you should
+                 only pass r-values in cases where this makes sense, such as the result of some
+                 size() call.
+        @internal */
+    NameValuePair(char const* n, T&& v) : name(n), value(std::forward<T>(v))
+    {
+    }
 
-      NameValuePair & operator=( NameValuePair const & ) = delete;
+    char const* name;
+    Type value;
+};
 
-    public:
-      //! Constructs a new NameValuePair
-      /*! @param n The name of the pair
-          @param v The value to pair.  Ideally this should be an l-value reference so that
-                   the value can be both loaded and saved to.  If you pass an r-value reference,
-                   the NameValuePair will store a copy of it instead of a reference.  Thus you should
-                   only pass r-values in cases where this makes sense, such as the result of some
-                   size() call.
-          @internal */
-      NameValuePair( char const * n, T && v ) : name(n), value(std::forward<T>(v)) {}
-
-      char const * name;
-      Type value;
-  };
-
-  // ######################################################################
-  //! Creates a name value pair
-  /*! @relates NameValuePair
-      @ingroup Utility */
-  template <class T> inline
-  NameValuePair<T> make_nvp( std::string const & name, T && value )
-  {
+// ######################################################################
+//! Creates a name value pair
+/*! @relates NameValuePair
+    @ingroup Utility */
+template <class T>
+inline NameValuePair<T> make_nvp(std::string const& name, T&& value)
+{
     return {name.c_str(), std::forward<T>(value)};
-  }
+}
 
-  //! Creates a name value pair
-  /*! @relates NameValuePair
-      @ingroup Utility */
-  template <class T> inline
-  NameValuePair<T> make_nvp( const char * name, T && value )
-  {
+//! Creates a name value pair
+/*! @relates NameValuePair
+    @ingroup Utility */
+template <class T>
+inline NameValuePair<T> make_nvp(const char* name, T&& value)
+{
     return {name, std::forward<T>(value)};
-  }
+}
 } // namespace muesli
 
 //! Creates a name value pair for the variable T with the same name as the variable

@@ -72,7 +72,8 @@ private:
 
     // 'arg' has 'serialize' member function
     template <typename T, typename D = Derived>
-    auto dispatch(T&& arg) -> decltype(discardConstQualifier(arg).serialize(static_cast<D*>(this) -> self), void())
+    auto dispatch(T&& arg)
+            -> decltype(discardConstQualifier(arg).serialize(static_cast<D*>(this) -> self), void())
     {
         discardConstQualifier(arg).serialize(self);
     }
@@ -80,7 +81,8 @@ private:
     // free function 'serialize' exists for 'arg'
     template <typename T, typename D = Derived>
     auto dispatch(T&& arg)
-            -> decltype(serialize(static_cast<D*>(this) -> self, discardConstQualifier(arg)), void())
+            -> decltype(serialize(static_cast<D*>(this) -> self, discardConstQualifier(arg)),
+                        void())
     {
         serialize(self, discardConstQualifier(arg));
     }
