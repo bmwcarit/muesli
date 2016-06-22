@@ -41,6 +41,21 @@ struct TypeWithinList<Needle, Head, Haystack...>
     static constexpr bool value =
             std::is_same<Needle, Head>::value || TypeWithinList<Needle, Haystack...>::value;
 };
+
+namespace detail
+{
+
+template <typename...>
+struct MakeVoid
+{
+    using type = void;
+};
+
+} // namespace detail
+
+template <typename... Ts>
+using VoidT = typename detail::MakeVoid<Ts...>::type;
+
 } // namespace muesli
 
 #endif // MUESLI_TRAITS_H_

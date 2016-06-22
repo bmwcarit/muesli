@@ -93,7 +93,7 @@ struct IsMap : std::false_type
 };
 
 template <typename T>
-struct IsMap<T, typename T::mapped_type> : std::true_type
+struct IsMap<T, VoidT<typename std::decay_t<T>::mapped_type>> : std::true_type
 {
 };
 

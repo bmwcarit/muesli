@@ -246,8 +246,8 @@ void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
 }
 
 template <typename InputStream, typename Map>
-auto load(JsonInputArchive<InputStream>& archive, Map& map)
-        -> decltype(typename Map::mapped_type(), void())
+std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStream>& archive,
+                                                       Map& map)
 {
     using T = typename Map::key_type;
     for (rapidjson::Document::ConstMemberIterator itr = archive.getMemberBegin();
