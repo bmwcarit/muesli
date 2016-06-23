@@ -38,8 +38,23 @@
 
 namespace muesli
 {
+
+using RegisteredOutputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputStream);
+using RegisteredInputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputStream);
+
+using RegisteredOutputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputArchive);
+using RegisteredInputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputArchive);
+
 namespace detail
 {
+
+template <typename List>
+constexpr std::size_t ListSize = boost::mpl::size<List>::value;
+
+static_assert(0 < ListSize<RegisteredOutputStreams>, "no OutputStream registered");
+static_assert(0 < ListSize<RegisteredInputStreams>, "no InputStream registered");
+static_assert(0 < ListSize<RegisteredOutputArchives>, "no OutputArchive registered");
+static_assert(0 < ListSize<RegisteredInputArchives>, "no InputArchive registered");
 
 template <typename Stream, typename RegisteredArchive>
 struct ApplyStream
@@ -73,12 +88,6 @@ template <typename RegisteredArchives, typename RegisteredStreams>
 using MakeArchiveVariant = typename boost::make_variant_over<typename boost::mpl::transform<
         FlatCartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>,
         std::add_lvalue_reference<boost::mpl::_1>>::type>::type;
-
-using RegisteredOutputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputStream);
-using RegisteredInputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputStream);
-
-using RegisteredOutputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputArchive);
-using RegisteredInputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputArchive);
 
 using OutputArchiveVariant = MakeArchiveVariant<RegisteredOutputArchives, RegisteredOutputStreams>;
 using InputArchiveVariant = MakeArchiveVariant<RegisteredInputArchives, RegisteredInputStreams>;
