@@ -23,6 +23,7 @@
 #include "muesli/BaseClass.h"
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
+#include "muesli/detail/Expansion.h"
 
 namespace muesli
 {
@@ -42,8 +43,7 @@ public:
     {
         // call handle() for each of the args
         static_assert(sizeof...(Ts) > 0, "at least one argument must be provided");
-        using Expansion = int[];
-        Expansion{0, (self.handle(std::forward<Ts>(args)), void(), 0)...};
+        detail::Expansion{0, (self.handle(std::forward<Ts>(args)), 0)...};
     }
 
 private:

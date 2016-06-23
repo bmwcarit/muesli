@@ -44,6 +44,7 @@
 #include "muesli/exceptions/UnknownTypeException.h"
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/exceptions/ParseException.h"
+#include "muesli/detail/Expansion.h"
 
 #include "detail/RapidJsonInputStreamAdapter.h"
 
@@ -316,16 +317,9 @@ void load(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePai
     archive(nameValuePair.value);
 }
 
-template <typename InputStream, std::size_t Index, typename TupleType, typename T, typename... Ts>
-void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
+namespace detail
 {
-    archive.setNextIndex(Index);
-    archive(std::get<Index>(tuple));
-
-    loadTupleElement<InputStream, Index + 1, TupleType, Ts...>(archive, tuple);
-}
-
-template <typename InputStream, typename TupleType, std::size_t Index>
+template <std::size_t Index, typename InputStream, typename TupleType>
 void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
 {
     archive.setNextIndex(Index);
@@ -337,9 +331,9 @@ void loadTuple(JsonInputArchive<InputStream>& archive,
                TupleType& tuple,
                std::index_sequence<Indicies...>)
 {
-    using Expansion = int[];
-    Expansion{0, (loadTupleElement<InputStream, TupleType, Indicies>(archive, tuple), 0)...};
+    detail::Expansion{0, (loadTupleElement<Indicies>(archive, tuple), 0)...};
 }
+} // namespace detail
 
 template <typename InputStream, typename... Ts>
 void load(JsonInputArchive<InputStream>& archive, std::tuple<Ts...>& tuple)
@@ -352,7 +346,7 @@ void load(JsonInputArchive<InputStream>& archive, std::tuple<Ts...>& tuple)
                                          std::to_string(sizeof...(Ts)));
     }
 
-    loadTuple(archive, tuple, std::index_sequence_for<Ts...>{});
+    detail::loadTuple(archive, tuple, std::index_sequence_for<Ts...>{});
 }
 
 template <typename InputStream, typename T>
