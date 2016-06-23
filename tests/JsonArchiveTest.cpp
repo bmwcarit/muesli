@@ -401,3 +401,69 @@ TEST_F(JsonArchiveTest, polymorphismDerived)
     jsonInputArchive(tNestedStructPolymorphicDeserialized);
     EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
 }
+
+struct StateHistoryTestStruct
+{
+    std::string stringBeforStruct;
+    muesli::tests::testtypes::TStruct tstruct;
+    std::string stringAfterStruct;
+
+    template <typename Archive>
+    void load(Archive& archive)
+    {
+        archive(muesli::make_nvp("stringBeforStruct", stringBeforStruct));
+        archive.pushState();
+        archive(muesli::make_nvp("stringAfterStruct", stringAfterStruct));
+    }
+
+    template <typename Archive>
+    void save(Archive& archive) const
+    {
+        archive(muesli::make_nvp("stringBeforStruct", stringBeforStruct),
+                muesli::make_nvp("tstruct", tstruct),
+                muesli::make_nvp("stringAfterStruct", stringAfterStruct));
+    }
+
+    bool operator==(const StateHistoryTestStruct& other) const
+    {
+        return stringBeforStruct == other.stringBeforStruct && tstruct == other.tstruct &&
+               stringAfterStruct == other.stringAfterStruct;
+    }
+};
+
+MUESLI_REGISTER_TYPE(StateHistoryTestStruct, "StateHistoryTestStruct")
+
+TEST_F(JsonArchiveTest, pushPopState)
+{
+    StateHistoryTestStruct expectedStateHistoryStruct;
+    expectedStateHistoryStruct.stringBeforStruct = "test string data before struct";
+    expectedStateHistoryStruct.tstruct = tStruct;
+    expectedStateHistoryStruct.stringAfterStruct = "test string data after struct";
+
+    std::string expectedSerializedStateHistoryStruct(
+            R"({)"
+            R"("_typeName":"StateHistoryTestStruct",)"
+            R"("stringBeforStruct":"test string data before struct",)"
+            R"("tstruct":)" +
+            expectedSerializedStruct +
+            R"(,)"
+            R"("stringAfterStruct":"test string data after struct")"
+            R"(})");
+
+    jsonOutputArchive(expectedStateHistoryStruct);
+    EXPECT_EQ(expectedSerializedStateHistoryStruct, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    StateHistoryTestStruct stateHistoryStructDeserialized;
+    jsonInputArchive(stateHistoryStructDeserialized);
+    EXPECT_EQ(expectedStateHistoryStruct.stringBeforStruct,
+              stateHistoryStructDeserialized.stringBeforStruct);
+    EXPECT_EQ(expectedStateHistoryStruct.stringAfterStruct,
+              stateHistoryStructDeserialized.stringAfterStruct);
+
+    jsonInputArchive.popState();
+    muesli::tests::testtypes::TStruct tstructDeserialized;
+    jsonInputArchive(muesli::make_nvp("tstruct", tstructDeserialized));
+    EXPECT_EQ(expectedStateHistoryStruct.tstruct, tstructDeserialized);
+}

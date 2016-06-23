@@ -60,7 +60,9 @@ public:
               nextKey(),
               nextKeyValid(false),
               nextIndex(0),
-              nextIndexValid(false)
+              nextIndexValid(false),
+              stack(),
+              stateHistoryStack()
     {
         using AdaptedStream = json::detail::RapidJsonInputStreamAdapter<InputStream>;
         AdaptedStream adaptedStream(stream);
@@ -154,6 +156,19 @@ public:
         nextIndexValid = false;
     }
 
+    void pushState() {
+        stateHistoryStack.push(stack);
+    }
+
+    void popState()
+    {
+        assert(!stateHistoryStack.empty());
+        stack = stateHistoryStack.top();
+        nextKeyValid = false;
+        nextIndexValid = false;
+        stateHistoryStack.pop();
+    }
+
 private:
     rapidjson::Document::GenericValue* getNextValue() const
     {
@@ -165,14 +180,15 @@ private:
         return nullptr;
     }
 
-    std::stack<rapidjson::Document::GenericValue*> stack;
-
 private:
     rapidjson::Document document;
     std::string nextKey;
     bool nextKeyValid;
     std::size_t nextIndex;
     bool nextIndexValid;
+    using ValueStack = std::stack<rapidjson::Document::GenericValue*>;
+    ValueStack stack;
+    std::stack<ValueStack> stateHistoryStack;
 };
 
 template <typename InputStream, typename T>
