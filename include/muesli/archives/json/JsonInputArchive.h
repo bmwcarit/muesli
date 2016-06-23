@@ -56,7 +56,7 @@ class JsonInputArchive
     using Parent = muesli::BaseArchive<muesli::tags::InputArchive, JsonInputArchive<InputStream>>;
 
 public:
-    JsonInputArchive(InputStream& stream)
+    explicit JsonInputArchive(InputStream& stream)
             : Parent(this),
               document(),
               nextKey(),

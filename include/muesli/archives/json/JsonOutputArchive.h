@@ -55,7 +55,7 @@ class JsonOutputArchive
             muesli::BaseArchive<muesli::tags::OutputArchive, JsonOutputArchive<OutputStream>>;
 
 public:
-    JsonOutputArchive(OutputStream& stream)
+    explicit JsonOutputArchive(OutputStream& stream)
             : Parent(this), outputStream(stream), writer(outputStream)
     {
     }
