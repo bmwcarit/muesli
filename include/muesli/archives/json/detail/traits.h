@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <cstddef>
 
 #include "muesli/Traits.h"
 
@@ -47,7 +48,8 @@ struct IsArray<std::vector<T>> : std::true_type
 template <typename T>
 struct IsPrimitive
 {
-    static constexpr bool value = std::is_same<std::string, T>::value || !std::is_class<T>::value;
+    static constexpr bool value = std::is_same<std::string, T>::value || !std::is_class<T>::value ||
+                                  std::is_same<std::nullptr_t, T>::value;
 };
 
 template <typename T>

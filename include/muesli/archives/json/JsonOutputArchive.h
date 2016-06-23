@@ -100,6 +100,12 @@ public:
         writer.String(stringValue);
     }
 
+    void writeValue(const std::nullptr_t& value)
+    {
+        std::ignore = value;
+        writer.Null();
+    }
+
     void startObject()
     {
         writer.StartObject();
@@ -261,7 +267,11 @@ std::enable_if_t<!std::is_polymorphic<T>::value> savePointer(
         JsonOutputArchive<OutputStream>& archive,
         const T* ptr)
 {
-    archive(*ptr);
+    if (ptr != nullptr) {
+        archive(*ptr);
+    } else {
+        archive(std::nullptr_t{});
+    }
 }
 
 // generic serialization for non-polymorphic pointer types
@@ -270,22 +280,26 @@ std::enable_if_t<std::is_polymorphic<Base>::value> savePointer(
         JsonOutputArchive<OutputStream>& archive,
         const Base* ptr)
 {
-    const std::type_info& ptrInfo = typeid(*ptr);
-    static const std::type_info& typeInfo = typeid(Base);
+    if (ptr != nullptr) {
+        const std::type_info& ptrInfo = typeid(*ptr);
+        static const std::type_info& typeInfo = typeid(Base);
 
-    auto& outputRegistry = muesli::TypeRegistry<Base>::getOutputRegistry();
-    if (ptrInfo == typeInfo) {
-        archive(*ptr);
-    } else {
-        // lookup in type registry
-        auto outputFunction = outputRegistry.find(ptrInfo);
-        if (outputFunction != outputRegistry.cend()) {
-            outputFunction->second(archive, ptr);
+        auto& outputRegistry = muesli::TypeRegistry<Base>::getOutputRegistry();
+        if (ptrInfo == typeInfo) {
+            archive(*ptr);
         } else {
-            throw exceptions::UnknownTypeException(
-                    std::string("could not find output serializer for " +
-                                boost::typeindex::type_id_runtime(ptr).pretty_name()));
+            // lookup in type registry
+            auto outputFunction = outputRegistry.find(ptrInfo);
+            if (outputFunction != outputRegistry.cend()) {
+                outputFunction->second(archive, ptr);
+            } else {
+                throw exceptions::UnknownTypeException(
+                        std::string("could not find output serializer for " +
+                                    boost::typeindex::type_id_runtime(ptr).pretty_name()));
+            }
         }
+    } else {
+        archive(std::nullptr_t{});
     }
 }
 } // detail

@@ -72,7 +72,10 @@ struct NestedStructPolymorphic
     bool operator==(const NestedStructPolymorphic& other) const
     {
         // value comparison
-        return *tStruct == *(other.tStruct);
+        if (tStruct != nullptr && other.tStruct != nullptr) {
+            return *tStruct == *(other.tStruct);
+        }
+        return tStruct == nullptr && other.tStruct == nullptr;
     }
 };
 // register with same name as above in order to use the same string comparison of expected JSON
@@ -123,6 +126,11 @@ public:
                 R"("tStruct":)" +
                 expectedSerializedStructExtended +
                 R"(})";
+        expectedSerializedNestedStructWithNullptr =
+                R"({)"
+                R"("_typeName":"NestedStruct",)"
+                R"("tStruct":null)"
+                R"(})";
     }
 
 protected:
@@ -136,6 +144,7 @@ protected:
     std::string expectedSerializedStructExtended;
     std::string expectedSerializedNestedStruct;
     std::string expectedSerializedNestedExtendedStruct;
+    std::string expectedSerializedNestedStructWithNullptr;
 };
 
 TEST_F(JsonArchiveTest, serializeStruct)
@@ -400,6 +409,18 @@ TEST_F(JsonArchiveTest, polymorphismDerived)
     NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
     jsonInputArchive(tNestedStructPolymorphicDeserialized);
     EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
+}
+
+TEST_F(JsonArchiveTest, nullptrSerializationPolymorphism)
+{
+    NestedStructPolymorphic tNestedStructPolymorphicWithNullptr = {nullptr};
+    jsonOutputArchive(tNestedStructPolymorphicWithNullptr);
+    EXPECT_EQ(expectedSerializedNestedStructWithNullptr, stream.str());
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
+    jsonInputArchive(tNestedStructPolymorphicDeserialized);
+    EXPECT_EQ(tNestedStructPolymorphicWithNullptr, tNestedStructPolymorphicDeserialized);
 }
 
 struct StateHistoryTestStruct

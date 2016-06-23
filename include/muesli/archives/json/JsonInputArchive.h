@@ -169,6 +169,11 @@ public:
         stateHistoryStack.pop();
     }
 
+    bool currentValueIsNull() const
+    {
+        return stack.top()->IsNull();
+    }
+
 private:
     rapidjson::Document::GenericValue* getNextValue() const
     {
@@ -328,6 +333,9 @@ template <typename T, typename InputStream>
 std::enable_if_t<!std::is_polymorphic<T>::value, std::unique_ptr<T>> loadPointer(
         JsonInputArchive<InputStream>& archive)
 {
+    if (archive.currentValueIsNull()) {
+        return nullptr;
+    }
     auto ptr = std::make_unique<T>();
     archive(SkipIntroOutroWrapper<T>(ptr.get()));
     return ptr;
@@ -338,6 +346,9 @@ template <typename Base, typename InputStream>
 std::enable_if_t<std::is_polymorphic<Base>::value, std::unique_ptr<Base>> loadPointer(
         JsonInputArchive<InputStream>& archive)
 {
+    if (archive.currentValueIsNull()) {
+        return nullptr;
+    }
     std::unique_ptr<Base> ptr = nullptr;
     archive.setNextKey("_typeName");
     static const std::string baseTypeName = RegisteredType<Base>::name();
