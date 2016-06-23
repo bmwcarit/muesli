@@ -32,6 +32,7 @@
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include "muesli/BaseArchive.h"
 #include "muesli/Traits.h"
@@ -69,6 +70,10 @@ public:
         using AdaptedStream = json::detail::RapidJsonInputStreamAdapter<InputStream>;
         AdaptedStream adaptedStream(stream);
         document.ParseStream<0>(adaptedStream);
+        if (document.HasParseError()) {
+            throw exceptions::ParseException(std::string("could not parse JSON: ") +
+                                             rapidjson::GetParseError_En(document.GetParseError()));
+        }
         stack.push(&document);
     }
 

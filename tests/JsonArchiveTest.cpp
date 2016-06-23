@@ -24,6 +24,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "muesli/exceptions/ParseException.h"
+
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"
 
@@ -487,4 +489,10 @@ TEST_F(JsonArchiveTest, pushPopState)
     muesli::tests::testtypes::TStruct tstructDeserialized;
     jsonInputArchive(muesli::make_nvp("tstruct", tstructDeserialized));
     EXPECT_EQ(expectedStateHistoryStruct.tstruct, tstructDeserialized);
+}
+
+TEST_F(JsonArchiveTest, invalidJsonCausesParseException)
+{
+    stream.str("}invalid-json{");
+    EXPECT_THROW(JsonInputArchiveImpl{inputStreamWrapper}, muesli::exceptions::ParseException);
 }
