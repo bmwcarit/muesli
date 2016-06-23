@@ -163,7 +163,8 @@ public:
         nextIndexValid = false;
     }
 
-    void pushState() {
+    void pushState()
+    {
         stateHistoryStack.push(stack);
     }
 
@@ -280,7 +281,8 @@ std::enable_if_t<std::is_same<T, std::string>::value> stringToType(const std::st
 }
 
 template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
-std::enable_if_t<std::is_enum<Enum>::value> stringToType(const std::string& literal, Enum& enumValue)
+std::enable_if_t<std::is_enum<Enum>::value> stringToType(const std::string& literal,
+                                                         Enum& enumValue)
 {
     enumValue = Wrapper::getEnum(literal);
 }
@@ -314,7 +316,7 @@ void load(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePai
     archive(nameValuePair.value);
 }
 
-template <typename InputStream, std::size_t Index, typename TupleType, typename T, typename ... Ts>
+template <typename InputStream, std::size_t Index, typename TupleType, typename T, typename... Ts>
 void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
 {
     archive.setNextIndex(Index);
@@ -323,26 +325,28 @@ void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
     loadTupleElement<InputStream, Index + 1, TupleType, Ts...>(archive, tuple);
 }
 
-template<typename InputStream, typename TupleType, std::size_t Index>
+template <typename InputStream, typename TupleType, std::size_t Index>
 void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
 {
     archive.setNextIndex(Index);
     archive(std::get<Index>(tuple));
 }
 
-template<typename InputStream, typename TupleType, std::size_t ... Indicies>
-void loadTuple(JsonInputArchive<InputStream>& archive, TupleType& tuple, std::index_sequence<Indicies...>)
+template <typename InputStream, typename TupleType, std::size_t... Indicies>
+void loadTuple(JsonInputArchive<InputStream>& archive,
+               TupleType& tuple,
+               std::index_sequence<Indicies...>)
 {
     using Expansion = int[];
     Expansion{0, (loadTupleElement<InputStream, TupleType, Indicies>(archive, tuple), 0)...};
 }
 
-template<typename InputStream, typename ... Ts>
+template <typename InputStream, typename... Ts>
 void load(JsonInputArchive<InputStream>& archive, std::tuple<Ts...>& tuple)
 {
     const std::size_t arraySize = archive.getArraySize();
 
-    if(arraySize != sizeof...(Ts)) {
+    if (arraySize != sizeof...(Ts)) {
         throw exceptions::ParseException("Failed to load tuple. Persisted tuple size is " +
                                          std::to_string(arraySize) + ". Expected tuple size is " +
                                          std::to_string(sizeof...(Ts)));

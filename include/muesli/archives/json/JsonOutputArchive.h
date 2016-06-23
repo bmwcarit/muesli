@@ -134,30 +134,32 @@ private:
     rapidjson::Writer<AdaptedStream> writer;
 };
 
-template<typename OutputStream, typename ... Ts>
+template <typename OutputStream, typename... Ts>
 void intro(JsonOutputArchive<OutputStream>& archive, const std::tuple<Ts...>& tuple)
 {
     archive.startArray();
     std::ignore = tuple;
 }
 
-template<typename OutputStream, typename ... Ts>
-void outro(JsonOutputArchive<OutputStream> &archive, const std::tuple<Ts...>& tuple)
+template <typename OutputStream, typename... Ts>
+void outro(JsonOutputArchive<OutputStream>& archive, const std::tuple<Ts...>& tuple)
 {
     archive.endArray();
     std::ignore = tuple;
 }
 
-template <typename OutputStream, typename TupleType, std::size_t ... Indicies>
-void saveTuple(JsonOutputArchive<OutputStream>& archive, TupleType& tuple, std::index_sequence<Indicies...>)
+template <typename OutputStream, typename TupleType, std::size_t... Indicies>
+void saveTuple(JsonOutputArchive<OutputStream>& archive,
+               TupleType& tuple,
+               std::index_sequence<Indicies...>)
 {
     archive(std::get<Indicies>(tuple)...);
 }
 
-template <typename OutputStream, typename ... Ts>
-void save(JsonOutputArchive<OutputStream> &archive, std::tuple<Ts...>& tuple)
+template <typename OutputStream, typename... Ts>
+void save(JsonOutputArchive<OutputStream>& archive, std::tuple<Ts...>& tuple)
 {
-    saveTuple(archive, tuple, std::index_sequence_for<Ts ...>{});
+    saveTuple(archive, tuple, std::index_sequence_for<Ts...>{});
 }
 
 template <typename OutputStream, typename T>
