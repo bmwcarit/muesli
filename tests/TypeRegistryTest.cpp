@@ -18,7 +18,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <boost/mpl/vector.hpp>
 
 #include "MockArchive.h"
 #include "MockStream.h"
