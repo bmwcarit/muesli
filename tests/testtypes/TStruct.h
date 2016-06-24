@@ -54,14 +54,6 @@ namespace tests
 namespace testtypes
 {
 
-// forward declaration is necessary since 'serialize' must be declared prior to using it as a friend
-// within the class
-class TStruct;
-
-// serialize TStruct with muesli
-template <typename Archive>
-void serialize(Archive& archive, TStruct& tStruct);
-
 /**
  * @version 49.13
  */
