@@ -20,34 +20,31 @@
 #define MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_
 
 #include <cstdint>
-#include <istream>
 #include <memory>
 #include <string>
 #include <stack>
 #include <vector>
 #include <tuple>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>
 #include <boost/optional.hpp>
 
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/stringbuffer.h>
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-#include "muesli/BaseArchive.h"
-#include "muesli/Traits.h"
 #include "muesli/ArchiveRegistry.h"
-#include "muesli/cereal/NameValuePair.h"
-#include "muesli/archives/json/detail/traits.h"
-#include "muesli/concepts/InputStream.h"
-#include "muesli/TypeRegistryFwd.h"
-#include "muesli/exceptions/UnknownTypeException.h"
+#include "muesli/BaseArchive.h"
+#include "muesli/NameValuePair.h"
 #include "muesli/SkipIntroOutroWrapper.h"
-#include "muesli/exceptions/ParseException.h"
+#include "muesli/Traits.h"
+#include "muesli/TypeRegistryFwd.h"
 #include "muesli/detail/Expansion.h"
+#include "muesli/exceptions/UnknownTypeException.h"
+#include "muesli/exceptions/ParseException.h"
 
-#include "detail/RapidJsonInputStreamAdapter.h"
+#include "muesli/archives/json/detail/traits.h"
+#include "muesli/archives/json/detail/RapidJsonInputStreamAdapter.h"
 
 namespace muesli
 {

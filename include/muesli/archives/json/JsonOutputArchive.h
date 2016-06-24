@@ -20,30 +20,26 @@
 #define MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
 
 #include <cstdint>
-#include <map>
 #include <memory>
-#include <ostream>
 #include <string>
 #include <tuple>
 #include <utility>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>
 #include <boost/optional.hpp>
 
-#include <rapidjson/ostreamwrapper.h>
-#include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "muesli/ArchiveRegistry.h"
 #include "muesli/BaseArchive.h"
 #include "muesli/NameValuePair.h"
 #include "muesli/Traits.h"
 #include "muesli/TypeRegistryFwd.h"
-#include "muesli/ArchiveRegistry.h"
-#include "muesli/archives/json/detail/traits.h"
-#include "muesli/concepts/OutputStream.h"
 #include "muesli/exceptions/UnknownTypeException.h"
 
-#include "detail/RapidJsonOutputStreamAdapter.h"
+#include "muesli/archives/json/detail/traits.h"
+#include "muesli/archives/json/detail/RapidJsonOutputStreamAdapter.h"
 
 namespace muesli
 {
