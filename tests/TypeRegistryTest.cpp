@@ -88,35 +88,40 @@ TEST(TypeRegistryTest, registeredNameIsCorrectForPolymorphicType)
 
 TEST(TypeRegistryTest, polymorphicTypeInputRegistry)
 {
-    auto& inputRegistry = muesli::TypeRegistry<PolymorphicBase>::getInputRegistry();
-    ASSERT_EQ(2, inputRegistry.size());
+    using TypeRegistry = muesli::TypeRegistry<PolymorphicBase>;
+    using LoadFunction = typename TypeRegistry::LoadFunction;
 
     MockInputArchiveImpl inputArchive;
+    {
+        boost::optional<LoadFunction> loadFunction =
+                TypeRegistry::getLoadFunction("PolymorphicDerived1");
+        ASSERT_TRUE(loadFunction.is_initialized());
+        EXPECT_CALL(inputArchive, serializeString(Eq("TEST123")));
+        std::unique_ptr<PolymorphicBase> p1 = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(PolymorphicDerived1), typeid(*p1));
+    }
 
-    auto derived1Fun = inputRegistry.find("PolymorphicDerived1");
-    ASSERT_NE(inputRegistry.cend(), derived1Fun);
-    EXPECT_CALL(inputArchive, serializeString(Eq("TEST123")));
-    auto p1 = derived1Fun->second(inputArchive);
-    EXPECT_EQ(typeid(PolymorphicDerived1), typeid(*p1));
-
-    auto derived2Fun = inputRegistry.find("PolymorphicDerived2");
-    ASSERT_NE(inputRegistry.cend(), derived2Fun);
-    EXPECT_CALL(inputArchive, serializeInt64(Eq(555)));
-    auto p2 = derived2Fun->second(inputArchive);
-    EXPECT_EQ(typeid(PolymorphicDerived2), typeid(*p2));
+    {
+        boost::optional<LoadFunction> loadFunction =
+                TypeRegistry::getLoadFunction("PolymorphicDerived2");
+        ASSERT_TRUE(loadFunction.is_initialized());
+        EXPECT_CALL(inputArchive, serializeInt64(Eq(555)));
+        std::unique_ptr<PolymorphicBase> p2 = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(PolymorphicDerived2), typeid(*p2));
+    }
 }
 
 TEST(TypeRegistryTest, polymorphicTypeOutputRegistry)
 {
-    auto& outputRegistry = muesli::TypeRegistry<PolymorphicBase>::getOutputRegistry();
-    ASSERT_EQ(2, outputRegistry.size());
+    using TypeRegistry = muesli::TypeRegistry<PolymorphicBase>;
+    using SaveFunction = typename TypeRegistry::SaveFunction;
 
     MockOutputArchiveImpl outputArchive;
     std::unique_ptr<PolymorphicBase> derived1 = std::make_unique<PolymorphicDerived1>();
-    auto derived1Fun = outputRegistry.find(typeid(*derived1));
-    ASSERT_NE(outputRegistry.cend(), derived1Fun);
+    boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(typeid(*derived1));
+    ASSERT_TRUE(saveFunction.is_initialized());
     EXPECT_CALL(outputArchive, serializeString(_));
-    derived1Fun->second(outputArchive, derived1.get());
+    (*saveFunction)(outputArchive, derived1.get());
 }
 
 // TODO 2 additional test cases: compile static and shared library which contains the datatypes,

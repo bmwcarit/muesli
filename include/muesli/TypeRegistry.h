@@ -26,6 +26,7 @@
 #include <typeindex>
 #include <type_traits>
 
+#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 #include <boost/mpl/transform.hpp>
 
@@ -44,33 +45,63 @@ template <typename Base>
 class TypeRegistry
 {
 public:
-    using DeserializerFunction = std::function<std::unique_ptr<Base>(InputArchiveVariant)>;
-    using SerializerFunction = std::function<void(OutputArchiveVariant, const Base*)>;
+    // represents a callable which is passed an InputArchive and handles the polymorphic
+    // deserialization of
+    // it returns a std::unique_ptr<Base>
+    using LoadFunction = std::function<std::unique_ptr<Base>(InputArchiveVariant)>;
 
-    using InputMap = std::unordered_map<std::string, DeserializerFunction>;
-    using OutputMap = std::unordered_map<std::type_index, SerializerFunction>;
+    // represents a callable which is passed an OutputArchive and a pointer to the value which shall
+    // be saved
+    // it handles the polymorphic serialization of the passed value
+    using SaveFunction = std::function<void(OutputArchiveVariant, const Base*)>;
 
-    static InputMap& getInputRegistry()
+    static boost::optional<LoadFunction> getLoadFunction(const std::string& typeName)
     {
-        static InputMap inputRegistry;
-        return inputRegistry;
+        return getFunction(typeName, getLoadFunctionMap());
     }
 
-    static OutputMap& getOutputRegistry()
+    static boost::optional<SaveFunction> getSaveFunction(const std::type_index& typeId)
     {
-        static OutputMap outputRegistry;
-        return outputRegistry;
+        return getFunction(typeId, getSaveFunctionMap());
     }
 
+private:
+    using TypeNameToLoadFunctionMap = std::unordered_map<std::string, LoadFunction>;
+    using TypeIdToSaveFunctionMap = std::unordered_map<std::type_index, SaveFunction>;
+
+    static TypeNameToLoadFunctionMap& getLoadFunctionMap()
+    {
+        static TypeNameToLoadFunctionMap loadFunctionMap;
+        return loadFunctionMap;
+    }
+
+    static TypeIdToSaveFunctionMap& getSaveFunctionMap()
+    {
+        static TypeIdToSaveFunctionMap saveFunctionMap;
+        return saveFunctionMap;
+    }
+
+    template <typename Key, typename Map, typename T = typename Map::mapped_type>
+    static boost::optional<T> getFunction(const Key& key, const Map& map)
+    {
+        boost::optional<T> function;
+        typename Map::const_iterator it = map.find(key);
+        if (it != map.cend()) {
+            function = it->second;
+        }
+        return function;
+    }
+
+public:
     struct Inserter
     {
-        Inserter(const std::string& name,
-                 const std::type_index& typeIndex,
-                 DeserializerFunction deserializerFun,
-                 SerializerFunction serializerFun)
+        Inserter(const std::string& typeName,
+                 const std::type_index& typeId,
+                 LoadFunction loadFunction,
+                 SaveFunction saveFunction)
         {
-            getInputRegistry().insert({name, deserializerFun});
-            getOutputRegistry().insert({typeIndex, serializerFun});
+            getLoadFunctionMap().insert({typeName, loadFunction});
+            getSaveFunctionMap().insert({typeId, saveFunction});
         }
     };
 };

@@ -28,6 +28,7 @@
 #include <utility>
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>
+#include <boost/optional.hpp>
 
 #include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -314,14 +315,15 @@ std::enable_if_t<std::is_polymorphic<Base>::value> savePointer(
         const std::type_info& ptrInfo = typeid(*ptr);
         static const std::type_info& typeInfo = typeid(Base);
 
-        auto& outputRegistry = muesli::TypeRegistry<Base>::getOutputRegistry();
         if (ptrInfo == typeInfo) {
             archive(*ptr);
         } else {
             // lookup in type registry
-            auto outputFunction = outputRegistry.find(ptrInfo);
-            if (outputFunction != outputRegistry.cend()) {
-                outputFunction->second(archive, ptr);
+            using TypeRegistry = typename muesli::TypeRegistry<Base>;
+            using SaveFunction = typename TypeRegistry::SaveFunction;
+            boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(ptrInfo);
+            if (saveFunction) {
+                (*saveFunction)(archive, ptr);
             } else {
                 throw exceptions::UnknownTypeException(
                         std::string("could not find output serializer for " +

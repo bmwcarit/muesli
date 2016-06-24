@@ -28,6 +28,7 @@
 #include <tuple>
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>
+#include <boost/optional.hpp>
 
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/stringbuffer.h>
@@ -401,10 +402,11 @@ std::enable_if_t<std::is_polymorphic<Base>::value, std::unique_ptr<Base>> loadPo
         archive(SkipIntroOutroWrapper<Base>(ptr.get()));
     } else {
         // lookup in type registry
-        auto& inputRegistry = TypeRegistry<Base>::getInputRegistry();
-        auto inputFunction = inputRegistry.find(typeName);
-        if (inputFunction != inputRegistry.cend()) {
-            ptr = inputFunction->second(archive);
+        using TypeRegistry = typename muesli::TypeRegistry<Base>;
+        using LoadFunction = typename TypeRegistry::LoadFunction;
+        boost::optional<LoadFunction> loadFunction = TypeRegistry::getLoadFunction(typeName);
+        if (loadFunction) {
+            ptr = (*loadFunction)(archive);
         } else {
             throw exceptions::UnknownTypeException(
                     std::string("could not find input serializer for " +
