@@ -48,6 +48,7 @@ AddTest(
     IncrementalTypeListTest.cpp
     MockStream.h
     TupleTest.cpp
+    RegistryTest.cpp
 )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

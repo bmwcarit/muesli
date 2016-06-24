@@ -35,70 +35,17 @@
 
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/SkipIntroOutroWrapper.h"
+#include "muesli/Registry.h"
 
 namespace muesli
 {
-
-using RegisteredOutputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputStream);
-using RegisteredInputStreams = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputStream);
-
-using RegisteredOutputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::OutputArchive);
-using RegisteredInputArchives = MUESLI_GET_INCREMENTAL_TYPELIST(muesli::tags::InputArchive);
-
-namespace detail
-{
-
-template <typename List>
-constexpr std::size_t ListSize = boost::mpl::size<List>::value;
-
-static_assert(0 < ListSize<RegisteredOutputStreams>, "no OutputStream registered");
-static_assert(0 < ListSize<RegisteredInputStreams>, "no InputStream registered");
-static_assert(0 < ListSize<RegisteredOutputArchives>, "no OutputArchive registered");
-static_assert(0 < ListSize<RegisteredInputArchives>, "no InputArchive registered");
-
-template <typename Stream, typename RegisteredArchive>
-struct ApplyStream
-{
-    // get actual Archive template out of TemplateHolder
-    // instantiate the combination of Archive template and concrete Stream implementation
-    using type = typename RegisteredArchive::template type<Stream>;
-};
-
-template <typename RegisteredArchive, typename RegisteredStreams>
-struct CartesianStreamProduct
-{
-    // iterate over registered streams
-    using type =
-            typename boost::mpl::transform<RegisteredStreams,
-                                           ApplyStream<boost::mpl::_1, RegisteredArchive>>::type;
-};
-
-// iterate over registered archives
-template <typename RegisteredArchives, typename RegisteredStreams>
-using CartesianStreamArchiveProduct = typename boost::mpl::transform<
-        RegisteredArchives,
-        CartesianStreamProduct<boost::mpl::_1, RegisteredStreams>>::type;
-
-// flatten nested type lists
-template <typename RegisteredArchives, typename RegisteredStreams>
-using FlatCartesianStreamArchiveProduct = typename FlattenMplSequence<
-        typename CartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>::type>::type;
-
-template <typename RegisteredArchives, typename RegisteredStreams>
-using MakeArchiveVariant = typename boost::make_variant_over<typename boost::mpl::transform<
-        FlatCartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>,
-        std::add_lvalue_reference<boost::mpl::_1>>::type>::type;
-
-using OutputArchiveVariant = MakeArchiveVariant<RegisteredOutputArchives, RegisteredOutputStreams>;
-using InputArchiveVariant = MakeArchiveVariant<RegisteredInputArchives, RegisteredInputStreams>;
-} // namespace detail
 
 template <typename Base>
 class TypeRegistry
 {
 public:
-    using DeserializerFunction = std::function<std::unique_ptr<Base>(detail::InputArchiveVariant)>;
-    using SerializerFunction = std::function<void(detail::OutputArchiveVariant, const Base*)>;
+    using DeserializerFunction = std::function<std::unique_ptr<Base>(InputArchiveVariant)>;
+    using SerializerFunction = std::function<void(OutputArchiveVariant, const Base*)>;
 
     using InputMap = std::unordered_map<std::string, DeserializerFunction>;
     using OutputMap = std::unordered_map<std::type_index, SerializerFunction>;
