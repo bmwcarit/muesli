@@ -18,6 +18,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <array>
 #include <boost/concept_check.hpp>
 
 #include "muesli/streams/StringIStream.h"
