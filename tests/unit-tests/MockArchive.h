@@ -28,6 +28,12 @@
 #include "muesli/BaseArchive.h"
 #include "muesli/ArchiveRegistry.h"
 
+// tag for mock archives
+namespace tag
+{
+struct mock;
+} // namespace tag
+
 template <typename InputStream>
 class MockInputArchive
         : public muesli::BaseArchive<muesli::tags::InputArchive, MockInputArchive<InputStream>>
@@ -43,7 +49,7 @@ public:
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
 
-MUESLI_REGISTER_INPUT_ARCHIVE(MockInputArchive)
+MUESLI_REGISTER_INPUT_ARCHIVE(MockInputArchive, tag::mock)
 
 template <typename OutputStream>
 class MockOutputArchive
@@ -61,7 +67,7 @@ public:
     MOCK_METHOD1(serializeInt64, void(std::int64_t&));
 };
 
-MUESLI_REGISTER_OUTPUT_ARCHIVE(MockOutputArchive)
+MUESLI_REGISTER_OUTPUT_ARCHIVE(MockOutputArchive, tag::mock)
 
 template <typename Archive>
 void serialize(Archive& ar, std::string& val)

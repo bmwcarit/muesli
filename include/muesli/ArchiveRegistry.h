@@ -20,20 +20,36 @@
 #ifndef MUESLI_ARCHIVEREGISTRY_H_
 #define MUESLI_ARCHIVEREGISTRY_H_
 
-#include "muesli/detail/IncrementalTypeList.h"
 #include "muesli/Tags.h"
+
+#include "muesli/detail/IncrementalTypeList.h"
+#include "muesli/detail/DelayStaticAssert.h"
+#include "muesli/detail/TemplateHolder.h"
 
 namespace muesli
 {
-namespace detail
+template <typename ArchiveTag>
+struct InputArchiveTraits
 {
-// wrapper which holds a template as its `type`
-template <template <typename...> class T>
-struct TemplateHolder;
-} // namespace detail
+    static_assert(detail::DelayStaticAssert<ArchiveTag>::value,
+                  "no InputArchive registered for this ArchiveTag");
+};
+
+template <typename ArchiveTag>
+struct OutputArchiveTraits
+{
+    static_assert(detail::DelayStaticAssert<ArchiveTag>::value,
+                  "no OutputArchive registered for this ArchiveTag");
+};
+
+template <typename Archive>
+struct TagTraits
+{
+    static_assert(detail::DelayStaticAssert<Archive>::value, "no Tag registered for this Archive");
+};
 } // namespace muesli
 
-#define MUESLI_REGISTER_ARCHIVE(Category, Archive)                                                 \
+#define MUESLI_REGISTER_ARCHIVE(Category, Archive, ArchiveTag)                                     \
     namespace muesli                                                                               \
     {                                                                                              \
     namespace detail                                                                               \
@@ -45,13 +61,25 @@ struct TemplateHolder;
         using type = Archive<Ts...>;                                                               \
     };                                                                                             \
     } /*namespace detail */                                                                        \
+    template <>                                                                                    \
+    struct Category##Traits<ArchiveTag>                                                            \
+    {                                                                                              \
+        template <typename... Ts>                                                                  \
+        using type = Archive<Ts...>;                                                               \
+    };                                                                                             \
+    template <typename... Ts>                                                                      \
+    struct TagTraits<Archive<Ts...>>                                                               \
+    {                                                                                              \
+        using type = ArchiveTag;                                                                   \
+    };                                                                                             \
     } /*namespace muesli */                                                                        \
-    MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Category, muesli::detail::TemplateHolder<Archive>)
+    MUESLI_ADD_TO_INCREMENTAL_TYPELIST(                                                            \
+            muesli::tags::Category, muesli::detail::TemplateHolder<Archive>)
 
-#define MUESLI_REGISTER_INPUT_ARCHIVE(Archive)                                                     \
-    MUESLI_REGISTER_ARCHIVE(muesli::tags::InputArchive, Archive)
+#define MUESLI_REGISTER_INPUT_ARCHIVE(Archive, ArchiveTag)                                         \
+    MUESLI_REGISTER_ARCHIVE(InputArchive, Archive, ArchiveTag)
 
-#define MUESLI_REGISTER_OUTPUT_ARCHIVE(Archive)                                                    \
-    MUESLI_REGISTER_ARCHIVE(muesli::tags::OutputArchive, Archive)
+#define MUESLI_REGISTER_OUTPUT_ARCHIVE(Archive, ArchiveTag)                                        \
+    MUESLI_REGISTER_ARCHIVE(OutputArchive, Archive, ArchiveTag)
 
 #endif // MUESLI_ARCHIVEREGISTRY_H_

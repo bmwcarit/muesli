@@ -45,6 +45,7 @@
 
 #include "muesli/archives/json/detail/traits.h"
 #include "muesli/archives/json/detail/RapidJsonInputStreamAdapter.h"
+#include "muesli/archives/json/Tag.h"
 
 namespace muesli
 {
@@ -430,6 +431,6 @@ void load(JsonInputArchive<InputStream>& archive, std::unique_ptr<T>& ptr)
 
 } // namespace muesli
 
-MUESLI_REGISTER_INPUT_ARCHIVE(muesli::JsonInputArchive)
+MUESLI_REGISTER_INPUT_ARCHIVE(muesli::JsonInputArchive, muesli::tags::json)
 
 #endif // MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_

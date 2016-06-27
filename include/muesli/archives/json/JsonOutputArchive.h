@@ -40,6 +40,7 @@
 
 #include "muesli/archives/json/detail/traits.h"
 #include "muesli/archives/json/detail/RapidJsonOutputStreamAdapter.h"
+#include "muesli/archives/json/Tag.h"
 
 namespace muesli
 {
@@ -346,6 +347,6 @@ void save(JsonOutputArchive<OutputStream>& archive, const std::unique_ptr<T>& pt
 
 } // namespace muesli
 
-MUESLI_REGISTER_OUTPUT_ARCHIVE(muesli::JsonOutputArchive)
+MUESLI_REGISTER_OUTPUT_ARCHIVE(muesli::JsonOutputArchive, muesli::tags::json)
 
 #endif // MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
