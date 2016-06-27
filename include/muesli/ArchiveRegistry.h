@@ -33,7 +33,7 @@ struct TemplateHolder;
 } // namespace detail
 } // namespace muesli
 
-#define MUESLI_REGISTER_ARCHIVE(Tag, Archive)                                                      \
+#define MUESLI_REGISTER_ARCHIVE(Category, Archive)                                                 \
     namespace muesli                                                                               \
     {                                                                                              \
     namespace detail                                                                               \
@@ -41,12 +41,12 @@ struct TemplateHolder;
     template <>                                                                                    \
     struct TemplateHolder<Archive>                                                                 \
     {                                                                                              \
-        template <typename T>                                                                      \
-        using type = Archive<T>;                                                                   \
+        template <typename... Ts>                                                                  \
+        using type = Archive<Ts...>;                                                               \
     };                                                                                             \
     } /*namespace detail */                                                                        \
     } /*namespace muesli */                                                                        \
-    MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag, muesli::detail::TemplateHolder<Archive>)
+    MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Category, muesli::detail::TemplateHolder<Archive>)
 
 #define MUESLI_REGISTER_INPUT_ARCHIVE(Archive)                                                     \
     MUESLI_REGISTER_ARCHIVE(muesli::tags::InputArchive, Archive)
