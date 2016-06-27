@@ -20,12 +20,12 @@
 #ifndef MUESLI_REGISTRY_H_
 #define MUESLI_REGISTRY_H_
 
-#include <string>
 #include <type_traits>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/mpl/size.hpp>
 
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
