@@ -62,4 +62,12 @@ install(
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
-add_subdirectory(tests)
+option(
+    BUILD_MUESLI_TESTS
+    "Build muesli tests?"
+    ON
+)
+
+if (BUILD_MUESLI_TESTS)
+    add_subdirectory(tests)
+endif(BUILD_MUESLI_TESTS)
