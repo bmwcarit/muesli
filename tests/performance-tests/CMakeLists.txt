@@ -47,7 +47,7 @@ else(USE_PLATFORM_GOOGLE_BENCHMARK)
         GIT_REPOSITORY https://github.com/google/benchmark.git
         GIT_TAG master
         TIMEOUT 10
-        CMAKE_ARGS "-DBENCHMARK_ENABLE_TESTING=OFF;-DCMAKE_BUILD_TYPE=Release" #disable building of unit tests
+        CMAKE_ARGS "-DBENCHMARK_ENABLE_TESTING=OFF;-DCMAKE_BUILD_TYPE=Release"
         BUILD_BYPRODUCTS "${EP_PREFIX}/src/googlebenchmark-build/src/${GBENCHMARK_LIBRARY_NAME}"
         NO_PROPAGATE_CMAKE_ARGS
     )
@@ -61,3 +61,13 @@ else(USE_PLATFORM_GOOGLE_BENCHMARK)
      set(GBENCHMARK_INCLUDE_DIRS ${GBENCHMARK_SOURCE_DIR}/include)
      set(GBENCHMARK_LIBRARIES ${GBENCHMARK_BINARY_DIR}/src/${GBENCHMARK_LIBRARY_NAME})
 endif(USE_PLATFORM_GOOGLE_BENCHMARK)
+
+
+AddBenchmark(
+    muesli-benchmark
+    JsonArchiveBenchmark.cpp
+)
+
+target_link_libraries(muesli-benchmark muesli)
+
+AddClangFormat(muesli-benchmark)
