@@ -112,7 +112,7 @@ public:
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsUnSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
+    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
         value = getNextValue()->GetUint();
     }

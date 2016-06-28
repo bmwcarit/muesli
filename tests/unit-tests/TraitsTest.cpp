@@ -26,8 +26,8 @@
 TEST(TraitsTest, StaticAsserts)
 {
     using namespace muesli;
-    static_assert(TypeWithinList<std::int8_t, std::int16_t, std::int32_t, std::int8_t>::value,
+    static_assert(IsTypeWithinList<std::int8_t, std::int16_t, std::int32_t, std::int8_t>::value,
                   "type must be found in list");
-    static_assert(!TypeWithinList<std::int64_t, std::int16_t, std::int32_t, std::int8_t>::value,
+    static_assert(!IsTypeWithinList<std::int64_t, std::int16_t, std::int32_t, std::int8_t>::value,
                   "type must NOT be found in list");
 }

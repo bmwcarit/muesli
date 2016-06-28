@@ -90,7 +90,7 @@ public:
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsUnSignedIntegerUpTo32bit<T>::value> writeValue(const T& value)
+    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> writeValue(const T& value)
     {
         writer.Uint(value);
     }

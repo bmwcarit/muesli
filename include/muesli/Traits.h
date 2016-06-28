@@ -30,16 +30,16 @@ template <typename Enum>
 struct EnumTraits;
 
 template <typename...>
-struct TypeWithinList
+struct IsTypeWithinList
 {
     static constexpr bool value = false;
 };
 
 template <typename Needle, typename Head, typename... Haystack>
-struct TypeWithinList<Needle, Head, Haystack...>
+struct IsTypeWithinList<Needle, Head, Haystack...>
 {
     static constexpr bool value =
-            std::is_same<Needle, Head>::value || TypeWithinList<Needle, Haystack...>::value;
+            std::is_same<Needle, Head>::value || IsTypeWithinList<Needle, Haystack...>::value;
 };
 
 namespace detail
