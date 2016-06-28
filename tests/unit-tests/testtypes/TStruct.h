@@ -45,8 +45,6 @@
 #include "muesli/TypeRegistry.h"
 #include "muesli/NameValuePair.h"
 
-// include complex Datatype headers.
-
 namespace muesli
 {
 namespace tests
@@ -182,6 +180,19 @@ public:
         this->tString = tString;
     }
 
+    std::string toString() const
+    {
+        std::ostringstream typeAsString;
+        typeAsString << "TStruct{";
+        typeAsString << "tDouble:" + std::to_string(getTDouble());
+        typeAsString << ", ";
+        typeAsString << "tInt64:" + std::to_string(getTInt64());
+        typeAsString << ", ";
+        typeAsString << "tString:" + getTString();
+        typeAsString << "}";
+        return typeAsString.str();
+    }
+
 protected:
     /**
      * @brief equals method
@@ -201,19 +212,6 @@ protected:
      * @param os The output stream to send the output to
      */
     friend void PrintTo(const TStruct& Print, ::std::ostream* os);
-
-    std::string toString() const
-    {
-        std::ostringstream typeAsString;
-        typeAsString << "TStruct{";
-        typeAsString << "tDouble:" + std::to_string(getTDouble());
-        typeAsString << ", ";
-        typeAsString << "tInt64:" + std::to_string(getTInt64());
-        typeAsString << ", ";
-        typeAsString << "tString:" + getTString();
-        typeAsString << "}";
-        return typeAsString.str();
-    }
 
 private:
     // serialize TStruct with muesli

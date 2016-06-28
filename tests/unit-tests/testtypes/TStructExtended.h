@@ -30,8 +30,8 @@
 #include "muesli/TypeRegistry.h"
 
 // include complex Datatype headers.
-#include "testtypes/TStruct.h"
-#include "testtypes/TEnum.h"
+#include "TStruct.h"
+#include "TEnum.h"
 
 namespace muesli
 {
