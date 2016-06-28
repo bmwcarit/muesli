@@ -6,9 +6,6 @@ AddTest(
     muesli-unit-test
     TestMain.cpp
     BaseArchiveTest.cpp
-    JsonArchiveTest.cpp
-    JsonTest.cpp
-    archives/json/TraitsTest.cpp
     TypeRegistryTest.cpp
     testtypes/TStruct.h
     testtypes/TStructExtended.h
@@ -19,8 +16,11 @@ AddTest(
     TraitsTest.cpp
     IncrementalTypeListTest.cpp
     MockStream.h
-    TupleTest.cpp
     RegistryTest.cpp
+    archives/json/JsonArchiveTest.cpp
+    archives/json/JsonTest.cpp
+    archives/json/TraitsTest.cpp
+    archives/json/TupleTest.cpp
     streams/StringIStreamTest.cpp
     streams/StringOStreamTest.cpp
     streams/OutputStreamTest.cpp
