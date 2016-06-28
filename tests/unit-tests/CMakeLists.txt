@@ -5,15 +5,9 @@ message(STATUS "variable rapidjson_INCLUDE_DIRS=" ${rapidjson_INCLUDE_DIRS})
 AddTest(
     muesli-unit-test
     TestMain.cpp
-    StringIStreamTest.cpp
-    StringOStreamTest.cpp
     BaseArchiveTest.cpp
     JsonArchiveTest.cpp
     JsonTest.cpp
-    OutputStreamTest.cpp
-    InputStreamTest.cpp
-    StdOStreamWrapperTest.cpp
-    StdIStreamWrapperTest.cpp
     archives/json/TraitsTest.cpp
     TypeRegistryTest.cpp
     testtypes/TStruct.h
@@ -27,6 +21,12 @@ AddTest(
     MockStream.h
     TupleTest.cpp
     RegistryTest.cpp
+    streams/StringIStreamTest.cpp
+    streams/StringOStreamTest.cpp
+    streams/OutputStreamTest.cpp
+    streams/InputStreamTest.cpp
+    streams/StdOStreamWrapperTest.cpp
+    streams/StdIStreamWrapperTest.cpp
 )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
