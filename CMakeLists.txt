@@ -45,6 +45,7 @@ else(USE_PLATFORM_RAPIDJSON)
      ExternalProject_Get_Property(rapidjson SOURCE_DIR)
      set(rapidjson_INCLUDE_DIRS "${SOURCE_DIR}/include")
 endif(USE_PLATFORM_RAPIDJSON)
+include(CheckRapidJsonImportTargets)
 
 target_include_directories(
     muesli
@@ -55,6 +56,9 @@ target_include_directories(
 )
 
 target_compile_definitions(muesli INTERFACE RAPIDJSON_HAS_STDSTRING)
+
+add_dependencies(muesli rapidjson::rapidjson)
+
 
 install(
     TARGETS muesli
