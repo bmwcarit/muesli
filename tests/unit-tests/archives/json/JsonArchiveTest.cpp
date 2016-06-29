@@ -21,10 +21,13 @@
 #include <sstream>
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include "muesli/exceptions/ParseException.h"
+#include "muesli/exceptions/ValueNotFoundException.h"
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"
@@ -32,11 +35,11 @@
 #include "muesli/streams/StdIStreamWrapper.h"
 #include "muesli/streams/StdOStreamWrapper.h"
 
+#include "muesli/TypeRegistry.h"
+
+#include "testtypes/NestedStructs.h"
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
-#include "testtypes/TEnum.h"
-
-#include "muesli/TypeRegistry.h"
 
 using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
 using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
@@ -44,44 +47,9 @@ using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
 using JsonOutputArchiveImpl = muesli::JsonOutputArchive<OutputStreamImpl>;
 using JsonInputArchiveImpl = muesli::JsonInputArchive<InputStreamImpl>;
 
-struct NestedStruct
-{
-    muesli::tests::testtypes::TStruct tStruct;
-
-    template <typename Archive>
-    void serialize(Archive& archive)
-    {
-        archive(muesli::make_nvp("tStruct", tStruct));
-    }
-
-    bool operator==(const NestedStruct& other) const
-    {
-        return tStruct == other.tStruct;
-    }
-};
-MUESLI_REGISTER_TYPE(NestedStruct, "NestedStruct")
-
-struct NestedStructPolymorphic
-{
-    std::shared_ptr<muesli::tests::testtypes::TStruct> tStruct;
-
-    template <typename Archive>
-    void serialize(Archive& archive)
-    {
-        archive(muesli::make_nvp("tStruct", tStruct));
-    }
-
-    bool operator==(const NestedStructPolymorphic& other) const
-    {
-        // value comparison
-        if (tStruct != nullptr && other.tStruct != nullptr) {
-            return *tStruct == *(other.tStruct);
-        }
-        return tStruct == nullptr && other.tStruct == nullptr;
-    }
-};
-// register with same name as above in order to use the same string comparison of expected JSON
-MUESLI_REGISTER_TYPE(NestedStructPolymorphic, "NestedStruct")
+using NestedBoostOptionalStruct = muesli::tests::testtypes::NestedBoostOptionalStruct;
+using NestedStruct = muesli::tests::testtypes::NestedStruct;
+using NestedStructPolymorphic = muesli::tests::testtypes::NestedStructPolymorphic;
 
 class JsonArchiveTest : public ::testing::Test
 {
@@ -118,20 +86,19 @@ public:
                 R"(})";
         expectedSerializedNestedStruct =
                 R"({)"
-                R"("_typeName":"NestedStruct",)"
+                R"("_typeName":"muesli.tests.testtypes.NestedStruct",)"
                 R"("tStruct":)" +
                 expectedSerializedStruct +
                 R"(})";
         expectedSerializedNestedExtendedStruct =
                 R"({)"
-                R"("_typeName":"NestedStruct",)"
+                R"("_typeName":"muesli.tests.testtypes.NestedStruct",)"
                 R"("tStruct":)" +
                 expectedSerializedStructExtended +
                 R"(})";
         expectedSerializedNestedStructWithNullptr =
                 R"({)"
-                R"("_typeName":"NestedStruct",)"
-                R"("tStruct":null)"
+                R"("_typeName":"muesli.tests.testtypes.NestedStruct")"
                 R"(})";
     }
 

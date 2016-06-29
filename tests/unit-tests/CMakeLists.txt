@@ -10,6 +10,7 @@ AddTest(
     testtypes/TStruct.h
     testtypes/TStructExtended.h
     testtypes/TEnum.h
+    testtypes/NestedStructs.h
     MockArchive.h
     TestUtil.h
     TestUtilTest.cpp
@@ -20,6 +21,7 @@ AddTest(
     archives/json/JsonArchiveTest.cpp
     archives/json/JsonTest.cpp
     archives/json/TraitsTest.cpp
+    archives/json/NullableTest.cpp
     archives/json/TupleTest.cpp
     streams/StringIStreamTest.cpp
     streams/StringOStreamTest.cpp
