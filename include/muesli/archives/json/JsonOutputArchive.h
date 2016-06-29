@@ -161,9 +161,21 @@ void save(JsonOutputArchive<OutputStream>& archive, std::tuple<Ts...>& tuple)
 }
 
 template <typename OutputStream, typename T>
-void intro(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
+std::enable_if_t<!json::detail::IsNullable<std::decay_t<T>>::value> intro(
+        JsonOutputArchive<OutputStream>& archive,
+        const NameValuePair<T>& nameValuePair)
 {
     archive.writeKey(nameValuePair.name);
+}
+
+template <typename OutputStream, typename T>
+std::enable_if_t<json::detail::IsNullable<std::decay_t<T>>::value> intro(
+        JsonOutputArchive<OutputStream>& archive,
+        const NameValuePair<T>& nameValuePair)
+{
+    if (nameValuePair.value) {
+        archive.writeKey(nameValuePair.name);
+    }
 }
 
 template <typename OutputStream, typename T>
@@ -297,8 +309,6 @@ std::enable_if_t<!std::is_polymorphic<T>::value> savePointer(
 {
     if (ptr != nullptr) {
         archive(*ptr);
-    } else {
-        archive(std::nullptr_t{});
     }
 }
 
@@ -327,8 +337,6 @@ std::enable_if_t<std::is_polymorphic<Base>::value> savePointer(
                                     boost::typeindex::type_id_runtime(ptr).pretty_name()));
             }
         }
-    } else {
-        archive(std::nullptr_t{});
     }
 }
 } // detail
@@ -343,6 +351,14 @@ template <typename OutputStream, typename T>
 void save(JsonOutputArchive<OutputStream>& archive, const std::unique_ptr<T>& ptr)
 {
     detail::savePointer(archive, ptr.get());
+}
+
+template <typename OutputStream, typename T>
+void save(JsonOutputArchive<OutputStream>& archive, const boost::optional<T>& opt)
+{
+    if (opt) {
+        archive(opt.get());
+    }
 }
 
 } // namespace muesli

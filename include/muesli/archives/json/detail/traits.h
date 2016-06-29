@@ -26,6 +26,8 @@
 #include <memory>
 #include <cstddef>
 
+#include <boost/optional.hpp>
+
 #include "muesli/Traits.h"
 
 namespace muesli
@@ -53,17 +55,22 @@ struct IsPrimitive
 };
 
 template <typename T>
-struct IsPointer : std::false_type
+struct IsNullable : std::false_type
 {
 };
 
 template <typename T>
-struct IsPointer<std::shared_ptr<T>> : std::true_type
+struct IsNullable<std::shared_ptr<T>> : std::true_type
 {
 };
 
 template <typename T>
-struct IsPointer<std::unique_ptr<T>> : std::true_type
+struct IsNullable<std::unique_ptr<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsNullable<boost::optional<T>> : std::true_type
 {
 };
 
@@ -71,7 +78,7 @@ template <typename T>
 struct IsObject
 {
     static constexpr bool value =
-            !IsPointer<T>::value && !IsPrimitive<T>::value && !IsArray<T>::value;
+            !IsNullable<T>::value && !IsPrimitive<T>::value && !IsArray<T>::value;
 };
 
 // any signed integer which is below int64_t
