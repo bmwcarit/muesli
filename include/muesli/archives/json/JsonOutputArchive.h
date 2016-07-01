@@ -148,14 +148,14 @@ void outro(JsonOutputArchive<OutputStream>& archive, const std::tuple<Ts...>& tu
 
 template <typename OutputStream, typename TupleType, std::size_t... Indicies>
 void saveTuple(JsonOutputArchive<OutputStream>& archive,
-               TupleType& tuple,
+               const TupleType& tuple,
                std::index_sequence<Indicies...>)
 {
     archive(std::get<Indicies>(tuple)...);
 }
 
 template <typename OutputStream, typename... Ts>
-void save(JsonOutputArchive<OutputStream>& archive, std::tuple<Ts...>& tuple)
+void save(JsonOutputArchive<OutputStream>& archive, const std::tuple<Ts...>& tuple)
 {
     saveTuple(archive, tuple, std::index_sequence_for<Ts...>{});
 }
