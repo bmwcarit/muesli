@@ -98,6 +98,11 @@ public:
         this->nextIndexValid = true;
     }
 
+    void readValue(bool& boolValue)
+    {
+        boolValue = getNextValue()->GetBool();
+    }
+
     void readValue(double& doubleValue) const
     {
         doubleValue = getNextValue()->GetDouble();

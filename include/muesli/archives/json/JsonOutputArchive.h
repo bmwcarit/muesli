@@ -63,6 +63,11 @@ public:
         writer.Key(key.c_str(), static_cast<rapidjson::SizeType>(key.size()));
     }
 
+    void writeValue(bool boolValue)
+    {
+        writer.Bool(boolValue);
+    }
+
     void writeValue(const double& doubleValue)
     {
         writer.Double(doubleValue);
@@ -98,6 +103,11 @@ public:
     void writeValue(const std::string& stringValue)
     {
         writer.String(stringValue);
+    }
+
+    void writeValue(const char* value)
+    {
+        writer.String(value);
     }
 
     void writeValue(const std::nullptr_t& value)
