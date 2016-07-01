@@ -406,6 +406,32 @@ void load(JsonInputArchive<InputStream>& archive, Enum& value)
 
 namespace detail
 {
+
+template <typename T, typename InputStream>
+std::unique_ptr<T> loadPointerDirectly(JsonInputArchive<InputStream>& archive)
+{
+    auto ptr = std::make_unique<T>();
+    archive(SkipIntroOutroWrapper<T>(ptr.get()));
+    return ptr;
+}
+
+template <typename Base, typename InputStream>
+std::unique_ptr<Base> loadPolymorphicPointerThroughRegistry(JsonInputArchive<InputStream>& archive,
+                                                            const std::string& typeName)
+{
+    // lookup in type registry
+    using TypeRegistry = typename muesli::TypeRegistry<Base>;
+    using LoadFunction = typename TypeRegistry::LoadFunction;
+    boost::optional<LoadFunction> loadFunction = TypeRegistry::getLoadFunction(typeName);
+    if (loadFunction) {
+        return (*loadFunction)(archive);
+    } else {
+        throw exceptions::UnknownTypeException(
+                std::string("could not find input serializer for " +
+                            boost::typeindex::type_id<Base>().pretty_name()));
+    }
+}
+
 // generic de-serialization for non-polymorphic pointer types
 template <typename T, typename InputStream>
 std::enable_if_t<!std::is_polymorphic<T>::value, std::unique_ptr<T>> loadPointer(
@@ -414,42 +440,48 @@ std::enable_if_t<!std::is_polymorphic<T>::value, std::unique_ptr<T>> loadPointer
     if (archive.currentValueIsNull()) {
         return nullptr;
     }
-    auto ptr = std::make_unique<T>();
-    archive(SkipIntroOutroWrapper<T>(ptr.get()));
-    return ptr;
+    return loadPointerDirectly<T>(archive);
 }
 
-// generic de-serialization for polymorphic pointer types
+template <typename InputStream>
+std::string getTypeNameForPointer(JsonInputArchive<InputStream>& archive)
+{
+    archive.setNextKey("_typeName");
+    std::string typeName;
+    archive.readValue(typeName);
+    return typeName;
+}
+
+// generic de-serialization for polymorphic, non-abstract pointer types
 template <typename Base, typename InputStream>
-std::enable_if_t<std::is_polymorphic<Base>::value, std::unique_ptr<Base>> loadPointer(
-        JsonInputArchive<InputStream>& archive)
+std::enable_if_t<std::is_polymorphic<Base>::value && !std::is_abstract<Base>::value,
+                 std::unique_ptr<Base>>
+loadPointer(JsonInputArchive<InputStream>& archive)
 {
     if (archive.currentValueIsNull()) {
         return nullptr;
     }
-    std::unique_ptr<Base> ptr = nullptr;
-    archive.setNextKey("_typeName");
     static const std::string baseTypeName = RegisteredType<Base>::name();
-    std::string typeName;
-    archive.readValue(typeName);
+    std::string typeName = getTypeNameForPointer(archive);
     if (baseTypeName == typeName) {
-        ptr = std::make_unique<Base>();
-        archive(SkipIntroOutroWrapper<Base>(ptr.get()));
+        return loadPointerDirectly<Base>(archive);
     } else {
-        // lookup in type registry
-        using TypeRegistry = typename muesli::TypeRegistry<Base>;
-        using LoadFunction = typename TypeRegistry::LoadFunction;
-        boost::optional<LoadFunction> loadFunction = TypeRegistry::getLoadFunction(typeName);
-        if (loadFunction) {
-            ptr = (*loadFunction)(archive);
-        } else {
-            throw exceptions::UnknownTypeException(
-                    std::string("could not find input serializer for " +
-                                boost::typeindex::type_id_runtime(ptr).pretty_name()));
-        }
+        return loadPolymorphicPointerThroughRegistry<Base>(archive, typeName);
     }
-    return ptr;
 }
+
+// generic de-serialization for polymorphic abstract pointer types
+template <typename Base, typename InputStream>
+std::enable_if_t<std::is_polymorphic<Base>::value && std::is_abstract<Base>::value,
+                 std::unique_ptr<Base>>
+loadPointer(JsonInputArchive<InputStream>& archive)
+{
+    if (archive.currentValueIsNull()) {
+        return nullptr;
+    }
+    return loadPolymorphicPointerThroughRegistry<Base>(archive, getTypeNameForPointer(archive));
+}
+
 } // namespace detail
 
 template <typename InputStream, typename T>

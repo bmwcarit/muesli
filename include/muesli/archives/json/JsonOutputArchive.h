@@ -311,6 +311,31 @@ void save(JsonOutputArchive<OutputStream>& archive, Enum value)
 
 namespace detail
 {
+
+template <typename OutputStream, typename T>
+void savePointerDirectly(JsonOutputArchive<OutputStream>& archive, const T* ptr)
+{
+    archive(*ptr);
+}
+
+template <typename OutputStream, typename Base>
+void savePolymorphicPointerThroughRegistry(JsonOutputArchive<OutputStream>& archive,
+                                           const Base* ptr,
+                                           const std::type_info& ptrInfo)
+{
+    // lookup in type registry
+    using TypeRegistry = typename muesli::TypeRegistry<Base>;
+    using SaveFunction = typename TypeRegistry::SaveFunction;
+    boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(ptrInfo);
+    if (saveFunction) {
+        (*saveFunction)(archive, ptr);
+    } else {
+        throw exceptions::UnknownTypeException(
+                std::string("could not find output serializer for " +
+                            boost::typeindex::type_id_runtime(ptr).pretty_name()));
+    }
+}
+
 // generic serialization for non-polymorphic pointer types
 template <typename OutputStream, typename T>
 std::enable_if_t<!std::is_polymorphic<T>::value> savePointer(
@@ -318,13 +343,13 @@ std::enable_if_t<!std::is_polymorphic<T>::value> savePointer(
         const T* ptr)
 {
     if (ptr != nullptr) {
-        archive(*ptr);
+        savePointerDirectly(archive, ptr);
     }
 }
 
-// generic serialization for non-polymorphic pointer types
+// generic serialization for polymorphic, non-abstract pointer types
 template <typename OutputStream, typename Base>
-std::enable_if_t<std::is_polymorphic<Base>::value> savePointer(
+std::enable_if_t<std::is_polymorphic<Base>::value && !std::is_abstract<Base>::value> savePointer(
         JsonOutputArchive<OutputStream>& archive,
         const Base* ptr)
 {
@@ -333,20 +358,21 @@ std::enable_if_t<std::is_polymorphic<Base>::value> savePointer(
         static const std::type_info& typeInfo = typeid(Base);
 
         if (ptrInfo == typeInfo) {
-            archive(*ptr);
+            savePointerDirectly(archive, ptr);
         } else {
-            // lookup in type registry
-            using TypeRegistry = typename muesli::TypeRegistry<Base>;
-            using SaveFunction = typename TypeRegistry::SaveFunction;
-            boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(ptrInfo);
-            if (saveFunction) {
-                (*saveFunction)(archive, ptr);
-            } else {
-                throw exceptions::UnknownTypeException(
-                        std::string("could not find output serializer for " +
-                                    boost::typeindex::type_id_runtime(ptr).pretty_name()));
-            }
+            savePolymorphicPointerThroughRegistry(archive, ptr, ptrInfo);
         }
+    }
+}
+
+// generic serialization for polymorphic, abstract pointer types
+template <typename OutputStream, typename Base>
+std::enable_if_t<std::is_polymorphic<Base>::value && std::is_abstract<Base>::value> savePointer(
+        JsonOutputArchive<OutputStream>& archive,
+        const Base* ptr)
+{
+    if (ptr != nullptr) {
+        savePolymorphicPointerThroughRegistry(archive, ptr, typeid(*ptr));
     }
 }
 } // detail
