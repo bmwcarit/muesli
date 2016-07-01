@@ -20,6 +20,8 @@
 #ifndef MUESLI_BASEARCHIVE_H_
 #define MUESLI_BASEARCHIVE_H_
 
+#include <memory>
+
 #include "muesli/BaseClass.h"
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
@@ -29,7 +31,7 @@ namespace muesli
 {
 
 template <typename ArchiveCategory, typename Derived>
-class BaseArchive
+class BaseArchive : public std::enable_shared_from_this<Derived>
 {
 public:
     using Category = ArchiveCategory;
