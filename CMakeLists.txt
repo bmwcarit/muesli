@@ -51,8 +51,14 @@ target_include_directories(
     muesli
     INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-    "$<BUILD_INTERFACE:${rapidjson_INCLUDE_DIRS}>"
     "$<INSTALL_INTERFACE:include>"
+)
+
+target_include_directories(
+    muesli
+    SYSTEM
+    INTERFACE
+    "$<BUILD_INTERFACE:${rapidjson_INCLUDE_DIRS}>"
 )
 
 target_compile_definitions(muesli INTERFACE RAPIDJSON_HAS_STDSTRING)
