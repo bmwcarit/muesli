@@ -44,7 +44,6 @@ public:
     void operator()(Ts&&... args)
     {
         // call handle() for each of the args
-        static_assert(sizeof...(Ts) > 0, "at least one argument must be provided");
         detail::Expansion{0, (self.handle(std::forward<Ts>(args)), 0)...};
     }
 
