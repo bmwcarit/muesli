@@ -56,6 +56,11 @@ struct MakeVoid
 template <typename... Ts>
 using VoidT = typename detail::MakeVoid<Ts...>::type;
 
+// this traits class is used to signal that for this type intro/outro shall not be called
+template <typename T>
+struct SkipIntroOutroTraits : std::false_type
+{
+};
 } // namespace muesli
 
 #endif // MUESLI_TRAITS_H_

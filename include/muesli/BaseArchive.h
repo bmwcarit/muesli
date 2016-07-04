@@ -25,6 +25,7 @@
 #include "muesli/BaseClass.h"
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
+#include "muesli/Traits.h"
 #include "muesli/detail/Expansion.h"
 
 namespace muesli
@@ -58,7 +59,13 @@ private:
     }
 
     template <typename T>
-    void handle(T&& arg)
+    std::enable_if_t<SkipIntroOutroTraits<std::decay_t<T>>::value> handle(T&& arg)
+    {
+        self.dispatch(arg);
+    }
+
+    template <typename T>
+    std::enable_if_t<!SkipIntroOutroTraits<std::decay_t<T>>::value> handle(T&& arg)
     {
         intro(self, arg);
         self.dispatch(arg);
