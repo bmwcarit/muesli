@@ -29,6 +29,7 @@
 #include <boost/optional.hpp>
 
 #include "muesli/Traits.h"
+#include "muesli/TypeRegistryFwd.h"
 
 namespace muesli
 {
@@ -104,6 +105,17 @@ struct IsMap : std::false_type
 
 template <typename T>
 struct IsMap<T, VoidT<typename std::decay_t<T>::mapped_type>> : std::true_type
+{
+};
+
+template <typename T, typename Enable = void>
+struct HasRegisteredTypeName : std::false_type
+{
+};
+
+template <typename T>
+struct HasRegisteredTypeName<T, VoidT<decltype(muesli::RegisteredType<std::decay_t<T>>::name())>>
+        : std::true_type
 {
 };
 

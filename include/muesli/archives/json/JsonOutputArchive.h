@@ -195,12 +195,30 @@ void outro(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nam
     std::ignore = nameValuePair;
 }
 
+namespace detail
+{
+template <typename T, typename OutputStream>
+std::enable_if_t<json::detail::HasRegisteredTypeName<T>::value> writeTypeName(
+        JsonOutputArchive<OutputStream>& archive)
+{
+    archive(muesli::make_nvp("_typeName", muesli::RegisteredType<T>::name()));
+}
+
+template <typename T, typename OutputStream>
+std::enable_if_t<!json::detail::HasRegisteredTypeName<T>::value> writeTypeName(
+        JsonOutputArchive<OutputStream>& archive)
+{
+    // do nothing
+    std::ignore = archive;
+}
+} // namespace detail
+
 template <typename OutputStream, typename T>
 std::enable_if_t<json::detail::IsObject<T>::value> intro(JsonOutputArchive<OutputStream>& archive,
                                                          const T& value)
 {
     archive.startObject();
-    archive(muesli::make_nvp("_typeName", muesli::RegisteredType<T>::name()));
+    detail::writeTypeName<T>(archive);
     std::ignore = value;
 }
 
