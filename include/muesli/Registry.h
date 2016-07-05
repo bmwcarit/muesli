@@ -44,12 +44,12 @@ namespace detail
 {
 
 template <typename List>
-constexpr std::size_t ListSize = boost::mpl::size<List>::value;
+using ListSize = boost::mpl::size<List>;
 
-static_assert(0 != ListSize<RegisteredOutputStreams>, "no OutputStream registered");
-static_assert(0 != ListSize<RegisteredInputStreams>, "no InputStream registered");
-static_assert(0 != ListSize<RegisteredOutputArchives>, "no OutputArchive registered");
-static_assert(0 != ListSize<RegisteredInputArchives>, "no InputArchive registered");
+static_assert(0 != ListSize<RegisteredOutputStreams>::value, "no OutputStream registered");
+static_assert(0 != ListSize<RegisteredInputStreams>::value, "no InputStream registered");
+static_assert(0 != ListSize<RegisteredOutputArchives>::value, "no OutputArchive registered");
+static_assert(0 != ListSize<RegisteredInputArchives>::value, "no InputArchive registered");
 
 template <typename Stream, typename RegisteredArchive>
 struct ApplyStream
