@@ -100,50 +100,95 @@ public:
 
     void readValue(bool& boolValue)
     {
-        boolValue = getNextValue()->GetBool();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsBool()) {
+            boolValue = nextValue->GetBool();
+        } else {
+            throw std::invalid_argument("Cannot read a Bool.");
+        }
     }
 
     void readValue(double& doubleValue) const
     {
-        doubleValue = getNextValue()->GetDouble();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsDouble()) {
+            doubleValue = nextValue->GetDouble();
+        } else {
+            throw std::invalid_argument("Cannot read a Double.");
+        }
     }
 
     void readValue(float& floatValue) const
     {
-        floatValue = getNextValue()->GetFloat();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsFloat()) {
+            floatValue = nextValue->GetFloat();
+        } else {
+            throw std::invalid_argument("Cannot read an Float.");
+        }
     }
 
     template <typename T>
     std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
-        value = getNextValue()->GetInt();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsInt()) {
+            value = nextValue->GetInt();
+        } else {
+            throw std::invalid_argument("Cannot read an Int.");
+        }
     }
 
     template <typename T>
     std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
-        value = getNextValue()->GetUint();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsUint()) {
+            value = nextValue->GetUint();
+        } else {
+            throw std::invalid_argument("Cannot read an Uint.");
+        }
     }
 
     void readValue(std::int64_t& int64Value) const
     {
-        int64Value = getNextValue()->GetInt64();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsInt64()) {
+            int64Value = nextValue->GetInt64();
+        } else {
+            throw std::invalid_argument("Cannot read an Int64.");
+        }
     }
 
     void readValue(std::uint64_t& uint64Value) const
     {
-        uint64Value = getNextValue()->GetUint64();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsUint64()) {
+            uint64Value = nextValue->GetUint64();
+        } else {
+            throw std::invalid_argument("Cannot read an UInt64.");
+        }
     }
 
     void readValue(std::string& stringValue) const
     {
-        stringValue = getNextValue()->GetString();
+        const Value* nextValue = getNextValue();
+        if (nextValue->IsString()) {
+            stringValue = nextValue->GetString();
+        } else {
+            throw std::invalid_argument("Cannot read a String.");
+        }
     }
 
     std::size_t getArraySize() const
     {
-        assert(stack.top()->IsArray());
+        assert(currentValueIsArray());
         return stack.top()->Size();
+    }
+
+    inline bool currentValueIsArray() const
+    {
+        return stack.top()->IsArray();
     }
 
     rapidjson::Document::ConstMemberIterator getMemberBegin() const
@@ -291,11 +336,15 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<Inp
 template <typename InputStream, typename T>
 void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
 {
-    std::size_t arraySize = archive.getArraySize();
-    array.resize(arraySize);
-    for (std::size_t i = 0; i < arraySize; i++) {
-        archive.setNextIndex(i);
-        archive(array[i]);
+    if (archive.currentValueIsArray()) {
+        std::size_t arraySize = archive.getArraySize();
+        array.resize(arraySize);
+        for (std::size_t i = 0; i < arraySize; i++) {
+            archive.setNextIndex(i);
+            archive(array[i]);
+        }
+    } else {
+        throw std::invalid_argument("Cannot read a Vector.");
     }
 }
 
@@ -374,15 +423,19 @@ void loadTuple(JsonInputArchive<InputStream>& archive,
 template <typename InputStream, typename... Ts>
 void load(JsonInputArchive<InputStream>& archive, std::tuple<Ts...>& tuple)
 {
-    const std::size_t arraySize = archive.getArraySize();
+    if (archive.currentValueIsArray()) {
+        const std::size_t arraySize = archive.getArraySize();
 
-    if (arraySize != sizeof...(Ts)) {
-        throw exceptions::ParseException("Failed to load tuple. Persisted tuple size is " +
-                                         std::to_string(arraySize) + ". Expected tuple size is " +
-                                         std::to_string(sizeof...(Ts)));
+        if (arraySize != sizeof...(Ts)) {
+            throw exceptions::ParseException(
+                    "Failed to load tuple. Persisted tuple size is " + std::to_string(arraySize) +
+                    ". Expected tuple size is " + std::to_string(sizeof...(Ts)));
+        }
+
+        detail::loadTuple(archive, tuple, std::index_sequence_for<Ts...>{});
+    } else {
+        throw std::invalid_argument("Cannot read a Tuple.");
     }
-
-    detail::loadTuple(archive, tuple, std::index_sequence_for<Ts...>{});
 }
 
 template <typename InputStream, typename T>
