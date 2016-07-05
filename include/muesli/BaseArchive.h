@@ -53,7 +53,7 @@ private:
     using EnableIfXArchive = std::enable_if_t<std::is_same<CheckCategory, C>::value>;
 
     template <typename T>
-    T& discardConstQualifier(const T& value)
+    static T& discardConstQualifier(const T& value)
     {
         return const_cast<T&>(value);
     }
