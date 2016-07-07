@@ -113,12 +113,6 @@ TYPED_TEST(JsonTest, serialize)
     }
 }
 
-using Int8Struct = TestStruct<std::int8_t>;
-MUESLI_REGISTER_TYPE(Int8Struct, "TestStruct")
-
-using Int32Struct = TestStruct<std::int32_t>;
-MUESLI_REGISTER_TYPE(Int32Struct, "TestStruct")
-
 template <>
 struct TestParams<double>
 {
@@ -129,8 +123,6 @@ struct TestParams<double>
             {0.012345678901234567890123456789, 0.012345678901234567890123456789},
             {std::numeric_limits<double>::max(), std::numeric_limits<double>::max()}};
 };
-using DoubleStruct = TestStruct<double>;
-MUESLI_REGISTER_TYPE(DoubleStruct, "TestStruct")
 
 template <>
 struct TestParams<std::string>
@@ -140,8 +132,6 @@ struct TestParams<std::string>
             {std::string(""), std::string("")},
             {std::string("Hello World!"), std::string("Hello World!")}};
 };
-using StringStruct = TestStruct<std::string>;
-MUESLI_REGISTER_TYPE(StringStruct, "TestStruct")
 
 template <>
 struct TestParams<std::vector<std::int32_t>>
@@ -151,8 +141,6 @@ struct TestParams<std::vector<std::int32_t>>
             {{0}, {0}},
             {{0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}}};
 };
-using ArrayOfInt32Struct = TestStruct<std::vector<std::int32_t>>;
-MUESLI_REGISTER_TYPE(ArrayOfInt32Struct, "TestStruct")
 
 template <>
 struct TestParams<std::vector<std::string>>
@@ -162,8 +150,6 @@ struct TestParams<std::vector<std::string>>
             {{"Test String 1"}, {"Test String 1"}},
             {{"", "Test String 1", "Test String 2"}, {"", "Test String 1", "Test String 2"}}};
 };
-using ArrayOfStringStruct = TestStruct<std::vector<std::string>>;
-MUESLI_REGISTER_TYPE(ArrayOfStringStruct, "TestStruct")
 
 template <>
 struct TestParams<std::vector<TEnum::Enum>>
@@ -173,8 +159,6 @@ struct TestParams<std::vector<TEnum::Enum>>
             {{TEnum::TLITERALA}, {TEnum::TLITERALA}},
             {{TEnum::TLITERALA, TEnum::TLITERALB}, {TEnum::TLITERALA, TEnum::TLITERALB}}};
 };
-using ArrayOfEnumStruct = TestStruct<std::vector<TEnum::Enum>>;
-MUESLI_REGISTER_TYPE(ArrayOfEnumStruct, "TestStruct")
 
 template <>
 struct TestParams<bool>
