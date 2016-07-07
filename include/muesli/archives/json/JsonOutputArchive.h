@@ -268,7 +268,7 @@ template <typename OutputStream, typename T>
 std::enable_if_t<json::detail::IsArray<T>::value> save(JsonOutputArchive<OutputStream>& archive,
                                                        const T& array)
 {
-    for (const auto& element : array) {
+    for (const typename T::value_type& element : array) {
         archive(element);
     }
 }

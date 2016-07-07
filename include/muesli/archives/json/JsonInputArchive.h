@@ -108,6 +108,13 @@ public:
         }
     }
 
+    void readValue(std::vector<bool>::reference& boolValue)
+    {
+        bool value;
+        readValue(value);
+        boolValue = value;
+    }
+
     void readValue(double& doubleValue) const
     {
         const Value* nextValue = getNextValue();

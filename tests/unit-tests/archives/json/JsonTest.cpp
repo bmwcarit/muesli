@@ -85,10 +85,12 @@ using JsonTest = ::testing::Test;
 using PrimitiveTypes = ::testing::Types<std::int8_t,
                                         std::int32_t,
                                         double,
+                                        bool,
                                         std::string,
                                         std::vector<std::int32_t>,
                                         std::vector<std::string>,
-                                        std::vector<TEnum::Enum>>;
+                                        std::vector<TEnum::Enum>,
+                                        std::vector<bool>>;
 
 TYPED_TEST_CASE(JsonTest, PrimitiveTypes);
 
@@ -173,3 +175,19 @@ struct TestParams<std::vector<TEnum::Enum>>
 };
 using ArrayOfEnumStruct = TestStruct<std::vector<TEnum::Enum>>;
 MUESLI_REGISTER_TYPE(ArrayOfEnumStruct, "TestStruct")
+
+template <>
+struct TestParams<bool>
+{
+    std::vector<std::pair<bool, bool>> params = {{true, true}, {false, false}};
+};
+
+template <>
+struct TestParams<std::vector<bool>>
+{
+    std::vector<std::pair<std::vector<bool>, std::vector<bool>>> params = {
+            {{true, true}, {true, true}},
+            {{false, true}, {false, true}},
+            {{true, false}, {true, false}},
+            {{false, false}, {false, false}}};
+};
