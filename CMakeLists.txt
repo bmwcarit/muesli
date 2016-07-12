@@ -1,14 +1,78 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.1)
 
 ######## Project settings ########
 project(muesli-0.1.0)
 set(MUESLI_MAJOR_VERSION 0)
-set(MUESLI_MINOR_VERSION 18)
+set(MUESLI_MINOR_VERSION 1)
 set(MUESLI_PATCH_VERSION 0)
 set(
     MUESLI_VERSION
     ${MUESLI_MAJOR_VERSION}.${MUESLI_MINOR_VERSION}.${MUESLI_PATCH_VERSION}
 )
+
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "setting default value 'Debug' for CMAKE_BUILD_TYPE")
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+endif()
+
+set_property(
+    CACHE
+    CMAKE_BUILD_TYPE
+    PROPERTY STRINGS
+    "Debug"
+    "Release"
+)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+include(Sanitizers)
+
+
+# defines GNU standard installation directories
+include(GNUInstallDirs)
+
+include(LocateProgram)
+include(AddClangFormat)
+message(STATUS "variable CMAKE_BUILD_TYPE=" ${CMAKE_BUILD_TYPE})
+
+option(
+    USE_PLATFORM_GTEST_GMOCK
+    "Resolve dependency to gtest and gmock from the system?"
+    ON
+)
+message(STATUS "option USE_PLATFORM_GTEST_GMOCK=" ${USE_PLATFORM_GTEST_GMOCK})
+
+######## Add Boost ########
+
+find_package(Boost 1.59.0 REQUIRED
+    COMPONENTS
+    system
+)
+include_directories(${Boost_INCLUDE_DIRS})
+
+######## DEFAULT COMPILER FLAGS #############
+
+include(SetCppStandard)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(GNU_CXX_FLAGS "-pipe -g")
+    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wall -Wunused-value -Wunused -Wcast-qual -Wpointer-arith")
+    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wextra -Wcast-align -Wdisabled-optimization -Wformat-y2k")
+    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wno-format-extra-args -Wformat-nonliteral -Wformat=2 -Winit-self")
+    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Winvalid-pch -Wunsafe-loop-optimizations -Wmissing-include-dirs")
+    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wmissing-braces -Wpacked -Wredundant-decls -Wstack-protector")
+    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wswitch-enum -Wuninitialized -Weffc++ -Wformat-security")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GNU_CXX_FLAGS} -pthread")
+
+    # check GNU CXX compiler version
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.9" OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.9")
+        add_definitions(-D_GLIBCXX_USE_NANOSLEEP)
+    else()
+        message(FATAL_ERROR "a gcc compiler with a version higher than 4.9 is needed.")
+    endif(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.9" OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.9")
+endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+set(MUESLI_BINARY_DIR ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MUESLI_BINARY_DIR})
 
 # add a fake target which allows displaying the headers in the IDE
 FILE(GLOB_RECURSE MUESLI_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")

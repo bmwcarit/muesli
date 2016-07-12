@@ -50,6 +50,7 @@ target_include_directories(
     SYSTEM
     PRIVATE
     ${rapidjson_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(muesli-unit-test
