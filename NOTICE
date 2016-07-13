@@ -26,6 +26,7 @@ NOTE: Some third-party components included in the RapidJSON source code are
         License is not used by muesli.
       Full details are provided in the RapidJSON license file:
       https://github.com/miloyip/rapidjson/blob/master/license.txt
+Boost under Boost Software License, Version 1.0
 
 --- Libraries used during joynr build ------------------------------------------
 
