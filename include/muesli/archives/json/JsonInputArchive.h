@@ -286,14 +286,14 @@ private:
 };
 
 template <typename InputStream, typename T>
-void intro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
+void intro(JsonInputArchive<InputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
     std::ignore = archive;
     std::ignore = nameValuePair;
 }
 
 template <typename InputStream, typename T>
-void outro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
+void outro(JsonInputArchive<InputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
     std::ignore = archive;
     std::ignore = nameValuePair;
@@ -302,7 +302,7 @@ void outro(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePa
 template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::value> intro(
         JsonInputArchive<InputStream>& archive,
-        T& value)
+        const T& value)
 {
     std::ignore = value;
     archive.pushNode();
@@ -310,7 +310,7 @@ std::enable_if_t<json::detail::IsObject<T>::value || json::detail::IsArray<T>::v
 
 template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsNullable<T>::value> intro(JsonInputArchive<InputStream>& archive,
-                                                           T& value)
+                                                           const T& value)
 {
     std::ignore = value;
     archive.pushNullableNode();
@@ -327,7 +327,7 @@ outro(JsonInputArchive<InputStream>& archive, const T& value)
 
 template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(JsonInputArchive<InputStream>& archive,
-                                                            T& value)
+                                                            const T& value)
 {
     std::ignore = archive;
     std::ignore = value;
@@ -335,7 +335,7 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value> intro(JsonInputArchive<Inp
 
 template <typename InputStream, typename T>
 std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<InputStream>& archive,
-                                                            T& value)
+                                                            const T& value)
 {
     std::ignore = archive;
     std::ignore = value;
