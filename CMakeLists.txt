@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.1)
 
 ######## Project settings ########
 project(muesli-0.1.0)
-set(MUESLI_MAJOR_VERSION 0)
-set(MUESLI_MINOR_VERSION 1)
-set(MUESLI_PATCH_VERSION 0)
+set(muesli_MAJOR_VERSION 0)
+set(muesli_MINOR_VERSION 1)
+set(muesli_PATCH_VERSION 0)
 set(
-    MUESLI_VERSION
-    ${MUESLI_MAJOR_VERSION}.${MUESLI_MINOR_VERSION}.${MUESLI_PATCH_VERSION}
+    muesli_VERSION
+    ${muesli_MAJOR_VERSION}.${muesli_MINOR_VERSION}.${muesli_PATCH_VERSION}
 )
 
 if(NOT CMAKE_BUILD_TYPE)
