@@ -400,7 +400,7 @@ TEST_F(JsonArchiveTest, polymorphismBase)
     EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
 }
 
-TEST_F(JsonArchiveTest, polymorphismDerived)
+TEST_F(JsonArchiveTest, DISABLED_polymorphismDerived)
 {
     NestedStructPolymorphic tNestedStructPolymorphic = {
             std::make_shared<muesli::tests::testtypes::TStructExtended>(tStructExtended)};
