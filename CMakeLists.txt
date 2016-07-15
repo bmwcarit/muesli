@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 2.8.12)
 
 ######## Project settings ########
 project(muesli-0.1.0)
@@ -72,7 +72,14 @@ FILE(GLOB_RECURSE MUESLI_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 add_custom_target(muesli_target_to_display_headers SOURCES ${MUESLI_HEADER_FILES})
 AddClangFormat(muesli_target_to_display_headers)
 
-add_library(muesli INTERFACE)
+if("${CMAKE_VERSION}" VERSION_GREATER 3.0.1)
+    add_library(muesli INTERFACE)
+else("${CMAKE_VERSION}" VERSION_GREATER 3.0.1)
+    message(STATUS "No support for INTERFACE library. An empty static library will be generated instead.")
+    add_library(muesli STATIC ${MUESLI_HEADER_FILES})
+    set_target_properties(muesli PROPERTIES LINKER_LANGUAGE CXX)
+endif("${CMAKE_VERSION}" VERSION_GREATER 3.0.1)
+
 set_property(
     TARGET muesli
     PROPERTY INTERFACE_muesli_MAJOR_VERSION ${muesli_MAJOR_VERSION}
