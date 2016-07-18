@@ -37,7 +37,7 @@ if (USE_PLATFORM_GOOGLE_BENCHMARK)
     # there is no FindGoogleBenchmark.cmake yet, TODO!
     # find_package(googlebenchmark REQUIRED)
 else(USE_PLATFORM_GOOGLE_BENCHMARK)
-    message(STATUS "############ Download: rapidjson ############")
+    message(STATUS "############ Download: google benchmark ############")
 
     get_property(EP_PREFIX DIRECTORY PROPERTY EP_PREFIX)
     set(GBENCHMARK_LIBRARY_NAME ${CMAKE_STATIC_LIBRARY_PREFIX}benchmark${CMAKE_STATIC_LIBRARY_SUFFIX})
