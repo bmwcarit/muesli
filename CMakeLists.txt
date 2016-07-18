@@ -90,8 +90,7 @@ message(STATUS "option USE_PLATFORM_RAPIDJSON=" ${USE_PLATFORM_RAPIDJSON})
 
 include(AddExternalProject)
 if (USE_PLATFORM_RAPIDJSON)
-    find_package(rapidjson REQUIRED)
-    get_target_property(rapidjson_INCLUDE_DIRS rapidjson::rapidjson INTERFACE_INCLUDE_DIRECTORIES)
+    find_package(RapidJSON 1.0.2 REQUIRED)
 else(USE_PLATFORM_RAPIDJSON)
     message(STATUS "############ Download: rapidjson ############")
 
@@ -106,10 +105,18 @@ else(USE_PLATFORM_RAPIDJSON)
         BUILD_COMMAND ""
     )
 
-     ExternalProject_Get_Property(rapidjson SOURCE_DIR)
-     set(rapidjson_INCLUDE_DIRS "${SOURCE_DIR}/include")
+    ExternalProject_Get_Property(rapidjson SOURCE_DIR)
+    # add import target for rapidjson library
+    add_library(rapidjson::rapidjson INTERFACE IMPORTED GLOBAL)
+    add_dependencies(rapidjson::rapidjson rapidjson)
+    set_property(
+        TARGET rapidjson::rapidjson
+        PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${SOURCE_DIR}/include"
+    )
 endif(USE_PLATFORM_RAPIDJSON)
 include(CheckRapidJsonImportTargets)
+get_target_property(rapidjson_INCLUDE_DIRECTORIES rapidjson::rapidjson INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "rapidjson_INCLUDE_DIRECTORIES=${rapidjson_INCLUDE_DIRECTORIES}")
 
 target_include_directories(
     muesli
@@ -118,12 +125,7 @@ target_include_directories(
     "$<INSTALL_INTERFACE:include>"
 )
 
-target_include_directories(
-    muesli
-    SYSTEM
-    INTERFACE
-    "$<BUILD_INTERFACE:${rapidjson_INCLUDE_DIRS}>"
-)
+target_link_libraries(muesli INTERFACE rapidjson::rapidjson)
 
 target_compile_definitions(muesli INTERFACE RAPIDJSON_HAS_STDSTRING)
 

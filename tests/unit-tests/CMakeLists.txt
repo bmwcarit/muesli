@@ -1,7 +1,5 @@
 include(AddGtestGmock)
 
-message(STATUS "variable rapidjson_INCLUDE_DIRS=" ${rapidjson_INCLUDE_DIRS})
-
 AddTest(
     muesli-unit-test
     TestMain.cpp
@@ -49,7 +47,6 @@ target_include_directories(
     muesli-unit-test
     SYSTEM
     PRIVATE
-    ${rapidjson_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
