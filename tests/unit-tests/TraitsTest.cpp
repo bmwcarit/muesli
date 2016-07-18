@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 
 #include "muesli/Traits.h"
+#include "muesli/detail/MetaSwitch.h"
 
 TEST(TraitsTest, isTypeWithinList)
 {
@@ -30,4 +31,32 @@ TEST(TraitsTest, isTypeWithinList)
                   "type must be found in list");
     static_assert(!IsTypeWithinList<std::int64_t, std::int16_t, std::int32_t, std::int8_t>::value,
                   "type must NOT be found in list");
+}
+
+TEST(TraitsTest, metaSwitchDefault)
+{
+    using namespace muesli::detail;
+    using T = MetaSwitchT<MetaCase<false, int>, MetaCase<false, double>, MetaDefault<void>>;
+    static_assert(std::is_void<T>::value, "type must be void");
+}
+
+TEST(TraitsTest, metaSwitchFirstCaseTrue)
+{
+    using namespace muesli::detail;
+    using T = MetaSwitchT<MetaCase<true, int>, MetaCase<false, double>, MetaDefault<void>>;
+    static_assert(std::is_same<T, int>::value, "type must be int");
+}
+
+TEST(TraitsTest, metaSwitchSecondCaseTrue)
+{
+    using namespace muesli::detail;
+    using T = MetaSwitchT<MetaCase<false, int>, MetaCase<true, double>, MetaDefault<void>>;
+    static_assert(std::is_same<T, double>::value, "type must be double");
+}
+
+TEST(TraitsTest, metaSwitchMultipleTrue)
+{
+    using namespace muesli::detail;
+    using T = MetaSwitchT<MetaCase<true, int>, MetaCase<true, double>, MetaDefault<void>>;
+    static_assert(std::is_same<T, int>::value, "type must be int");
 }
