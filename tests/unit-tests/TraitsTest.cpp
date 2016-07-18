@@ -23,7 +23,7 @@
 
 #include "muesli/Traits.h"
 
-TEST(TraitsTest, StaticAsserts)
+TEST(TraitsTest, isTypeWithinList)
 {
     using namespace muesli;
     static_assert(IsTypeWithinList<std::int8_t, std::int16_t, std::int32_t, std::int8_t>::value,
