@@ -27,7 +27,7 @@ namespace muesli
 namespace detail
 {
 
-template<bool V, typename T>
+template <bool V, typename T>
 struct MetaCase
 {
     static constexpr bool value = V;

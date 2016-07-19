@@ -27,6 +27,7 @@
 #include "muesli/Tags.h"
 #include "muesli/Traits.h"
 #include "muesli/detail/Expansion.h"
+#include "muesli/detail/DispatchTraits.h"
 
 namespace muesli
 {
@@ -34,6 +35,7 @@ namespace muesli
 template <typename ArchiveCategory, typename Derived>
 class BaseArchive : public std::enable_shared_from_this<Derived>
 {
+
 public:
     using Category = ArchiveCategory;
 
@@ -61,15 +63,15 @@ private:
     template <typename T>
     std::enable_if_t<SkipIntroOutroTraits<std::decay_t<T>>::value> handle(T&& arg)
     {
-        self.dispatch(arg);
+        self.dispatch(std::forward<T>(arg));
     }
 
     template <typename T>
     std::enable_if_t<!SkipIntroOutroTraits<std::decay_t<T>>::value> handle(T&& arg)
     {
-        intro(self, arg);
-        self.dispatch(arg);
-        outro(self, arg);
+        intro(self, std::forward<T>(arg));
+        self.dispatch(std::forward<T>(arg));
+        outro(self, std::forward<T>(arg));
     }
 
     template <typename T>
@@ -86,53 +88,54 @@ private:
         self.dispatch(*arg.wrapped);
     }
 
+    template <typename T>
+    void dispatch(T&& arg)
+    {
+        using DispatchTarget = detail::DispatchTo<std::decay_t<T>, Derived, ArchiveCategory>;
+        static_assert(!std::is_void<DispatchTarget>::value, "no serialization function found");
+        dispatch(std::forward<T>(arg), DispatchTarget{});
+    }
+
     // 'arg' has 'serialize' member function
-    template <typename T, typename D = Derived>
-    auto dispatch(T&& arg)
-            -> decltype(discardConstQualifier(arg).serialize(static_cast<D*>(this) -> self), void())
+    template <typename T>
+    void dispatch(T&& arg, const dispatch_targets::member::serialize&)
     {
         discardConstQualifier(arg).serialize(self);
     }
 
-    // free function 'serialize' exists for 'arg'
-    template <typename T, typename D = Derived>
-    auto dispatch(T&& arg)
-            -> decltype(serialize(static_cast<D*>(this) -> self, discardConstQualifier(arg)),
-                        void())
+    // free function 'serialize' exists
+    template <typename T>
+    void dispatch(T&& arg, const dispatch_targets::free::serialize&)
     {
         serialize(self, discardConstQualifier(arg));
     }
 
-    // 'Derived' is of category 'InputArchive', check if 'load' member function exists
-    template <typename T, typename D = Derived, typename C = Category>
-    auto dispatch(T&& arg) -> decltype(arg.load(static_cast<D*>(this) -> self),
-                                       EnableIfXArchive<tags::InputArchive, C>())
+    // 'arg' has 'load' member function
+    template <typename T>
+    void dispatch(T&& arg, const dispatch_targets::member::load&)
     {
         arg.load(self);
     }
 
-    // 'Derived' is of category 'InputArchive', check if free function 'load' exists
-    template <typename T, typename D = Derived, typename C = Category>
-    auto dispatch(T&& arg) -> decltype(load(static_cast<D*>(this) -> self, std::forward<T>(arg)),
-                                       EnableIfXArchive<tags::InputArchive, C>())
+    // 'arg' has 'save' member function
+    template <typename T>
+    void dispatch(T&& arg, const dispatch_targets::member::save&)
     {
-        load(self, std::forward<T>(arg));
+        discardConstQualifier(arg).save(self);
     }
 
-    // 'Derived' is of category 'OutputArchive', check if 'load' member function exists
-    template <typename T, typename D = Derived, typename C = Category>
-    auto dispatch(T&& arg) -> decltype(arg.save(static_cast<D*>(this) -> self),
-                                       EnableIfXArchive<tags::OutputArchive, C>())
+    // free function 'save' exists
+    template <typename T>
+    void dispatch(T&& arg, const dispatch_targets::free::save&)
     {
-        arg.save(self);
+        save(self, arg);
     }
 
-    // 'Derived' is of category 'OutputArchive', check if free function 'save' exists
-    template <typename T, typename D = Derived, typename C = Category>
-    auto dispatch(T&& arg) -> decltype(save(static_cast<D*>(this) -> self, std::forward<T>(arg)),
-                                       EnableIfXArchive<tags::OutputArchive, C>())
+    // free function 'load' exists
+    template <typename T>
+    void dispatch(T&& arg, const dispatch_targets::free::load&)
     {
-        save(self, std::forward<T>(arg));
+        load(self, arg);
     }
 
     Derived& self;

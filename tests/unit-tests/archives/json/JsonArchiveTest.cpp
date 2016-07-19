@@ -407,7 +407,7 @@ struct StateHistoryTestStruct
     }
 
     template <typename Archive>
-    void save(Archive& archive) const
+    void save(Archive& archive)
     {
         archive(muesli::make_nvp("stringBeforStruct", stringBeforStruct),
                 muesli::make_nvp("tstruct", tstruct),
