@@ -80,6 +80,27 @@ add_custom_target(muesli_target_to_display_headers SOURCES ${MUESLI_HEADER_FILES
 AddClangFormat(muesli_target_to_display_headers)
 
 add_library(muesli INTERFACE)
+set_property(
+    TARGET muesli
+    PROPERTY INTERFACE_muesli_MAJOR_VERSION ${muesli_MAJOR_VERSION}
+)
+set_property(
+    TARGET muesli
+    PROPERTY INTERFACE_muesli_MINOR_VERSION ${muesli_MINOR_VERSION}
+)
+set_property(
+    TARGET muesli
+    PROPERTY INTERFACE_muesli_PATCH_VERSION ${muesli_PATCH_VERSION}
+)
+set_property(
+    TARGET muesli
+    PROPERTY INTERFACE_muesli_VERSION ${muesli_VERSION}
+)
+set_property(
+    TARGET muesli
+    APPEND PROPERTY
+    COMPATIBLE_INTERFACE_STRING muesli_VERSION
+)
 
 option(
     USE_PLATFORM_RAPIDJSON
@@ -131,11 +152,51 @@ target_compile_definitions(muesli INTERFACE RAPIDJSON_HAS_STDSTRING)
 
 add_dependencies(muesli rapidjson::rapidjson)
 
+# defines GNU standard installation directories
+include(GNUInstallDirs)
 
 install(
     TARGETS muesli
-    EXPORT JoynrTargets
+    EXPORT muesliTargets
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+install(
+    DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/muesli/muesliConfigVersion.cmake"
+    VERSION ${muesli_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+export(
+    EXPORT muesliTargets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/muesli/muesliTargets.cmake"
+    NAMESPACE muesli::
+)
+configure_file(
+    muesliConfig.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/muesli/muesliConfig.cmake"
+    COPYONLY
+)
+
+set(CmakePackageDir ${CMAKE_INSTALL_LIBDIR}/cmake/muesli)
+
+install(
+    EXPORT muesliTargets
+    FILE muesliTargets.cmake
+    NAMESPACE muesli::
+    DESTINATION ${CmakePackageDir}
+)
+install(
+    FILES
+        muesliConfig.cmake
+        "${CMAKE_CURRENT_BINARY_DIR}/muesli/muesliConfigVersion.cmake"
+    DESTINATION ${CmakePackageDir}
+    COMPONENT Devel
 )
 
 option(
