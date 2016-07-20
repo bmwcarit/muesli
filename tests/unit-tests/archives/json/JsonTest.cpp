@@ -85,6 +85,7 @@ using JsonTest = ::testing::Test;
 using PrimitiveTypes = ::testing::Types<std::int8_t,
                                         std::int32_t,
                                         double,
+                                        float,
                                         bool,
                                         std::string,
                                         std::vector<std::int32_t>,
@@ -121,7 +122,20 @@ struct TestParams<double>
             {std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest()},
             {0, 0},
             {0.012345678901234567890123456789, 0.012345678901234567890123456789},
+            {1.25e-9, 1.25e-9},
             {std::numeric_limits<double>::max(), std::numeric_limits<double>::max()}};
+};
+
+template <>
+struct TestParams<float>
+{
+    std::vector<std::pair<float, float>> params = {
+            {std::numeric_limits<float>::min(), std::numeric_limits<float>::min()},
+            {std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()},
+            {0.0f, 0.0f},
+            {0.012345678901234567890123456789f, 0.012345678901234567890123456789f},
+            {1.25e-9f, 1.25e-9f},
+            {std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}};
 };
 
 template <>

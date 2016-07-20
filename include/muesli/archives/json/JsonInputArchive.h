@@ -127,12 +127,9 @@ public:
 
     void readValue(float& floatValue) const
     {
-        const Value* nextValue = getNextValue(true);
-        if (nextValue->IsFloat()) {
-            floatValue = nextValue->GetFloat();
-        } else {
-            throw std::invalid_argument("Cannot read an Float.");
-        }
+        double doubleValue;
+        readValue(doubleValue);
+        floatValue = static_cast<float>(doubleValue);
     }
 
     template <typename T>
