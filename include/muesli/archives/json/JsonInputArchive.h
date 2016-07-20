@@ -100,7 +100,7 @@ public:
 
     void readValue(bool& boolValue)
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsBool()) {
             boolValue = nextValue->GetBool();
         } else {
@@ -117,7 +117,7 @@ public:
 
     void readValue(double& doubleValue) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsDouble()) {
             doubleValue = nextValue->GetDouble();
         } else {
@@ -127,7 +127,7 @@ public:
 
     void readValue(float& floatValue) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsFloat()) {
             floatValue = nextValue->GetFloat();
         } else {
@@ -138,7 +138,7 @@ public:
     template <typename T>
     std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsInt()) {
             value = nextValue->GetInt();
         } else {
@@ -149,7 +149,7 @@ public:
     template <typename T>
     std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(T& value) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsUint()) {
             value = nextValue->GetUint();
         } else {
@@ -159,7 +159,7 @@ public:
 
     void readValue(std::int64_t& int64Value) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsInt64()) {
             int64Value = nextValue->GetInt64();
         } else {
@@ -169,7 +169,7 @@ public:
 
     void readValue(std::uint64_t& uint64Value) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsUint64()) {
             uint64Value = nextValue->GetUint64();
         } else {
@@ -179,7 +179,7 @@ public:
 
     void readValue(std::string& stringValue) const
     {
-        const Value* nextValue = getNextValue();
+        const Value* nextValue = getNextValue(true);
         if (nextValue->IsString()) {
             stringValue = nextValue->GetString();
         } else {
@@ -217,8 +217,8 @@ public:
             isRoot = false;
             return;
         }
-        const Value* nextValue = getNextValue();
-        if (nextValue != nullptr && !nextValue->IsNull()) {
+        const Value* nextValue = getNextValue(true);
+        if (!nextValue->IsNull()) {
             stack.push(nextValue);
         } else {
             throw exceptions::ValueNotFoundException(
@@ -258,7 +258,7 @@ public:
     }
 
 private:
-    const Value* getNextValue() const
+    const Value* getNextValue(bool throwOnNotFound = false) const
     {
         if (stack.top()->IsArray() && nextIndexValid) {
             return &(stack.top()->operator[](nextIndex));
@@ -266,6 +266,10 @@ private:
             Value::ConstMemberIterator it = stack.top()->FindMember(nextKey);
             if (it != stack.top()->MemberEnd()) {
                 return &(it->value);
+            }
+            if (throwOnNotFound) {
+                throw exceptions::ValueNotFoundException(
+                        "Could not find value for key \"" + nextKey +"\".");
             }
             return nullptr;
         }

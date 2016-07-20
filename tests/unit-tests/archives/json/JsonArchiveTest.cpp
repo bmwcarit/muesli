@@ -463,3 +463,19 @@ TEST_F(JsonArchiveTest, invalidJsonCausesParseException)
     stream.str("}invalid-json{");
     EXPECT_THROW(JsonInputArchiveImpl{inputStreamWrapper}, muesli::exceptions::ParseException);
 }
+
+TEST_F(JsonArchiveTest, deserializeThrowsOnMissingField)
+{
+    std::string expectedSerializedStruct =
+            R"({)"
+            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+            // missing tDouble field R"("tDouble":0.123456789,)"
+            R"("tInt64":64,)"
+            R"("tString":"test string data")"
+            R"(})";
+    stream.str(expectedSerializedStruct);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    muesli::tests::testtypes::TStruct tStructDeserialized;
+    EXPECT_THROW(serialize(jsonInputArchive, tStructDeserialized),
+                 muesli::exceptions::ValueNotFoundException);
+}
