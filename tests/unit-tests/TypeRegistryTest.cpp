@@ -110,35 +110,28 @@ TEST(TypeRegistryTest, registeredNameIsCorrectForPolymorphicType)
             "typenames must match");
 }
 
-TEST(TypeRegistryTest, polymorphicTypeInputRegistry)
+template <typename T>
+struct TypedTypeRegistryTest : public ::testing::Test
+{
+};
+
+using PolymorphicDerivedTypes = ::testing::Types<polymorphic::DerivedOne,
+                                                 polymorphic::DerivedTwo,
+                                                 polymorphic::DerivedFromDerivedOne>;
+
+TYPED_TEST_CASE(TypedTypeRegistryTest, PolymorphicDerivedTypes);
+
+TYPED_TEST(TypedTypeRegistryTest, polymorphicTypeInputRegistry)
 {
     using TypeRegistry = muesli::TypeRegistry<polymorphic::Base>;
     using LoadFunction = typename TypeRegistry::LoadFunction;
 
     MockInputArchiveImpl inputArchive;
-    {
-        boost::optional<LoadFunction> loadFunction =
-                TypeRegistry::getLoadFunction("polymorphic.DerivedOne");
-        ASSERT_TRUE(loadFunction.is_initialized());
-        std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(polymorphic::DerivedOne), typeid(*p));
-    }
-
-    {
-        boost::optional<LoadFunction> loadFunction =
-                TypeRegistry::getLoadFunction("polymorphic.DerivedTwo");
-        ASSERT_TRUE(loadFunction.is_initialized());
-        std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(polymorphic::DerivedTwo), typeid(*p));
-    }
-
-    {
-        boost::optional<LoadFunction> loadFunction =
-                TypeRegistry::getLoadFunction("polymorphic.DerivedFromDerivedOne");
-        ASSERT_TRUE(loadFunction.is_initialized());
-        std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(polymorphic::DerivedFromDerivedOne), typeid(*p));
-    }
+    boost::optional<LoadFunction> loadFunction =
+            TypeRegistry::getLoadFunction(muesli::RegisteredType<TypeParam>::name());
+    ASSERT_TRUE(loadFunction.is_initialized());
+    std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
+    EXPECT_EQ(typeid(TypeParam), typeid(*p));
 }
 
 TEST(TypeRegistryTest, polymorphicTypeOutputRegistry)
