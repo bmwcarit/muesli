@@ -28,7 +28,6 @@
 
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
-#include <boost/mpl/transform.hpp>
 
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
@@ -37,6 +36,7 @@
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Registry.h"
+#include "muesli/Traits.h"
 
 namespace muesli
 {
@@ -112,6 +112,9 @@ namespace detail
 template <typename Base, typename T>
 struct RegisteredPolymorphicType;
 
+template <typename T>
+struct LinkPolymorphicTypeWithBase;
+
 template <typename Base, typename T>
 struct RegisteredPolymorphicTypeInstance
 {
@@ -134,6 +137,26 @@ const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeI
                          boost::apply_visitor(
                                  [ptr](auto& ar) { ar(*(static_cast<const T*>(ptr))); }, archive);
                      });
+
+template <typename... Ts>
+struct TypeList
+{
+};
+
+template <typename T, typename List = TypeList<>, typename Enable = void>
+struct GetRegisteredBaseHierarchy
+{
+    using type = List;
+};
+
+template <typename T, typename... Bases>
+struct GetRegisteredBaseHierarchy<T,
+                                  TypeList<Bases...>,
+                                  VoidT<typename LinkPolymorphicTypeWithBase<T>::type>>
+{
+    using Base = typename LinkPolymorphicTypeWithBase<T>::type;
+    using type = typename GetRegisteredBaseHierarchy<Base, TypeList<Bases..., Base>>::type;
+};
 
 } // namespace detail
 } // namespace muesli
@@ -158,16 +181,30 @@ const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeI
     namespace detail                                                                               \
     {                                                                                              \
     template <>                                                                                    \
+    struct LinkPolymorphicTypeWithBase<T>                                                          \
+    {                                                                                              \
+        using type = Base;                                                                         \
+    };                                                                                             \
+    template <>                                                                                    \
     struct RegisteredPolymorphicType<Base, T>                                                      \
     {                                                                                              \
         static_assert(std::is_polymorphic<Base>::value, "Base must be polymorphic");               \
         static_assert(std::is_base_of<Base, T>::value, "Base must be a base class of T");          \
                                                                                                    \
+        using BaseHierarchyTypeList = typename GetRegisteredBaseHierarchy<T>::type;                \
+                                                                                                   \
+        template <typename... Bases>                                                               \
+        static auto dummyImpl(TypeList<Bases...>)                                                  \
+        {                                                                                          \
+            return std::make_tuple(                                                                \
+                    std::ref(RegisteredPolymorphicTypeInstance<Bases, T>::instance)...);           \
+        }                                                                                          \
+                                                                                                   \
         /* this function will never be called, it just forces instantation of the static object */ \
-        static const auto& dummy()                                                                 \
+        static auto dummy()                                                                        \
         {                                                                                          \
             assert(false);                                                                         \
-            return RegisteredPolymorphicTypeInstance<Base, T>::instance;                           \
+            return dummyImpl(BaseHierarchyTypeList{});                                             \
         }                                                                                          \
     };                                                                                             \
     } /* namespace detail */                                                                       \

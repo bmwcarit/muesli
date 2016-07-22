@@ -75,6 +75,16 @@ struct DerivedTwo : Base
     MOCK_METHOD0(serializeCalledDerivedTwo, void());
 };
 
+struct DerivedFromDerivedOne : DerivedOne
+{
+    template <typename Archive>
+    void serialize(Archive&)
+    {
+        serializeCalledDerivedFromDerivedOne();
+    }
+    MOCK_METHOD0(serializeCalledDerivedFromDerivedOne, void());
+};
+
 } // namespace polymorphic
 
 MUESLI_REGISTER_TYPE(polymorphic::Base, "polymorphic.Base")
@@ -84,6 +94,10 @@ MUESLI_REGISTER_POLYMORPHIC_TYPE(polymorphic::DerivedOne,
 MUESLI_REGISTER_POLYMORPHIC_TYPE(polymorphic::DerivedTwo,
                                  polymorphic::Base,
                                  "polymorphic.DerivedTwo")
+
+MUESLI_REGISTER_POLYMORPHIC_TYPE(polymorphic::DerivedFromDerivedOne,
+                                 polymorphic::DerivedOne,
+                                 "polymorphic.DerivedFromDerivedOne")
 
 using MockOutputArchiveImpl = MockOutputArchive<MockOutputStream>;
 using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
@@ -106,16 +120,24 @@ TEST(TypeRegistryTest, polymorphicTypeInputRegistry)
         boost::optional<LoadFunction> loadFunction =
                 TypeRegistry::getLoadFunction("polymorphic.DerivedOne");
         ASSERT_TRUE(loadFunction.is_initialized());
-        std::unique_ptr<polymorphic::Base> p1 = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(polymorphic::DerivedOne), typeid(*p1));
+        std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(polymorphic::DerivedOne), typeid(*p));
     }
 
     {
         boost::optional<LoadFunction> loadFunction =
                 TypeRegistry::getLoadFunction("polymorphic.DerivedTwo");
         ASSERT_TRUE(loadFunction.is_initialized());
-        std::unique_ptr<polymorphic::Base> p2 = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(polymorphic::DerivedTwo), typeid(*p2));
+        std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(polymorphic::DerivedTwo), typeid(*p));
+    }
+
+    {
+        boost::optional<LoadFunction> loadFunction =
+                TypeRegistry::getLoadFunction("polymorphic.DerivedFromDerivedOne");
+        ASSERT_TRUE(loadFunction.is_initialized());
+        std::unique_ptr<polymorphic::Base> p = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(polymorphic::DerivedFromDerivedOne), typeid(*p));
     }
 }
 
