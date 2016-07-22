@@ -17,8 +17,8 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
 #include <chrono>
+#include <gtest/gtest.h>
 #include <tuple>
 
 #include <rapidjson/stringbuffer.h>
@@ -31,9 +31,9 @@
 
 #include "muesli/exceptions/ParseException.h"
 
+#include "testtypes/TEnum.h"
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
-#include "testtypes/TEnum.h"
 
 using namespace ::testing;
 

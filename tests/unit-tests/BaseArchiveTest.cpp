@@ -17,8 +17,8 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "muesli/BaseArchive.h"
 #include "muesli/detail/TemplateHolder.h"

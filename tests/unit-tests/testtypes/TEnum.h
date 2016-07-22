@@ -24,8 +24,8 @@
 #include <ostream>
 #include <string>
 
-#include "muesli/TypeRegistry.h"
 #include "muesli/Traits.h"
+#include "muesli/TypeRegistry.h"
 
 namespace muesli
 {

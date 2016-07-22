@@ -17,11 +17,11 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
 #include <boost/concept_check.hpp>
+#include <gtest/gtest.h>
 
-#include "muesli/concepts/OutputStream.h"
 #include "MockStream.h"
+#include "muesli/concepts/OutputStream.h"
 
 TEST(OutputStreamTest, conceptCheck)
 {

@@ -39,11 +39,11 @@
 #include <cstddef>
 #include <memory>
 #include <string>
-#include <vector>
 #include <typeinfo>
+#include <vector>
 
-#include "muesli/TypeRegistry.h"
 #include "muesli/NameValuePair.h"
+#include "muesli/TypeRegistry.h"
 
 namespace muesli
 {

@@ -17,13 +17,13 @@
  * #L%
  */
 
-#include <string>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "muesli/concepts/InputStream.h"
 #include "muesli/streams/StdIStreamWrapper.h"

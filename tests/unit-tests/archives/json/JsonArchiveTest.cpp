@@ -23,11 +23,14 @@
 
 #include <boost/optional.hpp>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "muesli/exceptions/ParseException.h"
 #include "muesli/exceptions/ValueNotFoundException.h"
+
+#include "muesli/streams/StringIStream.h"
+#include "muesli/streams/StringOStream.h"
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"

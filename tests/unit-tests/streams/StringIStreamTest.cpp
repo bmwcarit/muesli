@@ -17,16 +17,16 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
 #include <boost/concept_check.hpp>
+#include <gtest/gtest.h>
 
+#include "muesli/concepts/InputStream.h"
 #include "muesli/streams/StringIStream.h"
 #include "muesli/streams/StringOStream.h"
-#include "muesli/concepts/InputStream.h"
 
 #include "MockArchive.h"
-#include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/TypeRegistry.h"
+#include "muesli/archives/json/JsonInputArchive.h"
 #include "testtypes/TStruct.h"
 
 using namespace ::testing;

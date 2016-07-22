@@ -21,14 +21,14 @@
 #define TESTTYPES_NESTEDSTRUCTS_H_
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <vector>
-#include <memory>
 
 #include <boost/optional.hpp>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "muesli/exceptions/ParseException.h"
 #include "muesli/exceptions/ValueNotFoundException.h"

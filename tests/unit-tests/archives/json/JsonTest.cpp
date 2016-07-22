@@ -22,8 +22,8 @@
 #include <sstream>
 #include <vector>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"
@@ -31,9 +31,9 @@
 #include "muesli/streams/StdIStreamWrapper.h"
 #include "muesli/streams/StdOStreamWrapper.h"
 
+#include "testtypes/TEnum.h"
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
-#include "testtypes/TEnum.h"
 
 #include "muesli/TypeRegistry.h"
 

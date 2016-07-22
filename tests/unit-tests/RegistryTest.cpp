@@ -19,8 +19,8 @@
 
 #include <type_traits>
 
-#include <boost/mpl/vector.hpp>
 #include <boost/mpl/equal.hpp>
+#include <boost/mpl/vector.hpp>
 #include <gtest/gtest.h>
 
 #include "MockArchive.h"

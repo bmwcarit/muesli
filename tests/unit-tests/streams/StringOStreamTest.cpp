@@ -17,13 +17,13 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
 #include <array>
 #include <boost/concept_check.hpp>
+#include <gtest/gtest.h>
 
+#include "muesli/concepts/OutputStream.h"
 #include "muesli/streams/StringIStream.h"
 #include "muesli/streams/StringOStream.h"
-#include "muesli/concepts/OutputStream.h"
 
 TEST(StringOStreamTest, conceptCheck)
 {

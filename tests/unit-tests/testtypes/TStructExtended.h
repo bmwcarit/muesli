@@ -23,15 +23,15 @@
 #include <cstddef>
 #include <memory>
 #include <string>
-#include <vector>
 #include <typeinfo>
+#include <vector>
 
 #include "muesli/BaseClass.h"
 #include "muesli/TypeRegistry.h"
 
 // include complex Datatype headers.
-#include "TStruct.h"
 #include "TEnum.h"
+#include "TStruct.h"
 
 namespace muesli
 {

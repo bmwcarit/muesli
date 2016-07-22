@@ -17,12 +17,12 @@
  * #L%
  */
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "muesli/concepts/InputStream.h"
 #include "MockStream.h"
+#include "muesli/concepts/InputStream.h"
 
 TEST(InputStreamTest, conceptCheck)
 {
