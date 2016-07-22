@@ -41,39 +41,49 @@ TEST(TypeRegistryTest, registeredNameIsCorrectForNonPolymorphicType)
                   "typenames must match");
 }
 
-struct PolymorphicBase
+namespace polymorphic
 {
-    virtual ~PolymorphicBase() = default;
 
+struct Base
+{
+    virtual ~Base() = default;
     template <typename Archive>
     void serialize(Archive&)
     {
+        serializeCalledBase();
     }
+    MOCK_METHOD0(serializeCalledBase, void());
 };
 
-struct PolymorphicDerived1 : PolymorphicBase
+struct DerivedOne : Base
 {
-    std::string strValue = "TEST123";
     template <typename Archive>
-    void serialize(Archive& archive)
+    void serialize(Archive&)
     {
-        archive(strValue);
+        serializeCalledDerivedOne();
     }
+    MOCK_METHOD0(serializeCalledDerivedOne, void());
 };
 
-struct PolymorphicDerived2 : PolymorphicBase
+struct DerivedTwo : Base
 {
-    std::int64_t int64Value = 555;
     template <typename Archive>
-    void serialize(Archive& archive)
+    void serialize(Archive&)
     {
-        archive(int64Value);
+        serializeCalledDerivedTwo();
     }
+    MOCK_METHOD0(serializeCalledDerivedTwo, void());
 };
 
-MUESLI_REGISTER_TYPE(PolymorphicBase, "PolymorphicBase")
-MUESLI_REGISTER_POLYMORPHIC_TYPE(PolymorphicDerived1, PolymorphicBase, "PolymorphicDerived1")
-MUESLI_REGISTER_POLYMORPHIC_TYPE(PolymorphicDerived2, PolymorphicBase, "PolymorphicDerived2")
+} // namespace polymorphic
+
+MUESLI_REGISTER_TYPE(polymorphic::Base, "polymorphic.Base")
+MUESLI_REGISTER_POLYMORPHIC_TYPE(polymorphic::DerivedOne,
+                                 polymorphic::Base,
+                                 "polymorphic.DerivedOne")
+MUESLI_REGISTER_POLYMORPHIC_TYPE(polymorphic::DerivedTwo,
+                                 polymorphic::Base,
+                                 "polymorphic.DerivedTwo")
 
 using MockOutputArchiveImpl = MockOutputArchive<MockOutputStream>;
 using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
@@ -81,47 +91,45 @@ using MockInputArchiveImpl = MockInputArchive<MockInputStream>;
 TEST(TypeRegistryTest, registeredNameIsCorrectForPolymorphicType)
 {
     static_assert(
-            muesli::test_util::stringEqual(
-                    "PolymorphicDerived1", muesli::RegisteredType<PolymorphicDerived1>::name()),
+            muesli::test_util::stringEqual("polymorphic.DerivedOne",
+                                           muesli::RegisteredType<polymorphic::DerivedOne>::name()),
             "typenames must match");
 }
 
 TEST(TypeRegistryTest, polymorphicTypeInputRegistry)
 {
-    using TypeRegistry = muesli::TypeRegistry<PolymorphicBase>;
+    using TypeRegistry = muesli::TypeRegistry<polymorphic::Base>;
     using LoadFunction = typename TypeRegistry::LoadFunction;
 
     MockInputArchiveImpl inputArchive;
     {
         boost::optional<LoadFunction> loadFunction =
-                TypeRegistry::getLoadFunction("PolymorphicDerived1");
+                TypeRegistry::getLoadFunction("polymorphic.DerivedOne");
         ASSERT_TRUE(loadFunction.is_initialized());
-        EXPECT_CALL(inputArchive, serializeString(Eq("TEST123")));
-        std::unique_ptr<PolymorphicBase> p1 = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(PolymorphicDerived1), typeid(*p1));
+        std::unique_ptr<polymorphic::Base> p1 = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(polymorphic::DerivedOne), typeid(*p1));
     }
 
     {
         boost::optional<LoadFunction> loadFunction =
-                TypeRegistry::getLoadFunction("PolymorphicDerived2");
+                TypeRegistry::getLoadFunction("polymorphic.DerivedTwo");
         ASSERT_TRUE(loadFunction.is_initialized());
-        EXPECT_CALL(inputArchive, serializeInt64(Eq(555)));
-        std::unique_ptr<PolymorphicBase> p2 = (*loadFunction)(inputArchive);
-        EXPECT_EQ(typeid(PolymorphicDerived2), typeid(*p2));
+        std::unique_ptr<polymorphic::Base> p2 = (*loadFunction)(inputArchive);
+        EXPECT_EQ(typeid(polymorphic::DerivedTwo), typeid(*p2));
     }
 }
 
 TEST(TypeRegistryTest, polymorphicTypeOutputRegistry)
 {
-    using TypeRegistry = muesli::TypeRegistry<PolymorphicBase>;
+    using TypeRegistry = muesli::TypeRegistry<polymorphic::Base>;
     using SaveFunction = typename TypeRegistry::SaveFunction;
 
     MockOutputArchiveImpl outputArchive;
-    std::unique_ptr<PolymorphicBase> derived1 = std::make_unique<PolymorphicDerived1>();
-    boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(typeid(*derived1));
+    std::unique_ptr<polymorphic::Base> derivedOne = std::make_unique<polymorphic::DerivedOne>();
+    boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(typeid(*derivedOne));
     ASSERT_TRUE(saveFunction.is_initialized());
-    EXPECT_CALL(outputArchive, serializeString(_));
-    (*saveFunction)(outputArchive, derived1.get());
+    EXPECT_CALL(dynamic_cast<polymorphic::DerivedOne&>(*derivedOne), serializeCalledDerivedOne());
+    (*saveFunction)(outputArchive, derivedOne.get());
 }
 
 // TODO 2 additional test cases: compile static and shared library which contains the datatypes,
