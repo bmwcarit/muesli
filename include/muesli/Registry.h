@@ -29,6 +29,7 @@
 
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
+#include "muesli/detail/CartesianTypeProduct.h"
 #include "muesli/Tags.h"
 
 namespace muesli
@@ -51,40 +52,26 @@ static_assert(0 != ListSize<RegisteredInputStreams>::value, "no InputStream regi
 static_assert(0 != ListSize<RegisteredOutputArchives>::value, "no OutputArchive registered");
 static_assert(0 != ListSize<RegisteredInputArchives>::value, "no InputArchive registered");
 
-template <typename Stream, typename RegisteredArchive>
-struct ApplyStream
+struct CombineArchiveAndStream
 {
     // get actual Archive template out of TemplateHolder
     // instantiate the combination of Archive template and concrete Stream implementation
-    using type = typename RegisteredArchive::template type<Stream>;
+    template <typename RegisteredArchive, typename Stream>
+    struct apply
+    {
+        using type = typename RegisteredArchive::template type<Stream>;
+    };
 };
 
-template <typename RegisteredArchive, typename RegisteredStreams>
-struct CartesianStreamProduct
-{
-    // iterate over registered streams
-    using type =
-            typename boost::mpl::transform<RegisteredStreams,
-                                           ApplyStream<boost::mpl::_1, RegisteredArchive>>::type;
-};
-
-// iterate over registered archives
-template <typename RegisteredArchives, typename RegisteredStreams>
-using CartesianStreamArchiveProduct = typename boost::mpl::transform<
-        RegisteredArchives,
-        CartesianStreamProduct<boost::mpl::_1, RegisteredStreams>>::type;
-
-// flatten nested type lists
-template <typename RegisteredArchives, typename RegisteredStreams>
-using FlatCartesianStreamArchiveProduct = typename FlattenMplSequence<
-        typename CartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>::type>::type;
 } // namespace detail
 
 template <typename RegisteredArchives,
           typename RegisteredStreams,
           template <typename> class Postprocess = boost::mpl::identity>
 using MakeArchiveVariant = typename boost::make_variant_over<typename boost::mpl::transform<
-        detail::FlatCartesianStreamArchiveProduct<RegisteredArchives, RegisteredStreams>,
+        detail::FlatCartesianTypeProduct<RegisteredArchives,
+                                         RegisteredStreams,
+                                         detail::CombineArchiveAndStream>,
         Postprocess<boost::mpl::_1>>::type>::type;
 
 using OutputArchiveVariant = MakeArchiveVariant<RegisteredOutputArchives,
