@@ -29,6 +29,7 @@
 
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
+#include "muesli/detail/TypeList.h"
 #include "muesli/detail/CartesianTypeProduct.h"
 #include "muesli/Tags.h"
 
@@ -62,24 +63,21 @@ struct CombineArchiveAndStream
         using type = typename RegisteredArchive::template type<Stream>;
     };
 };
-
 } // namespace detail
 
-template <typename RegisteredArchives,
-          typename RegisteredStreams,
-          template <typename> class Postprocess = boost::mpl::identity>
-using MakeArchiveVariant = typename boost::make_variant_over<typename boost::mpl::transform<
-        detail::FlatCartesianTypeProduct<RegisteredArchives,
-                                         RegisteredStreams,
-                                         detail::CombineArchiveAndStream>,
-        Postprocess<boost::mpl::_1>>::type>::type;
+using OutputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredOutputArchives,
+                                                                RegisteredOutputStreams,
+                                                                detail::CombineArchiveAndStream>;
+using InputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredInputArchives,
+                                                                 RegisteredInputStreams,
+                                                                 detail::CombineArchiveAndStream>;
 
-using OutputArchiveVariant = MakeArchiveVariant<RegisteredOutputArchives,
-                                                RegisteredOutputStreams,
-                                                std::add_lvalue_reference>;
-using InputArchiveVariant = MakeArchiveVariant<RegisteredInputArchives,
-                                               RegisteredInputStreams,
-                                               std::add_lvalue_reference>;
+template <typename ArchiveTypeVector, template <typename> class Postprocess = boost::mpl::identity>
+using MakeArchiveVariant = typename boost::make_variant_over<
+        typename boost::mpl::transform<ArchiveTypeVector, Postprocess<boost::mpl::_1>>::type>::type;
+
+using OutputArchiveVariant = MakeArchiveVariant<OutputArchiveTypeVector, std::add_lvalue_reference>;
+using InputArchiveVariant = MakeArchiveVariant<InputArchiveTypeVector, std::add_lvalue_reference>;
 
 } // namespace muesli
 

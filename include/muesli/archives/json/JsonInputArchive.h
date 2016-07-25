@@ -481,7 +481,7 @@ std::unique_ptr<Base> loadPolymorphicPointerThroughRegistry(JsonInputArchive<Inp
                                                             const std::string& typeName)
 {
     // lookup in type registry
-    using TypeRegistry = typename muesli::TypeRegistry<Base>;
+    using TypeRegistry = muesli::TypeLoadRegistry<Base, JsonInputArchive<InputStream>>;
     using LoadFunction = typename TypeRegistry::LoadFunction;
     boost::optional<LoadFunction> loadFunction = TypeRegistry::getLoadFunction(typeName);
     if (loadFunction) {

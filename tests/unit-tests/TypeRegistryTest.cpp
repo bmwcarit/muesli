@@ -123,7 +123,7 @@ TYPED_TEST_CASE(TypedTypeRegistryTest, PolymorphicDerivedTypes);
 
 TYPED_TEST(TypedTypeRegistryTest, polymorphicTypeInputRegistry)
 {
-    using TypeRegistry = muesli::TypeRegistry<polymorphic::Base>;
+    using TypeRegistry = muesli::TypeLoadRegistry<polymorphic::Base, MockInputArchiveImpl>;
     using LoadFunction = typename TypeRegistry::LoadFunction;
 
     MockInputArchiveImpl inputArchive;
@@ -136,7 +136,7 @@ TYPED_TEST(TypedTypeRegistryTest, polymorphicTypeInputRegistry)
 
 TEST(TypeRegistryTest, polymorphicTypeOutputRegistry)
 {
-    using TypeRegistry = muesli::TypeRegistry<polymorphic::Base>;
+    using TypeRegistry = muesli::TypeSaveRegistry<polymorphic::Base, MockOutputArchiveImpl>;
     using SaveFunction = typename TypeRegistry::SaveFunction;
 
     MockOutputArchiveImpl outputArchive;

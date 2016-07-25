@@ -342,7 +342,7 @@ void savePolymorphicPointerThroughRegistry(JsonOutputArchive<OutputStream>& arch
                                            const std::type_info& ptrInfo)
 {
     // lookup in type registry
-    using TypeRegistry = typename muesli::TypeRegistry<Base>;
+    using TypeRegistry = muesli::TypeSaveRegistry<Base, JsonOutputArchive<OutputStream>>;
     using SaveFunction = typename TypeRegistry::SaveFunction;
     boost::optional<SaveFunction> saveFunction = TypeRegistry::getSaveFunction(ptrInfo);
     if (saveFunction) {

@@ -27,61 +27,27 @@
 #include <type_traits>
 
 #include <boost/optional.hpp>
-#include <boost/variant.hpp>
+#include <boost/mpl/joint_view.hpp>
 
+#include "muesli/detail/TypeList.h"
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
-#include "muesli/Tags.h"
 
+#include "muesli/Tags.h"
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Registry.h"
 #include "muesli/Traits.h"
-#include "muesli/detail/TypeList.h"
 
 namespace muesli
 {
 
-template <typename Base>
-class TypeRegistry
+namespace detail
 {
-public:
-    // represents a callable which is passed an InputArchive and handles the polymorphic
-    // deserialization of
-    // it returns a std::unique_ptr<Base>
-    using LoadFunction = std::function<std::unique_ptr<Base>(InputArchiveVariant)>;
 
-    // represents a callable which is passed an OutputArchive and a pointer to the value which shall
-    // be saved
-    // it handles the polymorphic serialization of the passed value
-    using SaveFunction = std::function<void(OutputArchiveVariant, const Base*)>;
-
-    static boost::optional<LoadFunction> getLoadFunction(const std::string& typeName)
-    {
-        return getFunction(typeName, getLoadFunctionMap());
-    }
-
-    static boost::optional<SaveFunction> getSaveFunction(const std::type_index& typeId)
-    {
-        return getFunction(typeId, getSaveFunctionMap());
-    }
-
-private:
-    using TypeNameToLoadFunctionMap = std::unordered_map<std::string, LoadFunction>;
-    using TypeIdToSaveFunctionMap = std::unordered_map<std::type_index, SaveFunction>;
-
-    static TypeNameToLoadFunctionMap& getLoadFunctionMap()
-    {
-        static TypeNameToLoadFunctionMap loadFunctionMap;
-        return loadFunctionMap;
-    }
-
-    static TypeIdToSaveFunctionMap& getSaveFunctionMap()
-    {
-        static TypeIdToSaveFunctionMap saveFunctionMap;
-        return saveFunctionMap;
-    }
-
+class TypeRegistryBase
+{
+protected:
     template <typename Key, typename Map, typename T = typename Map::mapped_type>
     static boost::optional<T> getFunction(const Key& key, const Map& map)
     {
@@ -92,16 +58,70 @@ private:
         }
         return function;
     }
+};
+} // namespace detail
+
+template <typename Base, typename InputArchive>
+class TypeLoadRegistry : detail::TypeRegistryBase
+{
+public:
+    // represents a callable which is passed an InputArchive and handles the polymorphic
+    // deserialization
+    // it returns a std::unique_ptr<Base>
+    using LoadFunction = std::function<std::unique_ptr<Base>(InputArchive&)>;
+
+    static boost::optional<LoadFunction> getLoadFunction(const std::string& typeName)
+    {
+        return getFunction(typeName, getLoadFunctionMap());
+    }
+
+private:
+    using TypeNameToLoadFunctionMap = std::unordered_map<std::string, LoadFunction>;
+
+    static TypeNameToLoadFunctionMap& getLoadFunctionMap()
+    {
+        static TypeNameToLoadFunctionMap loadFunctionMap;
+        return loadFunctionMap;
+    }
 
 public:
     struct Inserter
     {
-        Inserter(const std::string& typeName,
-                 const std::type_index& typeId,
-                 LoadFunction loadFunction,
-                 SaveFunction saveFunction)
+        Inserter(const std::string& typeName, LoadFunction loadFunction)
         {
             getLoadFunctionMap().insert({typeName, loadFunction});
+        }
+    };
+};
+
+template <typename Base, typename OutputArchive>
+class TypeSaveRegistry : detail::TypeRegistryBase
+{
+public:
+    // represents a callable which is passed an OutputArchive and a pointer to the value which shall
+    // be saved
+    // it handles the polymorphic serialization of the passed value
+    using SaveFunction = std::function<void(OutputArchive&, const Base*)>;
+
+    static boost::optional<SaveFunction> getSaveFunction(const std::type_index& typeId)
+    {
+        return getFunction(typeId, getSaveFunctionMap());
+    }
+
+private:
+    using TypeIdToSaveFunctionMap = std::unordered_map<std::type_index, SaveFunction>;
+
+    static TypeIdToSaveFunctionMap& getSaveFunctionMap()
+    {
+        static TypeIdToSaveFunctionMap saveFunctionMap;
+        return saveFunctionMap;
+    }
+
+public:
+    struct Inserter
+    {
+        Inserter(const std::type_index& typeId, SaveFunction saveFunction)
+        {
             getSaveFunctionMap().insert({typeId, saveFunction});
         }
     };
@@ -116,28 +136,33 @@ struct RegisteredPolymorphicType;
 template <typename T>
 struct LinkPolymorphicTypeWithBase;
 
-template <typename Base, typename T>
-struct RegisteredPolymorphicTypeInstance
+template <typename T, typename Base, typename InputArchive>
+struct RegisteredPolymorphicTypeLoadInstance
 {
-    static const typename ::muesli::TypeRegistry<Base>::Inserter instance;
+    static const typename ::muesli::TypeLoadRegistry<Base, InputArchive>::Inserter instance;
 };
 
-template <typename Base, typename T>
-const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeInstance<
-        Base,
-        T>::instance(muesli::RegisteredType<T>::name(),
-                     typeid(T),
-                     [](InputArchiveVariant archive) {
-                         auto value = std::make_unique<T>();
-                         boost::apply_visitor(
-                                 [&value](auto& ar) { ar(SkipIntroOutroWrapper<T>(value.get())); },
-                                 archive);
-                         return value;
-                     },
-                     [](OutputArchiveVariant archive, const Base* ptr) {
-                         boost::apply_visitor(
-                                 [ptr](auto& ar) { ar(*(static_cast<const T*>(ptr))); }, archive);
-                     });
+template <typename T, typename Base, typename OutputArchive>
+struct RegisteredPolymorphicTypeSaveInstance
+{
+    static const typename ::muesli::TypeSaveRegistry<Base, OutputArchive>::Inserter instance;
+};
+
+template <typename T, typename Base, typename InputArchive>
+const typename ::muesli::TypeLoadRegistry<Base, InputArchive>::Inserter
+RegisteredPolymorphicTypeLoadInstance<T, Base, InputArchive>::instance(
+        muesli::RegisteredType<T>::name(),
+        [](InputArchive& archive) {
+            auto value = std::make_unique<T>();
+            archive(SkipIntroOutroWrapper<T>(value.get()));
+            return value;
+        });
+
+template <typename T, typename Base, typename OutputArchive>
+const typename ::muesli::TypeSaveRegistry<Base, OutputArchive>::Inserter
+RegisteredPolymorphicTypeSaveInstance<T, Base, OutputArchive>::instance(
+        typeid(T),
+        [](OutputArchive& archive, const Base* ptr) { archive(*(static_cast<const T*>(ptr))); });
 
 template <typename T, typename List = TypeList<>, typename Enable = void>
 struct GetRegisteredBaseHierarchy
@@ -152,6 +177,54 @@ struct GetRegisteredBaseHierarchy<T,
 {
     using Base = typename LinkPolymorphicTypeWithBase<T>::type;
     using type = typename GetRegisteredBaseHierarchy<Base, TypeList<Bases..., Base>>::type;
+};
+
+template <typename T>
+struct CombineBaseAndOutputArchiveForT
+{
+    template <typename Base, typename OutputArchive>
+    struct apply
+    {
+        using type = RegisteredPolymorphicTypeSaveInstance<T, Base, OutputArchive>;
+    };
+};
+
+template <typename T>
+struct CombineBaseAndInputArchiveForT
+{
+    template <typename Base, typename InputArchive>
+    struct apply
+    {
+        using type = RegisteredPolymorphicTypeLoadInstance<T, Base, InputArchive>;
+    };
+};
+
+template <typename T,
+          typename BasesTypeVector,
+          typename ArchiveTypeVector,
+          template <typename> class CombineOperation>
+using GetPolymorphicInstancesTypeVector =
+        typename FlatCartesianTypeProduct<BasesTypeVector,
+                                          ArchiveTypeVector,
+                                          CombineOperation<T>>::type;
+
+template <typename T, typename BasesTypeVector>
+struct GetFullPolymorphicInstancesTypeList
+{
+    using BaseByInputArchiveCartesianProduct =
+            GetPolymorphicInstancesTypeVector<T,
+                                              BasesTypeVector,
+                                              InputArchiveTypeVector,
+                                              CombineBaseAndInputArchiveForT>;
+    using BaseByOutputArchiveCartesianProduct =
+            GetPolymorphicInstancesTypeVector<T,
+                                              BasesTypeVector,
+                                              OutputArchiveTypeVector,
+                                              CombineBaseAndOutputArchiveForT>;
+    using BaseByInputOutputCartesianProduct =
+            typename boost::mpl::joint_view<BaseByInputArchiveCartesianProduct,
+                                            BaseByOutputArchiveCartesianProduct>::type;
+    using type = typename MplSequenceToTypeList<BaseByInputOutputCartesianProduct>::type;
 };
 
 } // namespace detail
@@ -189,18 +262,20 @@ struct GetRegisteredBaseHierarchy<T,
                                                                                                    \
         using BaseHierarchyTypeList = typename GetRegisteredBaseHierarchy<T>::type;                \
                                                                                                    \
-        template <typename... Bases>                                                               \
-        static auto dummyImpl(TypeList<Bases...>)                                                  \
+        template <typename... Instances>                                                           \
+        static auto dummyImpl(TypeList<Instances...>)                                              \
         {                                                                                          \
-            return std::make_tuple(                                                                \
-                    std::ref(RegisteredPolymorphicTypeInstance<Bases, T>::instance)...);           \
+            return std::make_tuple(std::ref(Instances::instance)...);                              \
         }                                                                                          \
                                                                                                    \
         /* this function will never be called, it just forces instantation of the static object */ \
         static auto dummy()                                                                        \
         {                                                                                          \
             assert(false);                                                                         \
-            return dummyImpl(BaseHierarchyTypeList{});                                             \
+            using BasesVector = typename TypeListToMplVector<BaseHierarchyTypeList>::type;        \
+            using InstanceTypeList =                                                                  \
+                    typename GetFullPolymorphicInstancesTypeList<T, BasesVector>::type;            \
+            return dummyImpl(InstanceTypeList{});                                                  \
         }                                                                                          \
     };                                                                                             \
     } /* namespace detail */                                                                       \

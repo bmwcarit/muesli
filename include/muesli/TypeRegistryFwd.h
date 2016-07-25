@@ -26,8 +26,11 @@ namespace muesli
 template <typename T>
 struct RegisteredType;
 
-template <typename Base>
-class TypeRegistry;
+template <typename Base, typename OutputArchive>
+class TypeSaveRegistry;
+
+template <typename Base, typename InputArchive>
+class TypeLoadRegistry;
 
 } // namespace muesli
 
