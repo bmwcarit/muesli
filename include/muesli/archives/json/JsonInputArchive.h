@@ -549,14 +549,14 @@ template <typename InputStream, typename T>
 void load(JsonInputArchive<InputStream>& archive, std::shared_ptr<T>& ptr)
 {
     // forward to raw pointer implementation
-    ptr = std::move(detail::loadPointer<T>(archive));
+    ptr = detail::loadPointer<T>(archive);
 }
 
 template <typename InputStream, typename T>
 void load(JsonInputArchive<InputStream>& archive, std::unique_ptr<T>& ptr)
 {
     // forward to raw pointer implementation
-    ptr = std::move(detail::loadPointer<T>(archive));
+    ptr = detail::loadPointer<T>(archive);
 }
 
 template <typename InputStream, typename T>
