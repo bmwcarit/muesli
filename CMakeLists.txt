@@ -47,7 +47,7 @@ find_package(Boost 1.59.0 REQUIRED
     COMPONENTS
     system
 )
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 ######## DEFAULT COMPILER FLAGS #############
 
