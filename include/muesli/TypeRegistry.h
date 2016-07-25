@@ -37,6 +37,7 @@
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Registry.h"
 #include "muesli/Traits.h"
+#include "muesli/detail/TypeList.h"
 
 namespace muesli
 {
@@ -137,11 +138,6 @@ const typename ::muesli::TypeRegistry<Base>::Inserter RegisteredPolymorphicTypeI
                          boost::apply_visitor(
                                  [ptr](auto& ar) { ar(*(static_cast<const T*>(ptr))); }, archive);
                      });
-
-template <typename... Ts>
-struct TypeList
-{
-};
 
 template <typename T, typename List = TypeList<>, typename Enable = void>
 struct GetRegisteredBaseHierarchy
