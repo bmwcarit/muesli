@@ -32,6 +32,7 @@
 #include "muesli/detail/TypeList.h"
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
+#include "muesli/detail/VoidT.h"
 
 #include "muesli/Tags.h"
 #include "muesli/TypeRegistryFwd.h"

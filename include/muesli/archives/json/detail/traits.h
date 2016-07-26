@@ -30,6 +30,7 @@
 
 #include "muesli/Traits.h"
 #include "muesli/TypeRegistryFwd.h"
+#include "muesli/detail/VoidT.h"
 
 namespace muesli
 {
@@ -106,7 +107,7 @@ struct IsMap : std::false_type
 };
 
 template <typename T>
-struct IsMap<T, VoidT<typename std::decay_t<T>::mapped_type>> : std::true_type
+struct IsMap<T, muesli::detail::VoidT<typename std::decay_t<T>::mapped_type>> : std::true_type
 {
 };
 
@@ -116,7 +117,7 @@ struct HasRegisteredTypeName : std::false_type
 };
 
 template <typename T>
-struct HasRegisteredTypeName<T, VoidT<decltype(muesli::RegisteredType<std::decay_t<T>>::name())>>
+struct HasRegisteredTypeName<T, muesli::detail::VoidT<decltype(muesli::RegisteredType<std::decay_t<T>>::name())>>
         : std::true_type
 {
 };
