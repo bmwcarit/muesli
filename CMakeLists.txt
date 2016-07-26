@@ -43,7 +43,7 @@ message(STATUS "option USE_PLATFORM_GTEST_GMOCK=" ${USE_PLATFORM_GTEST_GMOCK})
 
 ######## Add Boost ########
 
-find_package(Boost 1.59.0 REQUIRED
+find_package(Boost 1.58.0 REQUIRED
     COMPONENTS
     system
 )
