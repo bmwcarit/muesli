@@ -66,11 +66,11 @@ struct CombineArchiveAndStream
 } // namespace detail
 
 using OutputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredOutputArchives,
-                                                                RegisteredOutputStreams,
-                                                                detail::CombineArchiveAndStream>;
-using InputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredInputArchives,
-                                                                 RegisteredInputStreams,
+                                                                 RegisteredOutputStreams,
                                                                  detail::CombineArchiveAndStream>;
+using InputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredInputArchives,
+                                                                RegisteredInputStreams,
+                                                                detail::CombineArchiveAndStream>;
 
 template <typename ArchiveTypeVector, template <typename> class Postprocess = boost::mpl::identity>
 using MakeArchiveVariant = typename boost::make_variant_over<

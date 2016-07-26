@@ -143,5 +143,4 @@ inline NameValuePair<T> make_nvp(const char* name, T&& value)
     @ingroup Utility */
 #define MUESLI_NVP(T) ::muesli::make_nvp(#T, T)
 
-
 #endif // MUESLI_NAMEVALUEPAIR_H_

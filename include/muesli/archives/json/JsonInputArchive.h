@@ -265,8 +265,8 @@ private:
                 return &(it->value);
             }
             if (throwOnNotFound) {
-                throw exceptions::ValueNotFoundException(
-                        "Could not find value for key \"" + nextKey +"\".");
+                throw exceptions::ValueNotFoundException("Could not find value for key \"" +
+                                                         nextKey + "\".");
             }
             return nullptr;
         }

@@ -273,8 +273,8 @@ struct GetFullPolymorphicInstancesTypeList
         static auto dummy()                                                                        \
         {                                                                                          \
             assert(false);                                                                         \
-            using BasesVector = typename TypeListToMplVector<BaseHierarchyTypeList>::type;        \
-            using InstanceTypeList =                                                                  \
+            using BasesVector = typename TypeListToMplVector<BaseHierarchyTypeList>::type;         \
+            using InstanceTypeList =                                                               \
                     typename GetFullPolymorphicInstancesTypeList<T, BasesVector>::type;            \
             return dummyImpl(InstanceTypeList{});                                                  \
         }                                                                                          \

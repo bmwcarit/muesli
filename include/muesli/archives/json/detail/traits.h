@@ -118,7 +118,9 @@ struct HasRegisteredTypeName : std::false_type
 };
 
 template <typename T>
-struct HasRegisteredTypeName<T, muesli::detail::VoidT<decltype(muesli::RegisteredType<std::decay_t<T>>::name())>>
+struct HasRegisteredTypeName<
+        T,
+        muesli::detail::VoidT<decltype(muesli::RegisteredType<std::decay_t<T>>::name())>>
         : std::true_type
 {
 };
