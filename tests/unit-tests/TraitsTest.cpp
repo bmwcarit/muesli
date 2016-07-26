@@ -21,12 +21,12 @@
 
 #include <gtest/gtest.h>
 
-#include "muesli/Traits.h"
+#include "muesli/detail/IsTypeWithinList.h"
 #include "muesli/detail/MetaSwitch.h"
 
 TEST(TraitsTest, isTypeWithinList)
 {
-    using namespace muesli;
+    using namespace muesli::detail;
     static_assert(IsTypeWithinList<std::int8_t, std::int16_t, std::int32_t, std::int8_t>::value,
                   "type must be found in list");
     static_assert(!IsTypeWithinList<std::int64_t, std::int16_t, std::int32_t, std::int8_t>::value,

@@ -31,6 +31,7 @@
 #include "muesli/Traits.h"
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/detail/VoidT.h"
+#include "muesli/detail/IsTypeWithinList.h"
 
 namespace muesli
 {
@@ -90,7 +91,7 @@ template <typename T>
 struct IsSignedIntegerUpTo32bit
 {
     static constexpr bool value =
-            IsTypeWithinList<T, std::int8_t, std::int16_t, std::int32_t>::value;
+            muesli::detail::IsTypeWithinList<T, std::int8_t, std::int16_t, std::int32_t>::value;
 };
 
 // any unsigned integer which is below uint64_t
@@ -98,7 +99,7 @@ template <typename T>
 struct IsUnsignedIntegerUpTo32bit
 {
     static constexpr bool value =
-            IsTypeWithinList<T, std::uint8_t, std::uint16_t, std::uint32_t>::value;
+            muesli::detail::IsTypeWithinList<T, std::uint8_t, std::uint16_t, std::uint32_t>::value;
 };
 
 template <typename T, typename Enable = void>

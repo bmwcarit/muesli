@@ -17,23 +17,30 @@
  * #L%
  */
 
-#ifndef MUESLI_TRAITS_H_
-#define MUESLI_TRAITS_H_
+#ifndef MUESLI_DETAIL_ISTYPEWITHINLIST_H_
+#define MUESLI_DETAIL_ISTYPEWITHINLIST_H_
 
 #include <type_traits>
 
 namespace muesli
 {
-
-// this traits class is used to get the wrapper class for an enum
-template <typename Enum>
-struct EnumTraits;
-
-// this traits class is used to signal that for this type intro/outro shall not be called
-template <typename T>
-struct SkipIntroOutroTraits : std::false_type
+namespace detail
 {
+
+template <typename...>
+struct IsTypeWithinList
+{
+    static constexpr bool value = false;
 };
+
+template <typename Needle, typename Head, typename... Haystack>
+struct IsTypeWithinList<Needle, Head, Haystack...>
+{
+    static constexpr bool value =
+            std::is_same<Needle, Head>::value || IsTypeWithinList<Needle, Haystack...>::value;
+};
+
+} // namespace detail
 } // namespace muesli
 
-#endif // MUESLI_TRAITS_H_
+#endif // MUESLI_DETAIL_ISTYPEWITHINLIST_H_
