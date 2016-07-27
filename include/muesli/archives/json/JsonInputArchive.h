@@ -480,8 +480,9 @@ template <typename Base, typename InputStream>
 std::unique_ptr<Base> loadPolymorphicPointerThroughRegistry(JsonInputArchive<InputStream>& archive,
                                                             const std::string& typeName)
 {
+    using DecayedBase = std::decay_t<Base>;
     // lookup in type registry
-    using TypeRegistry = muesli::TypeLoadRegistry<Base, JsonInputArchive<InputStream>>;
+    using TypeRegistry = muesli::TypeLoadRegistry<DecayedBase, JsonInputArchive<InputStream>>;
     using LoadFunction = typename TypeRegistry::LoadFunction;
     boost::optional<LoadFunction> loadFunction = TypeRegistry::getLoadFunction(typeName);
     if (loadFunction) {
@@ -489,7 +490,7 @@ std::unique_ptr<Base> loadPolymorphicPointerThroughRegistry(JsonInputArchive<Inp
     } else {
         throw exceptions::UnknownTypeException(
                 std::string("could not find input serializer for " +
-                            boost::typeindex::type_id<Base>().pretty_name()));
+                            boost::typeindex::type_id<DecayedBase>().pretty_name()));
     }
 }
 
@@ -522,7 +523,7 @@ loadPointer(JsonInputArchive<InputStream>& archive)
     if (archive.currentValueIsNull()) {
         return nullptr;
     }
-    static const std::string baseTypeName = RegisteredType<Base>::name();
+    static const std::string baseTypeName = RegisteredType<std::decay_t<Base>>::name();
     std::string typeName = getTypeNameForPointer(archive);
     if (baseTypeName == typeName) {
         return loadPointerDirectly<Base>(archive);
