@@ -26,10 +26,10 @@ namespace muesli
 namespace exceptions
 {
 
-class ParseException : public std::runtime_error
+class ParseException : public std::invalid_argument
 {
 public:
-    using std::runtime_error::runtime_error;
+    using std::invalid_argument::invalid_argument;
 };
 
 } // namespace exceptions
