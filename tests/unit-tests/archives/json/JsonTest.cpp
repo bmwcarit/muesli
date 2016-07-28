@@ -46,18 +46,6 @@ using JsonInputArchiveImpl = muesli::JsonInputArchive<InputStreamImpl>;
 using TEnum = muesli::tests::testtypes::TEnum;
 
 template <typename T>
-struct TestStruct
-{
-    T value;
-
-    template <typename Archive>
-    void serialize(Archive& archive)
-    {
-        archive(muesli::make_nvp("value", value));
-    }
-};
-
-template <typename T>
 struct TestParams
 {
     std::vector<std::pair<T, T>> params = {
@@ -99,18 +87,20 @@ TYPED_TEST(JsonTest, serialize)
 {
     TestParams<TypeParam> testParams;
     for (std::pair<TypeParam, TypeParam> param : testParams.params) {
-        TestStruct<TypeParam> testStruct, deserializedTestStruct;
-        testStruct.value = param.first;
+        TypeParam value;
+        value = param.first;
 
         std::stringstream stream;
         OutputStreamImpl outputStreamWrapper(stream);
         JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
-        jsonOutputArchive(testStruct);
-        std::cout << "JSON for TestStruct : " << stream.str() << std::endl;
+        jsonOutputArchive(value);
+        std::cout << "JSON for value : " << stream.str() << std::endl;
+
         InputStreamImpl inputStreamWrapper(stream);
         JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
-        jsonInputArchive(deserializedTestStruct);
-        compareValues(param.second, deserializedTestStruct.value);
+        TypeParam deserializedValue;
+        jsonInputArchive(deserializedValue);
+        compareValues(param.second, deserializedValue);
     }
 }
 

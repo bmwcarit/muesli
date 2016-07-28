@@ -270,7 +270,7 @@ private:
             }
             return nullptr;
         }
-        return nullptr;
+        return stack.top();
     }
 
 private:
