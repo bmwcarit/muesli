@@ -22,7 +22,6 @@
 
 #include <type_traits>
 
-#include <boost/variant.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/size.hpp>
@@ -71,14 +70,6 @@ using OutputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredOutpu
 using InputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredInputArchives,
                                                                 RegisteredInputStreams,
                                                                 detail::CombineArchiveAndStream>;
-
-template <typename ArchiveTypeVector, template <typename> class Postprocess = boost::mpl::identity>
-using MakeArchiveVariant = typename boost::make_variant_over<
-        typename boost::mpl::transform<ArchiveTypeVector, Postprocess<boost::mpl::_1>>::type>::type;
-
-using OutputArchiveVariant = MakeArchiveVariant<OutputArchiveTypeVector, std::add_lvalue_reference>;
-using InputArchiveVariant = MakeArchiveVariant<InputArchiveTypeVector, std::add_lvalue_reference>;
-
 } // namespace muesli
 
 #endif // MUESLI_TYPEREGISTRY_H_

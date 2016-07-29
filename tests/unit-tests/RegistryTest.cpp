@@ -54,17 +54,12 @@ static_assert(boost::mpl::equal<muesli::RegisteredOutputStreams,
                                 boost::mpl::vector<MockOutputStream>>::value,
               "type vectors must match");
 
-// comparison of two variant types
-// check if underlying type vectors are equal
-template <typename V1, typename V2>
-using variant_equal = boost::mpl::equal<typename V1::types, typename V2::types>;
-
-// check that OutputArchiveVariant is as expected
-static_assert(variant_equal<muesli::OutputArchiveVariant,
-                            boost::variant<MockOutputArchive<MockOutputStream>&>>::value,
+// check that OutputArchiveTypeVector is as expected
+static_assert(boost::mpl::equal<muesli::OutputArchiveTypeVector,
+                                boost::mpl::vector<MockOutputArchive<MockOutputStream>>>::value,
               "variants must match");
 
-// check that InputArchiveVariant is as expected
-static_assert(variant_equal<muesli::InputArchiveVariant,
-                            boost::variant<MockInputArchive<MockInputStream>&>>::value,
+// check that InputArchiveTypeVector is as expected
+static_assert(boost::mpl::equal<muesli::InputArchiveTypeVector,
+                                boost::mpl::vector<MockInputArchive<MockInputStream>>>::value,
               "variants must match");
