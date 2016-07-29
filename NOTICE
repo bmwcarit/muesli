@@ -14,6 +14,12 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 
+
+muesli reuses some header files of the cereal library
+(https://github.com/USCiLab/cereal). cereal source code is licensed under the
+BSD 3-Clause License. Thanks to the cereal project for providing the reused
+header files to the muesli project under the Apache 2.0 License.
+
 This project has dependencies to:
 
 --- Header only libraries -----------------------------------------------------
