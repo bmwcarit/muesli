@@ -34,13 +34,6 @@ include(LocateProgram)
 include(AddClangFormat)
 message(STATUS "variable CMAKE_BUILD_TYPE=" ${CMAKE_BUILD_TYPE})
 
-option(
-    USE_PLATFORM_GTEST_GMOCK
-    "Resolve dependency to gtest and gmock from the system?"
-    ON
-)
-message(STATUS "option USE_PLATFORM_GTEST_GMOCK=" ${USE_PLATFORM_GTEST_GMOCK})
-
 ######## Add Boost ########
 
 find_package(Boost 1.58.0 REQUIRED
