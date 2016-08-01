@@ -357,7 +357,7 @@ void savePolymorphicPointerThroughRegistry(JsonOutputArchive<OutputStream>& arch
     } else {
         throw exceptions::UnknownTypeException(
                 std::string("could not find output serializer for " +
-                            boost::typeindex::type_id_runtime(ptr).pretty_name()));
+                            boost::typeindex::type_id_runtime(*ptr).pretty_name()));
     }
 }
 
