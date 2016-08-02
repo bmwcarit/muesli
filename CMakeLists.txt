@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 
 ######## Project settings ########
-project(muesli-0.1.0)
+project(muesli-0.2.0)
 set(muesli_MAJOR_VERSION 0)
-set(muesli_MINOR_VERSION 1)
+set(muesli_MINOR_VERSION 2)
 set(muesli_PATCH_VERSION 0)
 set(
     muesli_VERSION
