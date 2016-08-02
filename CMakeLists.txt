@@ -118,7 +118,7 @@ else(USE_PLATFORM_RAPIDJSON)
     AddExternalProject(
         rapidjson
         GIT_REPOSITORY https://github.com/miloyip/rapidjson
-        GIT_TAG 369de87e5d7da05786731a712f25ab9b46c4b0ce
+        GIT_TAG ab791ae90cbfd2e229be1b5e9db577728cfb3352
         TIMEOUT 10
         # Disable configure step
         CONFIGURE_COMMAND ""
