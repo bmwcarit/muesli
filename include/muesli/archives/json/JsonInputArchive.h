@@ -118,7 +118,7 @@ public:
     void readValue(double& doubleValue) const
     {
         const Value* nextValue = getNextValue(true);
-        if (nextValue->IsDouble()) {
+        if (nextValue->IsDouble() || nextValue->IsInt()) {
             doubleValue = nextValue->GetDouble();
         } else {
             throw std::invalid_argument("Cannot read a Double.");

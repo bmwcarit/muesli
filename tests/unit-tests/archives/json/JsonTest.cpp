@@ -179,3 +179,18 @@ struct TestParams<std::vector<bool>>
             {{true, false}, {true, false}},
             {{false, false}, {false, false}}};
 };
+
+TEST(JsonTest, deserializeDoubleFromInteger)
+{
+    using StringIntegerPair = std::pair<std::string, int>;
+    std::vector<StringIntegerPair> inputValues = {{"0", 0}, {"100", 100}, {"-999", -999}};
+
+    for (const StringIntegerPair& input : inputValues) {
+        std::stringstream stream(input.first);
+        InputStreamImpl inputStreamWrapper(stream);
+        JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+        double deserializedDouble = -1;
+        jsonInputArchive(deserializedDouble);
+        EXPECT_FLOAT_EQ(input.second, deserializedDouble);
+    }
+}
