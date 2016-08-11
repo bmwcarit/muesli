@@ -148,8 +148,6 @@ target_include_directories(
 
 target_link_libraries(muesli INTERFACE rapidjson::rapidjson)
 
-target_compile_definitions(muesli INTERFACE RAPIDJSON_HAS_STDSTRING)
-
 add_dependencies(muesli rapidjson::rapidjson)
 
 # defines GNU standard installation directories
