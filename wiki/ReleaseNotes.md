@@ -1,3 +1,10 @@
+#muesli 0.1.1
+This is a bugfix release.
+fixed:
+* muesliConfig.cmake does not create GLOBAL imported targets
+* JSON: allow to deserialize a double from an integer
+* Local use of defines instead of global use via cmake
+
 #muesli 0.1.0
 This is the initial release of muesli.
 

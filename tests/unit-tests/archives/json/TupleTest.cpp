@@ -21,8 +21,6 @@
 #include <gtest/gtest.h>
 #include <tuple>
 
-#include <rapidjson/stringbuffer.h>
-
 #include "muesli/streams/StringIStream.h"
 #include "muesli/streams/StringOStream.h"
 
