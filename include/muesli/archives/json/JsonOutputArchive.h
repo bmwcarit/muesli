@@ -400,7 +400,7 @@ std::enable_if_t<std::is_polymorphic<Base>::value && std::is_abstract<Base>::val
         savePolymorphicPointerThroughRegistry(archive, ptr, typeid(*ptr));
     }
 }
-} // detail
+} // namespace detail
 
 template <typename OutputStream, typename T>
 void save(JsonOutputArchive<OutputStream>& archive, const std::shared_ptr<T>& ptr)

@@ -87,7 +87,7 @@ template <>
 struct IsConst<save> : std::true_type
 {
 };
-} // namespace function tags
+} // namespace function_tags
 
 template <typename Archive, typename T>
 std::false_type serialize(Archive&, T&);
