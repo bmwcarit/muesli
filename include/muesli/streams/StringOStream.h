@@ -60,6 +60,13 @@ public:
         return buffer;
     }
 
+    // non-copyable
+    BasicStringOStream(const BasicStringOStream&) = delete;
+    BasicStringOStream& operator=(const BasicStringOStream&) = delete;
+
+    BasicStringOStream(BasicStringOStream&&) = default;
+    BasicStringOStream& operator=(BasicStringOStream&&) = default;
+    ~BasicStringOStream() = default;
 private:
     StringType buffer;
 };

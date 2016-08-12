@@ -69,6 +69,9 @@ public:
     StdIStreamWrapper(const StdIStreamWrapper&) = delete;
     StdIStreamWrapper& operator=(const StdIStreamWrapper&) = delete;
 
+    StdIStreamWrapper(StdIStreamWrapper&&) = default;
+    StdIStreamWrapper& operator=(StdIStreamWrapper&&) = default;
+    ~StdIStreamWrapper() = default;
 private:
     Stream& stream;
 };

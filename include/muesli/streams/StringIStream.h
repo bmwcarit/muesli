@@ -84,6 +84,13 @@ public:
         return currentCharIndex;
     }
 
+    // non-copyable
+    BasicStringIStream(const BasicStringIStream&) = delete;
+    BasicStringIStream& operator=(const BasicStringIStream&) = delete;
+
+    BasicStringIStream(BasicStringIStream&&) = default;
+    BasicStringIStream& operator=(BasicStringIStream&&) = default;
+    ~BasicStringIStream() = default;
 private:
     std::size_t currentCharIndex;
     const std::size_t inputLength;

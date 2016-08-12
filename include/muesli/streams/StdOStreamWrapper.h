@@ -60,6 +60,9 @@ public:
     StdOStreamWrapper(const StdOStreamWrapper&) = delete;
     StdOStreamWrapper& operator=(const StdOStreamWrapper&) = delete;
 
+    StdOStreamWrapper(StdOStreamWrapper&&) = default;
+    StdOStreamWrapper& operator=(StdOStreamWrapper&&) = default;
+    ~StdOStreamWrapper() = default;
 private:
     Stream& stream;
 };
