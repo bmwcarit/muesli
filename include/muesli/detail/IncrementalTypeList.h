@@ -45,7 +45,7 @@ struct IncrementalTypeListIndex<0>
 
 // initially empty type list
 template <class TypeListTag>
-boost::mpl::vector<> IncrementalTypeList(TypeListTag&, IncrementalTypeListIndex<0>);
+boost::mpl::vector<> IncrementalTypeList(const TypeListTag&, IncrementalTypeListIndex<0>);
 
 } // namespace detail
 } // namespace muesli
@@ -54,7 +54,7 @@ boost::mpl::vector<> IncrementalTypeList(TypeListTag&, IncrementalTypeListIndex<
 // this has to be a macro instead of an alias template due to GCC's delayed template instantiation
 #define MUESLI_GET_INCREMENTAL_TYPELIST(TypeListTag)                                               \
     decltype(muesli::detail::IncrementalTypeList(                                                  \
-            std::declval<TypeListTag&>(),                                                          \
+            std::declval<const TypeListTag&>(),                                                    \
             muesli::detail::IncrementalTypeListIndex<                                              \
                     muesli::detail::MaxIncrementalTypeListSize::value>{}))
 
@@ -68,7 +68,7 @@ boost::mpl::vector<> IncrementalTypeList(TypeListTag&, IncrementalTypeListIndex<
                   "max types exceeded for tag " #TypeListTag);                                     \
     boost::mpl::push_back<MUESLI_GET_INCREMENTAL_TYPELIST(TypeListTag), Type>::type                \
     IncrementalTypeList(                                                                           \
-            TypeListTag&,                                                                          \
+            const TypeListTag&,                                                                    \
             IncrementalTypeListIndex<                                                              \
                     boost::mpl::size<MUESLI_GET_INCREMENTAL_TYPELIST(TypeListTag)>::value + 1>);   \
     } /* namespace detail */                                                                       \
