@@ -80,8 +80,9 @@ protected:
     std::string expectedDeserialization;
 };
 
-typedef ::testing::Types<NestedUniquePtrStruct, NestedSharedPtrStruct, NestedBoostOptionalStruct>
-        NullableTypesToTest;
+using NullableTypesToTest =
+        ::testing::Types<NestedUniquePtrStruct, NestedSharedPtrStruct, NestedBoostOptionalStruct>;
+
 TYPED_TEST_CASE(NullablePtrHandling, NullableTypesToTest);
 
 TYPED_TEST(NullablePtrHandling, AllowNullableToBeMissing)
