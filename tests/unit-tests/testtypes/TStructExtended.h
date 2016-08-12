@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_
-#define MUESLI_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_
+#ifndef MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_
+#define MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_
 
 #include <cstddef>
 #include <memory>
@@ -211,4 +211,4 @@ MUESLI_REGISTER_POLYMORPHIC_TYPE(muesli::tests::testtypes::TStructExtended,
                                  muesli::tests::testtypes::TStruct,
                                  "muesli.tests.testtypes.TStructExtended")
 
-#endif // MUESLI_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_
+#endif // MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCTEXTENDED_H_

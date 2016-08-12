@@ -33,8 +33,8 @@
  * limitations under the License.
  */
 
-#ifndef MUESLI_TESTS_TESTTYPES_TSTRUCT_H_
-#define MUESLI_TESTS_TESTTYPES_TSTRUCT_H_
+#ifndef MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCT_H_
+#define MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCT_H_
 
 #include <cstddef>
 #include <memory>
@@ -245,4 +245,4 @@ void serialize(Archive& archive, TStruct& tStruct)
 
 MUESLI_REGISTER_TYPE(muesli::tests::testtypes::TStruct, "muesli.tests.testtypes.TStruct")
 
-#endif // MUESLI_TESTS_TESTTYPES_TSTRUCT_H_
+#endif // MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCT_H_

@@ -72,4 +72,4 @@ using InputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredInputA
                                                                 detail::CombineArchiveAndStream>;
 } // namespace muesli
 
-#endif // MUESLI_TYPEREGISTRY_H_
+#endif // MUESLI_REGISTRY_H_

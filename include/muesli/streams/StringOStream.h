@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_BASICSTRINGOSTREAM_H_
-#define MUESLI_BASICSTRINGOSTREAM_H_
+#ifndef MUESLI_STREAMS_STRINGOSTREAM_H_
+#define MUESLI_STREAMS_STRINGOSTREAM_H_
 
 #include <string>
 #include "muesli/StreamRegistry.h"
@@ -70,4 +70,4 @@ using StringOStream = BasicStringOStream<std::string>;
 
 MUESLI_REGISTER_OUTPUT_STREAM(muesli::StringOStream)
 
-#endif // MUESLI_BASICSTRINGOSTREAM_H_
+#endif // MUESLI_STREAMS_STRINGOSTREAM_H_
