@@ -33,6 +33,7 @@ include(GNUInstallDirs)
 include(LocateProgram)
 include(AddClangFormat)
 include(AddClangTidy)
+include(AddIncludeWhatYouUse)
 
 message(STATUS "variable CMAKE_BUILD_TYPE=" ${CMAKE_BUILD_TYPE})
 

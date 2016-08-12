@@ -63,3 +63,4 @@ target_link_libraries(muesli-unit-test
 
 AddClangFormat(muesli-unit-test)
 AddClangTidy(muesli-unit-test)
+AddIncludeWhatYouUse(muesli-unit-test)
