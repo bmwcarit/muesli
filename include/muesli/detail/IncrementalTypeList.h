@@ -22,9 +22,9 @@
 
 #include <utility>
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/size.hpp>
 #include <boost/mpl/push_back.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/vector.hpp>
 
 namespace muesli
 {

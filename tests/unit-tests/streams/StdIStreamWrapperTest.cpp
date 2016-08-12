@@ -22,7 +22,6 @@
 #include <string>
 
 #include <boost/concept_check.hpp>
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "muesli/concepts/InputStream.h"

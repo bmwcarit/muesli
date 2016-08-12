@@ -26,8 +26,8 @@
 #include <utility>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/type_index.hpp>
 #include <boost/optional.hpp>
+#include <boost/type_index.hpp>
 
 #ifndef RAPIDJSON_HAS_STDSTRING
 #define RAPIDJSON_HAS_STDSTRING 1
@@ -44,9 +44,9 @@
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/exceptions/UnknownTypeException.h"
 
-#include "muesli/archives/json/detail/traits.h"
-#include "muesli/archives/json/detail/RapidJsonOutputStreamAdapter.h"
 #include "muesli/archives/json/Tag.h"
+#include "muesli/archives/json/detail/RapidJsonOutputStreamAdapter.h"
+#include "muesli/archives/json/detail/traits.h"
 
 namespace muesli
 {

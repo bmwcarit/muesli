@@ -20,18 +20,18 @@
 #ifndef MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
 #define MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
 
-#include <type_traits>
-#include <string>
-#include <vector>
-#include <memory>
 #include <cstddef>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 #include <boost/optional.hpp>
 
 #include "muesli/Traits.h"
 #include "muesli/TypeRegistryFwd.h"
-#include "muesli/detail/VoidT.h"
 #include "muesli/detail/IsTypeWithinList.h"
+#include "muesli/detail/VoidT.h"
 
 namespace muesli
 {

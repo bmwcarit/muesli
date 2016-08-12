@@ -26,10 +26,10 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/size.hpp>
 
+#include "muesli/detail/CartesianTypeProduct.h"
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
 #include "muesli/detail/TypeList.h"
-#include "muesli/detail/CartesianTypeProduct.h"
 #include "muesli/Tags.h"
 
 namespace muesli

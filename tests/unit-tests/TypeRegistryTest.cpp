@@ -17,6 +17,9 @@
  * #L%
  */
 
+#include <memory>
+#include <typeinfo>
+
 #include <gtest/gtest.h>
 
 #include "MockArchive.h"

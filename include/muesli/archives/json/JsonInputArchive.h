@@ -21,10 +21,10 @@
 
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <stack>
-#include <vector>
+#include <string>
 #include <tuple>
+#include <vector>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>

@@ -26,8 +26,8 @@
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
 #include "muesli/Traits.h"
-#include "muesli/detail/Expansion.h"
 #include "muesli/detail/DispatchTraits.h"
+#include "muesli/detail/Expansion.h"
 
 namespace muesli
 {

@@ -21,23 +21,23 @@
 #define MUESLI_TYPEREGISTRY_H_
 
 #include <unordered_map>
-#include <string>
 #include <functional>
+#include <string>
 #include <typeindex>
 #include <type_traits>
 
-#include <boost/optional.hpp>
 #include <boost/mpl/joint_view.hpp>
+#include <boost/optional.hpp>
 
 #include "muesli/detail/TypeList.h"
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
 #include "muesli/detail/VoidT.h"
 
+#include "muesli/Registry.h"
+#include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
 #include "muesli/TypeRegistryFwd.h"
-#include "muesli/SkipIntroOutroWrapper.h"
-#include "muesli/Registry.h"
 #include "muesli/Traits.h"
 
 namespace muesli

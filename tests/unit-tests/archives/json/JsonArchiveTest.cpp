@@ -17,20 +17,20 @@
  * #L%
  */
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <memory>
+#include <map>
+#include <string>
 
 #include <boost/optional.hpp>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "muesli/exceptions/ParseException.h"
 #include "muesli/exceptions/ValueNotFoundException.h"
-
-#include "muesli/streams/StringIStream.h"
-#include "muesli/streams/StringOStream.h"
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"
@@ -43,6 +43,7 @@
 #include "testtypes/NestedStructs.h"
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
+#include "testtypes/TEnum.h"
 
 using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
 using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;

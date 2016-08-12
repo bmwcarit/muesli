@@ -18,7 +18,6 @@
  */
 
 #include <boost/concept_check.hpp>
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "MockStream.h"
