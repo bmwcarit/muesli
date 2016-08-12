@@ -37,7 +37,7 @@ class StdOStreamWrapper
 public:
     using Char = typename Stream::char_type;
 
-    StdOStreamWrapper(Stream& stream) : stream(stream)
+    explicit StdOStreamWrapper(Stream& stream) : stream(stream)
     {
     }
 

@@ -32,7 +32,7 @@ class BasicStringOStream
 public:
     using Char = typename StringType::value_type;
 
-    BasicStringOStream(std::size_t initialSize = 4096) : buffer()
+    explicit BasicStringOStream(std::size_t initialSize = 4096) : buffer()
     {
         buffer.reserve(initialSize);
     }
