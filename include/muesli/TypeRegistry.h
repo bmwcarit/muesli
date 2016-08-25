@@ -69,7 +69,7 @@ public:
     // represents a callable which is passed an InputArchive and handles the polymorphic
     // deserialization
     // it returns a std::unique_ptr<Base>
-    using LoadFunction = std::function<std::unique_ptr<Base>(InputArchive&)>;
+    using LoadFunction = std::add_pointer_t<std::unique_ptr<Base>(InputArchive&)>;
 
     static boost::optional<LoadFunction> getLoadFunction(const std::string& typeName)
     {
@@ -102,7 +102,7 @@ public:
     // represents a callable which is passed an OutputArchive and a pointer to the value which shall
     // be saved
     // it handles the polymorphic serialization of the passed value
-    using SaveFunction = std::function<void(OutputArchive&, const Base*)>;
+    using SaveFunction = std::add_pointer_t<void(OutputArchive&, const Base*)>;
 
     static boost::optional<SaveFunction> getSaveFunction(const std::type_index& typeId)
     {
@@ -153,10 +153,10 @@ template <typename T, typename Base, typename InputArchive>
 const typename ::muesli::TypeLoadRegistry<Base, InputArchive>::Inserter
 RegisteredPolymorphicTypeLoadInstance<T, Base, InputArchive>::instance(
         muesli::RegisteredType<T>::name(),
-        [](InputArchive& archive) {
+        [](InputArchive& archive) -> std::unique_ptr<Base> {
             auto value = std::make_unique<T>();
             archive(SkipIntroOutroWrapper<T>(value.get()));
-            return value;
+            return std::move(value);
         });
 
 template <typename T, typename Base, typename OutputArchive>
