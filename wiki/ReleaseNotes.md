@@ -1,3 +1,8 @@
+#muesli 0.1.2
+This is a bugfix release.
+fixed:
+* muesliConfig.cmake only creates rapidjson target once
+
 #muesli 0.1.1
 This is a bugfix release.
 fixed:
