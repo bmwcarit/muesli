@@ -3,7 +3,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/muesliTargets.cmake")
 find_package(RapidJSON 1.0.2 REQUIRED)
 
 if(NOT TARGET rapidjson::rapidjson)
-    add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+    include("${CMAKE_CURRENT_LIST_DIR}/CreateImportTarget.cmake")
+    CreateImportTarget(rapidjson::rapidjson)
     set_property(
         TARGET rapidjson::rapidjson
         APPEND

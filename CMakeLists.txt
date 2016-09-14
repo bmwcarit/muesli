@@ -13,7 +13,7 @@ set(
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "setting default value 'Debug' for CMAKE_BUILD_TYPE")
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
-endif()
+endif(NOT CMAKE_BUILD_TYPE)
 
 set_property(
     CACHE
@@ -72,13 +72,13 @@ FILE(GLOB_RECURSE MUESLI_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 add_custom_target(muesli_target_to_display_headers SOURCES ${MUESLI_HEADER_FILES})
 AddClangFormat(muesli_target_to_display_headers)
 
-if("${CMAKE_VERSION}" VERSION_GREATER 3.0.1)
-    add_library(muesli INTERFACE)
-else("${CMAKE_VERSION}" VERSION_GREATER 3.0.1)
+if("${CMAKE_VERSION}" VERSION_LESS 3.0.0)
     message(STATUS "No support for INTERFACE library. An empty static library will be generated instead.")
     add_library(muesli STATIC ${MUESLI_HEADER_FILES})
     set_target_properties(muesli PROPERTIES LINKER_LANGUAGE CXX)
-endif("${CMAKE_VERSION}" VERSION_GREATER 3.0.1)
+else("${CMAKE_VERSION}" VERSION_LESS 3.0.0)
+    add_library(muesli INTERFACE)
+endif("${CMAKE_VERSION}" VERSION_LESS 3.0.0)
 
 set_property(
     TARGET muesli
@@ -126,16 +126,23 @@ else(USE_PLATFORM_RAPIDJSON)
         BUILD_COMMAND ""
     )
 
-    ExternalProject_Get_Property(rapidjson SOURCE_DIR)
     # add import target for rapidjson library
-    add_library(rapidjson::rapidjson INTERFACE IMPORTED GLOBAL)
+    include(CreateImportTarget)
+    CreateImportTarget(rapidjson::rapidjson)
+
+    # make sure rapidjson external project is built in advance
     add_dependencies(rapidjson::rapidjson rapidjson)
+
+    # set include directories properly
+    ExternalProject_Get_Property(rapidjson SOURCE_DIR)
     set_property(
         TARGET rapidjson::rapidjson
         PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${SOURCE_DIR}/include"
     )
 endif(USE_PLATFORM_RAPIDJSON)
 include(CheckRapidJsonImportTargets)
+
+# verify custom rapidjson target does include correct INCLUDES
 get_target_property(rapidjson_INCLUDE_DIRECTORIES rapidjson::rapidjson INTERFACE_INCLUDE_DIRECTORIES)
 message(STATUS "rapidjson_INCLUDE_DIRECTORIES=${rapidjson_INCLUDE_DIRECTORIES}")
 
@@ -193,6 +200,7 @@ install(
     FILES
         muesliConfig.cmake
         "${CMAKE_CURRENT_BINARY_DIR}/muesli/muesliConfigVersion.cmake"
+        "CMake/CreateImportTarget.cmake"
     DESTINATION ${CmakePackageDir}
     COMPONENT Devel
 )
