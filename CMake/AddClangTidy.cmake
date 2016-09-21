@@ -52,7 +52,7 @@ function(FilterOutHeaders INPUT OUTPUT)
        endif()
      endforeach()
      set(${OUTPUT} ${FILTERED_LIST} PARENT_SCOPE)
-endfunction(filter_out_headers)
+endfunction(FilterOutHeaders INPUT OUTPUT)
 
 
 function(AddClangTidy TARGET)
