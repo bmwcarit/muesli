@@ -114,14 +114,14 @@ message(STATUS "option USE_PLATFORM_RAPIDJSON=" ${USE_PLATFORM_RAPIDJSON})
 
 include(AddExternalProject)
 if (USE_PLATFORM_RAPIDJSON)
-    find_package(RapidJSON 1.0.2 REQUIRED)
+    find_package(RapidJSON 1.1.0 REQUIRED)
 else(USE_PLATFORM_RAPIDJSON)
     message(STATUS "############ Download: rapidjson ############")
 
     AddExternalProject(
         rapidjson
         GIT_REPOSITORY https://github.com/miloyip/rapidjson
-        GIT_TAG ab791ae90cbfd2e229be1b5e9db577728cfb3352
+        GIT_TAG v1.1.0
         TIMEOUT 10
         # Disable configure step
         CONFIGURE_COMMAND ""
