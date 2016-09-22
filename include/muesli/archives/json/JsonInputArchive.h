@@ -409,7 +409,7 @@ std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStr
         archive.setNextKey(std::move(keyString));
         V value;
         archive(value);
-        map.insert({std::move(key), std::move(value)});
+        map[std::move(key)] = std::move(value);
     }
 }
 
