@@ -233,6 +233,12 @@ class TEnumValueMap : public std::map<std::string, muesli::tests::testtypes::TEn
 
 MUESLI_REGISTER_TYPE(TEnumValueMap, "TEnumValueMap")
 
+class TStringStringMap : public std::map<std::string, std::string>
+{
+};
+
+MUESLI_REGISTER_TYPE(TStringStringMap, "TStringStringMap")
+
 TEST_F(JsonArchiveTest, serializeIntegerMap)
 {
     TIntegerKeyMap expectedMap;
@@ -252,6 +258,28 @@ TEST_F(JsonArchiveTest, serializeIntegerMap)
 
     JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     TIntegerKeyMap mapDeserialized;
+    jsonInputArchive(mapDeserialized);
+    EXPECT_EQ(expectedMap, mapDeserialized);
+}
+
+TEST_F(JsonArchiveTest, overrideExistingMapEntriesDuringDeserialization)
+{
+    TStringStringMap expectedMap;
+    expectedMap.insert({"existingKey", "overriddenValue"});
+    TStringStringMap mapDeserialized;
+    mapDeserialized.insert({"existingKey", "existingValue"});
+
+    std::string expectedSerializedMap(
+            R"({)"
+            R"("_typeName":"TStringStringMap",)"
+            R"("existingKey":"overriddenValue")"
+            R"(})");
+
+    jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, stream.str());
+
+    EXPECT_NE(expectedMap, mapDeserialized);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
 }
