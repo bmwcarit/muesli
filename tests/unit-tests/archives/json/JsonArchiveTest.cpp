@@ -209,6 +209,25 @@ TEST_F(JsonArchiveTest, serializeVectorOfEnums)
     EXPECT_EQ(tEnums, tEnumsDeserialized);
 }
 
+TEST_F(JsonArchiveTest, clearExistingVectorEntriesDuringDeserialization)
+{
+    std::vector<std::string> expectedVector;
+    std::vector<std::string> vectorDeserialized;
+    vectorDeserialized.push_back("existingEntry");
+
+    std::string expectedSerializedVector(
+            R"([)"
+            R"(])");
+
+    jsonOutputArchive(expectedVector);
+    EXPECT_EQ(expectedSerializedVector, stream.str());
+
+    EXPECT_NE(expectedVector, vectorDeserialized);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    jsonInputArchive(vectorDeserialized);
+    EXPECT_EQ(expectedVector, vectorDeserialized);
+}
+
 class TIntegerKeyMap : public std::map<std::int32_t, std::string>
 {
 };
@@ -274,6 +293,26 @@ TEST_F(JsonArchiveTest, overrideExistingMapEntriesDuringDeserialization)
             R"({)"
             R"("_typeName":"TStringStringMap",)"
             R"("existingKey":"overriddenValue")"
+            R"(})");
+
+    jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, stream.str());
+
+    EXPECT_NE(expectedMap, mapDeserialized);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    jsonInputArchive(mapDeserialized);
+    EXPECT_EQ(expectedMap, mapDeserialized);
+}
+
+TEST_F(JsonArchiveTest, clearExistingMapEntriesDuringDeserialization)
+{
+    TStringStringMap expectedMap;
+    TStringStringMap mapDeserialized;
+    mapDeserialized.insert({"existingKey", "existingValue"});
+
+    std::string expectedSerializedMap(
+            R"({)"
+            R"("_typeName":"TStringStringMap")"
             R"(})");
 
     jsonOutputArchive(expectedMap);
