@@ -394,6 +394,7 @@ std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStr
 {
     using T = typename Map::key_type;
     using V = typename Map::mapped_type;
+    map.clear();
     for (rapidjson::Document::ConstMemberIterator itr = archive.getMemberBegin();
          itr != archive.getMemberEnd();
          ++itr) {
@@ -409,7 +410,7 @@ std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStr
         archive.setNextKey(std::move(keyString));
         V value;
         archive(value);
-        map[std::move(key)] = std::move(value);
+        map.insert({std::move(key), std::move(value)});
     }
 }
 
