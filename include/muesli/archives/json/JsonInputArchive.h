@@ -363,6 +363,23 @@ void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
     }
 }
 
+template <typename InputStream, typename Set>
+std::enable_if_t<json::detail::IsSet<Set>::value> load(JsonInputArchive<InputStream>& archive, Set& set)
+{
+    using ValueType = typename Set::value_type;
+    if (archive.currentValueIsArray()) {
+        std::size_t arraySize = archive.getArraySize();
+        for (std::size_t i = 0; i < arraySize; i++) {
+            archive.setNextIndex(i);
+            ValueType entry;
+            archive(entry);
+            set.insert(std::move(entry));
+        }
+    } else {
+        throw std::invalid_argument("Cannot read a Set.");
+    }
+}
+
 namespace detail
 {
 template <typename T>

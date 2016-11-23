@@ -24,6 +24,8 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <set>
+#include <unordered_set>
 
 #include <boost/optional.hpp>
 
@@ -207,6 +209,39 @@ TEST_F(JsonArchiveTest, serializeVectorOfEnums)
     std::vector<muesli::tests::testtypes::TEnum::Enum> tEnumsDeserialized;
     jsonInputArchive(tEnumsDeserialized);
     EXPECT_EQ(tEnums, tEnumsDeserialized);
+}
+
+TEST_F(JsonArchiveTest, serializeSetOfStrings)
+{
+    const std::set<std::string> orderedStringSet = {"string_a", "string_b"};
+
+    std::string expectedSerializedStringSet(
+            R"([)"
+            R"("string_a",)"
+            R"("string_b")"
+            R"(])");
+
+    jsonOutputArchive(orderedStringSet);
+    EXPECT_EQ(expectedSerializedStringSet, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    std::set<std::string> setOfStringDeserialized;
+    jsonInputArchive(setOfStringDeserialized);
+    EXPECT_EQ(orderedStringSet, setOfStringDeserialized);
+}
+
+TEST_F(JsonArchiveTest, serializeUnorderedSetOfStrings)
+{
+    const std::unordered_set<std::string> unorderedStringSet = {"string_a", "string_b"};
+
+    jsonOutputArchive(unorderedStringSet);
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    std::unordered_set<std::string> unorderedSetOfStringDeserialized;
+    jsonInputArchive(unorderedSetOfStringDeserialized);
+    EXPECT_EQ(unorderedStringSet, unorderedSetOfStringDeserialized);
 }
 
 TEST_F(JsonArchiveTest, clearExistingVectorEntriesDuringDeserialization)

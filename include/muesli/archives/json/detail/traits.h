@@ -25,6 +25,8 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <set>
+#include <unordered_set>
 
 #include <boost/optional.hpp>
 
@@ -41,7 +43,22 @@ namespace detail
 {
 
 template <typename T>
-struct IsArray : std::false_type
+struct IsSet: std::false_type
+{
+};
+
+template <typename T>
+struct IsSet<std::unordered_set<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsSet<std::set<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsArray : IsSet<T>
 {
 };
 
