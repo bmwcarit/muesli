@@ -31,7 +31,7 @@ template <typename Base>
 struct BaseClass
 {
     template <typename Derived>
-    BaseClass(const Derived* derived)
+    explicit BaseClass(const Derived* derived)
             : wrapped(const_cast<Base*>(static_cast<const Base*>(derived)))
     {
         static_assert(

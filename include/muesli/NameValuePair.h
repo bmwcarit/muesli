@@ -114,6 +114,9 @@ public:
     {
     }
 
+    NameValuePair(NameValuePair&&) = default;
+    NameValuePair& operator=(NameValuePair&&) = default;
+
     char const* name;
     Type value;
 };

@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_TESTS_MOCKARCHIVE_H_
-#define MUESLI_TESTS_MOCKARCHIVE_H_
+#ifndef MUESLI_TESTS_UNIT_TESTS_MOCKARCHIVE_H_
+#define MUESLI_TESTS_UNIT_TESTS_MOCKARCHIVE_H_
 
 #include <gmock/gmock.h>
 #include <boost/concept_check.hpp>
@@ -81,4 +81,4 @@ void serialize(Archive& ar, std::int64_t& val)
     ar.serializeInt64(val);
 }
 
-#endif // MUESLI_TESTS_MOCKARCHIVE_H_
+#endif // MUESLI_TESTS_UNIT_TESTS_MOCKARCHIVE_H_

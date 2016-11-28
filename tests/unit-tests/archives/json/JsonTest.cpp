@@ -17,12 +17,13 @@
  * #L%
  */
 
+#include <cstdint>
 #include <iostream>
 #include <limits>
 #include <sstream>
 #include <vector>
+#include <utility>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "muesli/archives/json/JsonInputArchive.h"
@@ -32,10 +33,6 @@
 #include "muesli/streams/StdOStreamWrapper.h"
 
 #include "testtypes/TEnum.h"
-#include "testtypes/TStruct.h"
-#include "testtypes/TStructExtended.h"
-
-#include "muesli/TypeRegistry.h"
 
 using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
 using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;

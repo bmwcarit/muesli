@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_STDISTREAMWRAPPER_H_
-#define MUESLI_STDISTREAMWRAPPER_H_
+#ifndef MUESLI_STREAMS_STDISTREAMWRAPPER_H_
+#define MUESLI_STREAMS_STDISTREAMWRAPPER_H_
 
 #include <iosfwd>
 
@@ -37,7 +37,7 @@ class StdIStreamWrapper
 public:
     using Char = typename Stream::char_type;
 
-    StdIStreamWrapper(Stream& stream) : stream(stream)
+    explicit StdIStreamWrapper(Stream& stream) : stream(stream)
     {
     }
 
@@ -69,6 +69,9 @@ public:
     StdIStreamWrapper(const StdIStreamWrapper&) = delete;
     StdIStreamWrapper& operator=(const StdIStreamWrapper&) = delete;
 
+    StdIStreamWrapper(StdIStreamWrapper&&) = default;
+    StdIStreamWrapper& operator=(StdIStreamWrapper&&) = default;
+    ~StdIStreamWrapper() = default;
 private:
     Stream& stream;
 };
@@ -76,4 +79,4 @@ private:
 
 MUESLI_REGISTER_INPUT_STREAM(muesli::StdIStreamWrapper<std::istream>)
 
-#endif // MUESLI_STDISTREAMWRAPPER_H_
+#endif // MUESLI_STREAMS_STDISTREAMWRAPPER_H_

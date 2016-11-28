@@ -17,11 +17,8 @@
  * #L%
  */
 
-#include <type_traits>
-
 #include <boost/mpl/equal.hpp>
 #include <boost/mpl/vector.hpp>
-#include <gtest/gtest.h>
 
 #include "MockArchive.h"
 #include "MockStream.h"
@@ -57,9 +54,9 @@ static_assert(boost::mpl::equal<muesli::RegisteredOutputStreams,
 // check that OutputArchiveTypeVector is as expected
 static_assert(boost::mpl::equal<muesli::OutputArchiveTypeVector,
                                 boost::mpl::vector<MockOutputArchive<MockOutputStream>>>::value,
-              "variants must match");
+              "type vectors must match");
 
 // check that InputArchiveTypeVector is as expected
 static_assert(boost::mpl::equal<muesli::InputArchiveTypeVector,
                                 boost::mpl::vector<MockInputArchive<MockInputStream>>>::value,
-              "variants must match");
+              "type vectors must match");

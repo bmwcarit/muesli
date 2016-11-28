@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 

@@ -17,14 +17,10 @@
  * #L%
  */
 
-#include <iostream>
 #include <memory>
 #include <sstream>
-#include <vector>
+#include <string>
 
-#include <boost/optional.hpp>
-
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "muesli/exceptions/ParseException.h"
@@ -37,9 +33,6 @@
 #include "muesli/streams/StdOStreamWrapper.h"
 
 #include "testtypes/NestedStructs.h"
-#include "testtypes/TStruct.h"
-
-#include "muesli/TypeRegistry.h"
 
 using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
 using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
@@ -87,8 +80,9 @@ protected:
     std::string expectedDeserialization;
 };
 
-typedef ::testing::Types<NestedUniquePtrStruct, NestedSharedPtrStruct, NestedBoostOptionalStruct>
-        NullableTypesToTest;
+using NullableTypesToTest =
+        ::testing::Types<NestedUniquePtrStruct, NestedSharedPtrStruct, NestedBoostOptionalStruct>;
+
 TYPED_TEST_CASE(NullablePtrHandling, NullableTypesToTest);
 
 TYPED_TEST(NullablePtrHandling, AllowNullableToBeMissing)

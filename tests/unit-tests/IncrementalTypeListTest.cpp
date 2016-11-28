@@ -18,6 +18,7 @@
  */
 
 #include <boost/mpl/equal.hpp>
+#include <boost/mpl/vector.hpp>
 
 #include "muesli/detail/IncrementalTypeList.h"
 

@@ -28,7 +28,7 @@ namespace detail
 struct Expansion
 {
     template <typename... T>
-    Expansion(T&&...)
+    explicit Expansion(T&&...)
     {
     }
 };

@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_TESTS_TESTTYPES_TENUM_H_
-#define MUESLI_TESTS_TESTTYPES_TENUM_H_
+#ifndef MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TENUM_H_
+#define MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TENUM_H_
 
 #include <cstdint>
 #include <ostream>
@@ -161,4 +161,4 @@ struct EnumTraits<muesli::tests::testtypes::TEnum::Enum>
 
 } // namespace muesli
 
-#endif // MUESLI_TESTS_TESTTYPES_TENUM_H_
+#endif // MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TENUM_H_

@@ -26,8 +26,8 @@
 #include <utility>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/type_index.hpp>
 #include <boost/optional.hpp>
+#include <boost/type_index.hpp>
 
 #ifndef RAPIDJSON_HAS_STDSTRING
 #define RAPIDJSON_HAS_STDSTRING 1
@@ -44,9 +44,9 @@
 #include "muesli/TypeRegistryFwd.h"
 #include "muesli/exceptions/UnknownTypeException.h"
 
-#include "muesli/archives/json/detail/traits.h"
-#include "muesli/archives/json/detail/RapidJsonOutputStreamAdapter.h"
 #include "muesli/archives/json/Tag.h"
+#include "muesli/archives/json/detail/RapidJsonOutputStreamAdapter.h"
+#include "muesli/archives/json/detail/traits.h"
 
 namespace muesli
 {
@@ -357,7 +357,7 @@ void savePolymorphicPointerThroughRegistry(JsonOutputArchive<OutputStream>& arch
     } else {
         throw exceptions::UnknownTypeException(
                 std::string("could not find output serializer for " +
-                            boost::typeindex::type_id_runtime(ptr).pretty_name()));
+                            boost::typeindex::type_id_runtime(*ptr).pretty_name()));
     }
 }
 
@@ -400,7 +400,7 @@ std::enable_if_t<std::is_polymorphic<Base>::value && std::is_abstract<Base>::val
         savePolymorphicPointerThroughRegistry(archive, ptr, typeid(*ptr));
     }
 }
-} // detail
+} // namespace detail
 
 template <typename OutputStream, typename T>
 void save(JsonOutputArchive<OutputStream>& archive, const std::shared_ptr<T>& ptr)

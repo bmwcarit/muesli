@@ -20,8 +20,8 @@
 #ifndef MUESLI_STREAMREGISTRY_H_
 #define MUESLI_STREAMREGISTRY_H_
 
-#include "muesli/detail/IncrementalTypeList.h"
 #include "muesli/Tags.h"
+#include "muesli/detail/IncrementalTypeList.h"
 
 #define MUESLI_REGISTER_STREAM(Tag, Stream) MUESLI_ADD_TO_INCREMENTAL_TYPELIST(Tag, Stream)
 

@@ -20,18 +20,20 @@
 #ifndef MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
 #define MUESLI_ARCHIVES_JSON_DETAIL_TRAITS_H_
 
-#include <type_traits>
-#include <string>
-#include <vector>
-#include <memory>
 #include <cstddef>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <vector>
+#include <set>
+#include <unordered_set>
 
 #include <boost/optional.hpp>
 
 #include "muesli/Traits.h"
 #include "muesli/TypeRegistryFwd.h"
-#include "muesli/detail/VoidT.h"
 #include "muesli/detail/IsTypeWithinList.h"
+#include "muesli/detail/VoidT.h"
 
 namespace muesli
 {
@@ -41,7 +43,22 @@ namespace detail
 {
 
 template <typename T>
-struct IsArray : std::false_type
+struct IsSet: std::false_type
+{
+};
+
+template <typename T>
+struct IsSet<std::unordered_set<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsSet<std::set<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsArray : IsSet<T>
 {
 };
 

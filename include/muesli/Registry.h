@@ -26,10 +26,10 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/size.hpp>
 
+#include "muesli/detail/CartesianTypeProduct.h"
 #include "muesli/detail/FlattenMplSequence.h"
 #include "muesli/detail/IncrementalTypeList.h"
 #include "muesli/detail/TypeList.h"
-#include "muesli/detail/CartesianTypeProduct.h"
 #include "muesli/Tags.h"
 
 namespace muesli
@@ -72,4 +72,4 @@ using InputArchiveTypeVector = detail::FlatCartesianTypeProduct<RegisteredInputA
                                                                 detail::CombineArchiveAndStream>;
 } // namespace muesli
 
-#endif // MUESLI_TYPEREGISTRY_H_
+#endif // MUESLI_REGISTRY_H_

@@ -17,20 +17,22 @@
  * #L%
  */
 
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <memory>
+#include <map>
+#include <string>
+#include <set>
+#include <unordered_set>
 
 #include <boost/optional.hpp>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "muesli/exceptions/ParseException.h"
 #include "muesli/exceptions/ValueNotFoundException.h"
-
-#include "muesli/streams/StringIStream.h"
-#include "muesli/streams/StringOStream.h"
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"
@@ -43,6 +45,7 @@
 #include "testtypes/NestedStructs.h"
 #include "testtypes/TStruct.h"
 #include "testtypes/TStructExtended.h"
+#include "testtypes/TEnum.h"
 
 using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
 using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
@@ -206,6 +209,39 @@ TEST_F(JsonArchiveTest, serializeVectorOfEnums)
     std::vector<muesli::tests::testtypes::TEnum::Enum> tEnumsDeserialized;
     jsonInputArchive(tEnumsDeserialized);
     EXPECT_EQ(tEnums, tEnumsDeserialized);
+}
+
+TEST_F(JsonArchiveTest, serializeSetOfStrings)
+{
+    const std::set<std::string> orderedStringSet = {"string_a", "string_b"};
+
+    std::string expectedSerializedStringSet(
+            R"([)"
+            R"("string_a",)"
+            R"("string_b")"
+            R"(])");
+
+    jsonOutputArchive(orderedStringSet);
+    EXPECT_EQ(expectedSerializedStringSet, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    std::set<std::string> setOfStringDeserialized;
+    jsonInputArchive(setOfStringDeserialized);
+    EXPECT_EQ(orderedStringSet, setOfStringDeserialized);
+}
+
+TEST_F(JsonArchiveTest, serializeUnorderedSetOfStrings)
+{
+    const std::unordered_set<std::string> unorderedStringSet = {"string_a", "string_b"};
+
+    jsonOutputArchive(unorderedStringSet);
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    std::unordered_set<std::string> unorderedSetOfStringDeserialized;
+    jsonInputArchive(unorderedSetOfStringDeserialized);
+    EXPECT_EQ(unorderedStringSet, unorderedSetOfStringDeserialized);
 }
 
 TEST_F(JsonArchiveTest, clearExistingVectorEntriesDuringDeserialization)

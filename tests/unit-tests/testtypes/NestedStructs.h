@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef TESTTYPES_NESTEDSTRUCTS_H_
-#define TESTTYPES_NESTEDSTRUCTS_H_
+#ifndef MUESLI_TESTS_UNIT_TESTS_TESTTYPES_NESTEDSTRUCTS_H_
+#define MUESLI_TESTS_UNIT_TESTS_TESTTYPES_NESTEDSTRUCTS_H_
 
 #include <iostream>
 #include <memory>
@@ -171,4 +171,4 @@ MUESLI_REGISTER_TYPE(muesli::tests::testtypes::NestedSharedPtrStruct,
 MUESLI_REGISTER_TYPE(muesli::tests::testtypes::NestedBoostOptionalStruct,
                      "muesli.tests.testtypes.NestedBoostOptionalStruct")
 
-#endif // TESTTYPES_NESTEDSTRUCTS_H_
+#endif // MUESLI_TESTS_UNIT_TESTS_TESTTYPES_NESTEDSTRUCTS_H_

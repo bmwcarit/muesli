@@ -22,11 +22,11 @@
 
 #include <type_traits>
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/push_back.hpp>
 #include <boost/mpl/copy.hpp>
 #include <boost/mpl/fold.hpp>
 #include <boost/mpl/is_sequence.hpp>
+#include <boost/mpl/push_back.hpp>
+#include <boost/mpl/vector.hpp>
 
 namespace muesli
 {

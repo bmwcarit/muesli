@@ -27,7 +27,7 @@ namespace muesli
 template <typename Wrapped>
 struct SkipIntroOutroWrapper
 {
-    SkipIntroOutroWrapper(const Wrapped* wrapped) : wrapped(const_cast<Wrapped*>(wrapped))
+    explicit SkipIntroOutroWrapper(const Wrapped* wrapped) : wrapped(const_cast<Wrapped*>(wrapped))
     {
     }
 

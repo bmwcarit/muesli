@@ -22,7 +22,6 @@
 #include <gtest/gtest.h>
 
 #include "muesli/concepts/OutputStream.h"
-#include "muesli/streams/StringIStream.h"
 #include "muesli/streams/StringOStream.h"
 
 TEST(StringOStreamTest, conceptCheck)

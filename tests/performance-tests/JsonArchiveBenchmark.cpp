@@ -16,6 +16,9 @@
  * limitations under the License.
  * #L%
  */
+
+#include <sstream>
+
 #include <benchmark/benchmark_api.h>
 
 #include "muesli/archives/json/JsonInputArchive.h"

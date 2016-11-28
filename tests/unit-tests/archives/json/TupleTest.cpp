@@ -17,9 +17,10 @@
  * #L%
  */
 
-#include <chrono>
-#include <gtest/gtest.h>
+#include <cstdint>
 #include <tuple>
+
+#include <gtest/gtest.h>
 
 #include "muesli/streams/StringIStream.h"
 #include "muesli/streams/StringOStream.h"
@@ -31,7 +32,6 @@
 
 #include "testtypes/TEnum.h"
 #include "testtypes/TStruct.h"
-#include "testtypes/TStructExtended.h"
 
 using namespace ::testing;
 

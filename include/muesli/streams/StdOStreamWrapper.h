@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_STDOSTREAMWRAPPER_H_
-#define MUESLI_STDOSTREAMWRAPPER_H_
+#ifndef MUESLI_STREAMS_STDOSTREAMWRAPPER_H_
+#define MUESLI_STREAMS_STDOSTREAMWRAPPER_H_
 
 #include <iosfwd>
 
@@ -37,7 +37,7 @@ class StdOStreamWrapper
 public:
     using Char = typename Stream::char_type;
 
-    StdOStreamWrapper(Stream& stream) : stream(stream)
+    explicit StdOStreamWrapper(Stream& stream) : stream(stream)
     {
     }
 
@@ -60,6 +60,9 @@ public:
     StdOStreamWrapper(const StdOStreamWrapper&) = delete;
     StdOStreamWrapper& operator=(const StdOStreamWrapper&) = delete;
 
+    StdOStreamWrapper(StdOStreamWrapper&&) = default;
+    StdOStreamWrapper& operator=(StdOStreamWrapper&&) = default;
+    ~StdOStreamWrapper() = default;
 private:
     Stream& stream;
 };
@@ -68,4 +71,4 @@ private:
 // register the common std::ostream case
 MUESLI_REGISTER_OUTPUT_STREAM(muesli::StdOStreamWrapper<std::ostream>)
 
-#endif // MUESLI_STDOSTREAMWRAPPER_H_
+#endif // MUESLI_STREAMS_STDOSTREAMWRAPPER_H_

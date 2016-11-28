@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_BASICSTRINGOSTREAM_H_
-#define MUESLI_BASICSTRINGOSTREAM_H_
+#ifndef MUESLI_STREAMS_STRINGOSTREAM_H_
+#define MUESLI_STREAMS_STRINGOSTREAM_H_
 
 #include <string>
 #include "muesli/StreamRegistry.h"
@@ -32,7 +32,7 @@ class BasicStringOStream
 public:
     using Char = typename StringType::value_type;
 
-    BasicStringOStream(std::size_t initialSize = 4096) : buffer()
+    explicit BasicStringOStream(std::size_t initialSize = 4096) : buffer()
     {
         buffer.reserve(initialSize);
     }
@@ -60,6 +60,13 @@ public:
         return buffer;
     }
 
+    // non-copyable
+    BasicStringOStream(const BasicStringOStream&) = delete;
+    BasicStringOStream& operator=(const BasicStringOStream&) = delete;
+
+    BasicStringOStream(BasicStringOStream&&) = default;
+    BasicStringOStream& operator=(BasicStringOStream&&) = default;
+    ~BasicStringOStream() = default;
 private:
     StringType buffer;
 };
@@ -70,4 +77,4 @@ using StringOStream = BasicStringOStream<std::string>;
 
 MUESLI_REGISTER_OUTPUT_STREAM(muesli::StringOStream)
 
-#endif // MUESLI_BASICSTRINGOSTREAM_H_
+#endif // MUESLI_STREAMS_STRINGOSTREAM_H_

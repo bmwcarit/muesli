@@ -17,8 +17,8 @@
  * #L%
  */
 
-#ifndef MUESLI_BASICSTRINGISTREAM_H_
-#define MUESLI_BASICSTRINGISTREAM_H_
+#ifndef MUESLI_STREAMS_STRINGISTREAM_H_
+#define MUESLI_STREAMS_STRINGISTREAM_H_
 
 #include <string>
 #include "muesli/StreamRegistry.h"
@@ -35,13 +35,13 @@ class BasicStringIStream
 public:
     using Char = typename StringType::value_type;
 
-    BasicStringIStream(const StringType& input)
+    explicit BasicStringIStream(const StringType& input)
             : currentCharIndex(0), inputLength(input.length()), input(input)
     {
         assert(input[inputLength] == '\0');
     }
 
-    BasicStringIStream(const StringType&& input)
+    explicit BasicStringIStream(const StringType&& input)
             : currentCharIndex(0), inputLength(input.length()), input(std::move(input))
     {
         assert(input[inputLength] == '\0');
@@ -84,6 +84,13 @@ public:
         return currentCharIndex;
     }
 
+    // non-copyable
+    BasicStringIStream(const BasicStringIStream&) = delete;
+    BasicStringIStream& operator=(const BasicStringIStream&) = delete;
+
+    BasicStringIStream(BasicStringIStream&&) = default;
+    BasicStringIStream& operator=(BasicStringIStream&&) = default;
+    ~BasicStringIStream() = default;
 private:
     std::size_t currentCharIndex;
     const std::size_t inputLength;
@@ -97,4 +104,4 @@ using StringIStream = BasicStringIStream<std::string>;
 
 MUESLI_REGISTER_INPUT_STREAM(muesli::StringIStream)
 
-#endif // MUESLI_BASICSTRINGISTREAM_H_
+#endif // MUESLI_STREAMS_STRINGISTREAM_H_

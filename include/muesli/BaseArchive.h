@@ -26,8 +26,8 @@
 #include "muesli/SkipIntroOutroWrapper.h"
 #include "muesli/Tags.h"
 #include "muesli/Traits.h"
-#include "muesli/detail/Expansion.h"
 #include "muesli/detail/DispatchTraits.h"
+#include "muesli/detail/Expansion.h"
 
 namespace muesli
 {
@@ -37,12 +37,6 @@ class BaseArchive : public std::enable_shared_from_this<Derived>
 {
 
 public:
-    using Category = ArchiveCategory;
-
-    BaseArchive(Derived* self) : self(*self)
-    {
-    }
-
     template <typename... Ts>
     void operator()(Ts&&... args)
     {
@@ -50,9 +44,13 @@ public:
         detail::Expansion{0, (self.handle(std::forward<Ts>(args)), 0)...};
     }
 
+protected:
+
+    explicit BaseArchive(Derived* self) : self(*self)
+    {
+    }
+
 private:
-    template <typename CheckCategory, typename C>
-    using EnableIfXArchive = std::enable_if_t<std::is_same<CheckCategory, C>::value>;
 
     template <typename T>
     static T& discardConstQualifier(const T& value)

@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 
 ######## Project settings ########
-project(muesli-0.1.4)
+project(muesli-0.2.0)
 set(muesli_MAJOR_VERSION 0)
-set(muesli_MINOR_VERSION 1)
-set(muesli_PATCH_VERSION 4)
+set(muesli_MINOR_VERSION 2)
+set(muesli_PATCH_VERSION 0)
 set(
     muesli_VERSION
     ${muesli_MAJOR_VERSION}.${muesli_MINOR_VERSION}.${muesli_PATCH_VERSION}
@@ -32,6 +32,9 @@ include(GNUInstallDirs)
 
 include(LocateProgram)
 include(AddClangFormat)
+include(AddClangTidy)
+include(AddIncludeWhatYouUse)
+
 message(STATUS "variable CMAKE_BUILD_TYPE=" ${CMAKE_BUILD_TYPE})
 
 ######## Add Boost ########
@@ -111,14 +114,14 @@ message(STATUS "option USE_PLATFORM_RAPIDJSON=" ${USE_PLATFORM_RAPIDJSON})
 
 include(AddExternalProject)
 if (USE_PLATFORM_RAPIDJSON)
-    find_package(RapidJSON 1.0.2 REQUIRED)
+    find_package(RapidJSON 1.1.0 REQUIRED)
 else(USE_PLATFORM_RAPIDJSON)
     message(STATUS "############ Download: rapidjson ############")
 
     AddExternalProject(
         rapidjson
         GIT_REPOSITORY https://github.com/miloyip/rapidjson
-        GIT_TAG ab791ae90cbfd2e229be1b5e9db577728cfb3352
+        GIT_TAG v1.1.0
         TIMEOUT 10
         # Disable configure step
         CONFIGURE_COMMAND ""

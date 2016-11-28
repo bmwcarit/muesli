@@ -71,3 +71,5 @@ AddBenchmark(
 target_link_libraries(muesli-benchmark muesli)
 
 AddClangFormat(muesli-benchmark)
+AddClangTidy(muesli-benchmark)
+AddIncludeWhatYouUse(muesli-benchmark)

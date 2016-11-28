@@ -21,10 +21,10 @@
 
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <stack>
-#include <vector>
+#include <string>
 #include <tuple>
+#include <vector>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/type_index.hpp>
@@ -360,6 +360,23 @@ void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
         }
     } else {
         throw std::invalid_argument("Cannot read a Vector.");
+    }
+}
+
+template <typename InputStream, typename Set>
+std::enable_if_t<json::detail::IsSet<Set>::value> load(JsonInputArchive<InputStream>& archive, Set& set)
+{
+    using ValueType = typename Set::value_type;
+    if (archive.currentValueIsArray()) {
+        std::size_t arraySize = archive.getArraySize();
+        for (std::size_t i = 0; i < arraySize; i++) {
+            archive.setNextIndex(i);
+            ValueType entry;
+            archive(entry);
+            set.insert(std::move(entry));
+        }
+    } else {
+        throw std::invalid_argument("Cannot read a Set.");
     }
 }
 

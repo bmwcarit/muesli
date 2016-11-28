@@ -1,3 +1,11 @@
+#muesli 0.2.0
+
+## API relevant changes
+None.
+
+##Other changes
+* added support for std::set and std::unordered_set
+
 #muesli 0.1.2
 This is a bugfix release.
 fixed:
