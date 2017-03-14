@@ -20,6 +20,7 @@
 #define MUESLI_ARCHIVES_JSON_JSONINPUTARCHIVE_H_
 
 #include <cstdint>
+#include <iterator>
 #include <memory>
 #include <stack>
 #include <string>
@@ -292,6 +293,60 @@ private:
     bool isRoot;
 };
 
+namespace detail
+{
+template <std::size_t Index, typename InputStream, typename TupleType>
+void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
+{
+    archive.setNextIndex(Index);
+    archive(std::get<Index>(tuple));
+}
+
+template <typename InputStream, typename TupleType, std::size_t... Indicies>
+void loadTuple(JsonInputArchive<InputStream>& archive,
+               TupleType& tuple,
+               std::index_sequence<Indicies...>)
+{
+    detail::Expansion{0, (loadTupleElement<Indicies>(archive, tuple), 0)...};
+}
+
+template <typename T>
+std::enable_if_t<!std::is_enum<T>::value && !std::is_same<T, std::string>::value> stringToType(
+        const std::string& string,
+        T& type)
+{
+    type = boost::lexical_cast<T>(string);
+}
+
+template <typename T>
+std::enable_if_t<std::is_same<T, std::string>::value> stringToType(const std::string& string,
+                                                                   T& type)
+{
+    type = string;
+}
+
+template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
+std::enable_if_t<std::is_enum<Enum>::value> stringToType(const std::string& literal,
+                                                         Enum& enumValue)
+{
+    enumValue = Wrapper::getEnum(literal);
+}
+
+template <typename T>
+std::enable_if_t<json::detail::IsArray<T>::value> reserveArray(T& array, std::size_t size)
+{
+    array.reserve(size);
+}
+
+template <typename T>
+void reserveArray(std::set<T>& array, std::size_t size)
+{
+    std::ignore = array;
+    std::ignore = size;
+}
+
+} // namespace detail
+
 template <typename InputStream, typename T>
 void intro(JsonInputArchive<InputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
@@ -349,61 +404,24 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<Inp
 }
 
 template <typename InputStream, typename T>
-void load(JsonInputArchive<InputStream>& archive, std::vector<T>& array)
+std::enable_if_t<json::detail::IsArray<T>::value> load(JsonInputArchive<InputStream>& archive, T& array)
 {
+    using ValueType = typename T::value_type;
     if (archive.currentValueIsArray()) {
         std::size_t arraySize = archive.getArraySize();
-        array.resize(arraySize);
-        for (std::size_t i = 0; i < arraySize; i++) {
-            archive.setNextIndex(i);
-            archive(array[i]);
-        }
-    } else {
-        throw std::invalid_argument("Cannot read a Vector.");
-    }
-}
-
-template <typename InputStream, typename Set>
-std::enable_if_t<json::detail::IsSet<Set>::value> load(JsonInputArchive<InputStream>& archive, Set& set)
-{
-    using ValueType = typename Set::value_type;
-    if (archive.currentValueIsArray()) {
-        std::size_t arraySize = archive.getArraySize();
+        array.clear();
+        detail::reserveArray(array, arraySize);
+        auto inserter = std::inserter(array, array.begin());
         for (std::size_t i = 0; i < arraySize; i++) {
             archive.setNextIndex(i);
             ValueType entry;
             archive(entry);
-            set.insert(std::move(entry));
+            inserter = std::move(entry);
         }
     } else {
-        throw std::invalid_argument("Cannot read a Set.");
+        throw std::invalid_argument("Cannot read an array.");
     }
 }
-
-namespace detail
-{
-template <typename T>
-std::enable_if_t<!std::is_enum<T>::value && !std::is_same<T, std::string>::value> stringToType(
-        const std::string& string,
-        T& type)
-{
-    type = boost::lexical_cast<T>(string);
-}
-
-template <typename T>
-std::enable_if_t<std::is_same<T, std::string>::value> stringToType(const std::string& string,
-                                                                   T& type)
-{
-    type = string;
-}
-
-template <typename Enum, typename Wrapper = typename EnumTraits<Enum>::Wrapper>
-std::enable_if_t<std::is_enum<Enum>::value> stringToType(const std::string& literal,
-                                                         Enum& enumValue)
-{
-    enumValue = Wrapper::getEnum(literal);
-}
-} // namespace detail
 
 template <typename InputStream, typename Map>
 std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStream>& archive,
@@ -437,24 +455,6 @@ void load(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePai
     archive.setNextKey(nameValuePair.name);
     archive(nameValuePair.value);
 }
-
-namespace detail
-{
-template <std::size_t Index, typename InputStream, typename TupleType>
-void loadTupleElement(JsonInputArchive<InputStream>& archive, TupleType& tuple)
-{
-    archive.setNextIndex(Index);
-    archive(std::get<Index>(tuple));
-}
-
-template <typename InputStream, typename TupleType, std::size_t... Indicies>
-void loadTuple(JsonInputArchive<InputStream>& archive,
-               TupleType& tuple,
-               std::index_sequence<Indicies...>)
-{
-    detail::Expansion{0, (loadTupleElement<Indicies>(archive, tuple), 0)...};
-}
-} // namespace detail
 
 template <typename InputStream, typename... Ts>
 void load(JsonInputArchive<InputStream>& archive, std::tuple<Ts...>& tuple)

@@ -43,27 +43,22 @@ namespace detail
 {
 
 template <typename T>
-struct IsSet: std::false_type
-{
-};
-
-template <typename T>
-struct IsSet<std::unordered_set<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct IsSet<std::set<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct IsArray : IsSet<T>
+struct IsArray : std::false_type
 {
 };
 
 template <typename T>
 struct IsArray<std::vector<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsArray<std::unordered_set<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsArray<std::set<T>> : std::true_type
 {
 };
 
