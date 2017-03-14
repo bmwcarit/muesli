@@ -345,6 +345,13 @@ void reserveArray(std::set<T>& array, std::size_t size)
     std::ignore = size;
 }
 
+template <typename... Ts>
+void reserveArray(boost::multi_index_container<Ts...>& array, std::size_t size)
+{
+    std::ignore = array;
+    std::ignore = size;
+}
+
 } // namespace detail
 
 template <typename InputStream, typename T>

@@ -18,7 +18,10 @@
  */
 
 #include <cstdint>
+
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <sstream>
 #include <vector>
 #include <memory>
@@ -27,6 +30,9 @@
 #include <set>
 #include <unordered_set>
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/mem_fun.hpp>
 #include <boost/optional.hpp>
 
 #include <gtest/gtest.h>
@@ -106,6 +112,25 @@ public:
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.NestedStruct")"
                 R"(})";
+
+        tStructVector = {muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data"),
+                         muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")};
+
+        expectedSerializedStructVector =
+                R"([)"
+                R"({)"
+                R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+                R"("tDouble":0.123456789,)"
+                R"("tInt64":64,)"
+                R"("tString":"test string data")"
+                R"(},)"
+                R"({)"
+                R"("_typeName":"muesli.tests.testtypes.TStruct",)"
+                R"("tDouble":0.987654321,)"
+                R"("tInt64":-64,)"
+                R"("tString":"second test string")"
+                R"(})"
+                R"(])";
     }
 
 protected:
@@ -120,6 +145,8 @@ protected:
     std::string expectedSerializedNestedStruct;
     std::string expectedSerializedNestedExtendedStruct;
     std::string expectedSerializedNestedStructWithNullptr;
+    std::vector<muesli::tests::testtypes::TStruct> tStructVector;
+    std::string expectedSerializedStructVector;
 };
 
 TEST_F(JsonArchiveTest, serializeStruct)
@@ -160,34 +187,14 @@ TEST_F(JsonArchiveTest, serializeNestedStruct)
 
 TEST_F(JsonArchiveTest, serializeVectorOfStruct)
 {
-    std::vector<muesli::tests::testtypes::TStruct> tStructs = {
-            muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data"),
-            muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")};
-
-    std::string expectedSerializedStructs(
-            R"([)"
-            R"({)"
-            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
-            R"("tDouble":0.123456789,)"
-            R"("tInt64":64,)"
-            R"("tString":"test string data")"
-            R"(},)"
-            R"({)"
-            R"("_typeName":"muesli.tests.testtypes.TStruct",)"
-            R"("tDouble":0.987654321,)"
-            R"("tInt64":-64,)"
-            R"("tString":"second test string")"
-            R"(})"
-            R"(])");
-
-    jsonOutputArchive(tStructs);
-    EXPECT_EQ(expectedSerializedStructs, stream.str());
+    jsonOutputArchive(tStructVector);
+    EXPECT_EQ(expectedSerializedStructVector, stream.str());
     std::cout << stream.str() << std::endl;
 
     JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
     std::vector<muesli::tests::testtypes::TStruct> tStructsDeserialized;
     jsonInputArchive(tStructsDeserialized);
-    EXPECT_EQ(tStructs, tStructsDeserialized);
+    EXPECT_EQ(tStructVector, tStructsDeserialized);
 }
 
 TEST_F(JsonArchiveTest, serializeVectorOfEnums)
@@ -584,4 +591,35 @@ TEST_F(JsonArchiveTest, deserializeThrowsOnMissingField)
     muesli::tests::testtypes::TStruct tStructDeserialized;
     EXPECT_THROW(serialize(jsonInputArchive, tStructDeserialized),
                  muesli::exceptions::ValueNotFoundException);
+}
+
+namespace bmi = boost::multi_index;
+
+using TStructMultiIndexContainer = boost::multi_index_container<
+        muesli::tests::testtypes::TStruct,
+        bmi::indexed_by<bmi::hashed_unique<
+                                BOOST_MULTI_INDEX_CONST_MEM_FUN(muesli::tests::testtypes::TStruct,
+                                                                const std::int64_t&,
+                                                                getTInt64)>,
+                        bmi::hashed_unique<
+                                BOOST_MULTI_INDEX_CONST_MEM_FUN(muesli::tests::testtypes::TStruct,
+                                                                const std::string&,
+                                                                getTString)>>>;
+
+TEST_F(JsonArchiveTest, serializeDeserializeBoostMultiIndexContainer)
+{
+    TStructMultiIndexContainer multiIndexContainer;
+
+    std::copy(tStructVector.begin(),
+              tStructVector.end(),
+              std::inserter(multiIndexContainer, multiIndexContainer.begin()));
+
+    jsonOutputArchive(multiIndexContainer);
+    EXPECT_EQ(expectedSerializedStructVector, stream.str());
+    std::cout << stream.str() << std::endl;
+
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    TStructMultiIndexContainer multiIndexContainerDeserialized;
+    jsonInputArchive(multiIndexContainerDeserialized);
+    EXPECT_EQ(multiIndexContainer, multiIndexContainerDeserialized);
 }
