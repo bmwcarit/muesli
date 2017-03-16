@@ -28,6 +28,7 @@
 #include <set>
 #include <unordered_set>
 
+#include <boost/multi_index_container.hpp>
 #include <boost/optional.hpp>
 
 #include "muesli/Traits.h"
@@ -43,22 +44,7 @@ namespace detail
 {
 
 template <typename T>
-struct IsSet: std::false_type
-{
-};
-
-template <typename T>
-struct IsSet<std::unordered_set<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct IsSet<std::set<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct IsArray : IsSet<T>
+struct IsArray : std::false_type
 {
 };
 
@@ -66,6 +52,22 @@ template <typename T>
 struct IsArray<std::vector<T>> : std::true_type
 {
 };
+
+template <typename T>
+struct IsArray<std::unordered_set<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct IsArray<std::set<T>> : std::true_type
+{
+};
+
+template <typename... Ts>
+struct IsArray<boost::multi_index_container<Ts...>> : std::true_type
+{
+};
+
 
 template <typename T>
 struct IsPrimitive

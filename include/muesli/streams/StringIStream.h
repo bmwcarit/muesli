@@ -41,7 +41,7 @@ public:
         assert(input[inputLength] == '\0');
     }
 
-    explicit BasicStringIStream(const StringType&& input)
+    explicit BasicStringIStream(StringType&& input)
             : currentCharIndex(0), inputLength(input.length()), input(std::move(input))
     {
         assert(input[inputLength] == '\0');
