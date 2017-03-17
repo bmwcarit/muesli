@@ -26,21 +26,41 @@
 
 using namespace ::testing;
 
+template <typename Stream>
+using StringIStreamTest = ::testing::Test;
+
+struct RValueReferenceString {
+    static auto getStream(std::string str)
+    {
+        return muesli::StringIStream(std::move(str));
+    }
+};
+
+struct LValueReferenceString {
+    static auto getStream(std::string str)
+    {
+        return muesli::StringIStream(str);
+    }
+};
+
+using StringInitializationTypes = ::testing::Types<RValueReferenceString, LValueReferenceString>;
+TYPED_TEST_CASE(StringIStreamTest, StringInitializationTypes);
+
 TEST(StringIStreamTest, conceptCheck)
 {
     BOOST_CONCEPT_ASSERT((muesli::concepts::InputStream<muesli::StringIStream>));
 }
 
-TEST(StringIStreamTest, getOnEmptyStringReturnsEof)
+TYPED_TEST(StringIStreamTest, getOnEmptyStringReturnsEof)
 {
-    muesli::StringIStream stream("");
+    auto stream = TypeParam::getStream(std::string());
 
     ASSERT_EQ('\0', stream.get());
 }
 
-TEST(StringIStreamTest, getCharsOnEmptyStringReturnsEof)
+TYPED_TEST(StringIStreamTest, getCharsOnEmptyStringReturnsEof)
 {
-    muesli::StringIStream stream("");
+    auto stream = TypeParam::getStream(std::string());
     std::array<muesli::StringIStream::Char, 1> dest;
 
     stream.get(dest.data(), dest.size());
@@ -48,18 +68,18 @@ TEST(StringIStreamTest, getCharsOnEmptyStringReturnsEof)
     ASSERT_EQ('\0', dest.at(0));
 }
 
-TEST(StringIStreamTest, getCharUntilEof)
+TYPED_TEST(StringIStreamTest, getCharUntilEof)
 {
-    muesli::StringIStream stream("12");
+    auto stream = TypeParam::getStream("12");
 
     ASSERT_EQ('1', stream.get());
     ASSERT_EQ('2', stream.get());
     ASSERT_EQ('\0', stream.get());
 }
 
-TEST(StringIStreamTest, getChars_RequestMoreCharsThanAvailable)
+TYPED_TEST(StringIStreamTest, getChars_RequestMoreCharsThanAvailable)
 {
-    muesli::StringIStream stream("12");
+    auto stream = TypeParam::getStream("12");
     std::array<muesli::StringIStream::Char, 3> dest;
 
     stream.get(dest.data(), dest.size());
@@ -69,9 +89,9 @@ TEST(StringIStreamTest, getChars_RequestMoreCharsThanAvailable)
     ASSERT_EQ('\0', dest.at(2));
 }
 
-TEST(StringIStreamTest, getChars_RequestAllChars)
+TYPED_TEST(StringIStreamTest, getChars_RequestAllChars)
 {
-    muesli::StringIStream stream("12");
+    auto stream = TypeParam::getStream("12");
     std::array<muesli::StringIStream::Char, 2> dest;
 
     stream.get(dest.data(), dest.size());
@@ -80,9 +100,9 @@ TEST(StringIStreamTest, getChars_RequestAllChars)
     ASSERT_EQ('2', dest.at(1));
 }
 
-TEST(StringIStreamTest, getCharsThanGetChar)
+TYPED_TEST(StringIStreamTest, getCharsThanGetChar)
 {
-    muesli::StringIStream stream("123");
+    auto stream = TypeParam::getStream("123");
     std::array<muesli::StringIStream::Char, 2> dest;
 
     stream.get(dest.data(), dest.size());
@@ -92,9 +112,9 @@ TEST(StringIStreamTest, getCharsThanGetChar)
     ASSERT_EQ('3', stream.get());
 }
 
-TEST(StringIStreamTest, getCharThanGetChars)
+TYPED_TEST(StringIStreamTest, getCharThanGetChars)
 {
-    muesli::StringIStream stream("123");
+    auto stream = TypeParam::getStream("123");
     std::array<muesli::StringIStream::Char, 2> dest;
 
     ASSERT_EQ('1', stream.get());
@@ -105,9 +125,9 @@ TEST(StringIStreamTest, getCharThanGetChars)
     ASSERT_EQ('3', dest.at(1));
 }
 
-TEST(StringIStreamTest, tell)
+TYPED_TEST(StringIStreamTest, tell)
 {
-    muesli::StringIStream stream("12");
+    auto stream = TypeParam::getStream("12");
 
     ASSERT_EQ(0, stream.tell());
 
@@ -121,9 +141,9 @@ TEST(StringIStreamTest, tell)
     ASSERT_EQ('\0', output);
 }
 
-TEST(StringIStreamTest, peekDoesNotChangePosition)
+TYPED_TEST(StringIStreamTest, peekDoesNotChangePosition)
 {
-    muesli::StringIStream stream("12");
+    auto stream = TypeParam::getStream("12");
 
     ASSERT_EQ('1', stream.peek());
     ASSERT_EQ(0, stream.tell());
@@ -132,11 +152,17 @@ TEST(StringIStreamTest, peekDoesNotChangePosition)
     ASSERT_EQ(0, stream.tell());
 }
 
-TEST(StringIStreamTest, peekReturnsNullTerminalAtTheEnd)
+TYPED_TEST(StringIStreamTest, peekReturnsNullTerminalAtTheEnd)
 {
-    muesli::StringIStream stream("1");
+    auto stream = TypeParam::getStream("1");
 
     stream.get();
 
     ASSERT_EQ('\0', stream.peek());
+}
+
+TYPED_TEST(StringIStreamTest, initWithLongString)
+{
+    auto stream = TypeParam::getStream(std::string(1000, '#'));
+    ASSERT_EQ('#', stream.peek());
 }

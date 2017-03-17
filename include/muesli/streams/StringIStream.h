@@ -38,13 +38,13 @@ public:
     explicit BasicStringIStream(const StringType& input)
             : currentCharIndex(0), inputLength(input.length()), input(input)
     {
-        assert(input[inputLength] == '\0');
+        checkInputForNullCharTermination();
     }
 
     explicit BasicStringIStream(StringType&& input)
             : currentCharIndex(0), inputLength(input.length()), input(std::move(input))
     {
-        assert(input[inputLength] == '\0');
+        checkInputForNullCharTermination();
     }
 
     Char peek() const
@@ -92,6 +92,12 @@ public:
     BasicStringIStream& operator=(BasicStringIStream&&) = default;
     ~BasicStringIStream() = default;
 private:
+
+    void checkInputForNullCharTermination() const
+    {
+        assert(input[inputLength] == '\0');
+    }
+
     std::size_t currentCharIndex;
     const std::size_t inputLength;
 
