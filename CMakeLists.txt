@@ -160,9 +160,6 @@ target_link_libraries(muesli INTERFACE rapidjson::rapidjson)
 
 add_dependencies(muesli rapidjson::rapidjson)
 
-# defines GNU standard installation directories
-include(GNUInstallDirs)
-
 install(
     TARGETS muesli
     EXPORT muesliTargets
