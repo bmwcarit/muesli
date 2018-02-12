@@ -45,7 +45,7 @@ else(USE_PLATFORM_GOOGLE_BENCHMARK)
     AddExternalProject(
         googlebenchmark
         GIT_REPOSITORY https://github.com/google/benchmark.git
-        GIT_TAG master
+        GIT_TAG v1.3.0
         TIMEOUT 10
         CMAKE_ARGS "-DBENCHMARK_ENABLE_TESTING=OFF;-DCMAKE_BUILD_TYPE=Release"
         BUILD_BYPRODUCTS "${EP_PREFIX}/src/googlebenchmark-build/src/${GBENCHMARK_LIBRARY_NAME}"
