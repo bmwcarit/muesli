@@ -25,6 +25,7 @@
 #include <utility>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"
@@ -50,7 +51,8 @@ struct TestParams
             {std::numeric_limits<T>::min(), std::numeric_limits<T>::min()},
             {0, 0},
             {std::numeric_limits<T>::max(), std::numeric_limits<T>::max()},
-            {std::numeric_limits<T>::max() + 1, std::numeric_limits<T>::min()}};
+            {std::numeric_limits<T>::max() + 1, std::numeric_limits<T>::min()},
+            {std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()}};
 };
 
 template <typename T>
@@ -61,7 +63,12 @@ void compareValues(const T& expected, const T& actual)
 
 void compareValues(const double& expected, const double& actual)
 {
-    EXPECT_FLOAT_EQ(expected, actual);
+    EXPECT_THAT(expected, ::testing::NanSensitiveDoubleEq(actual));
+}
+
+void compareValues(const float& expected, const float& actual)
+{
+    EXPECT_THAT(expected, ::testing::NanSensitiveFloatEq(actual));
 }
 
 template <typename T>
@@ -110,7 +117,8 @@ struct TestParams<double>
             {0, 0},
             {0.012345678901234567890123456789, 0.012345678901234567890123456789},
             {1.25e-9, 1.25e-9},
-            {std::numeric_limits<double>::max(), std::numeric_limits<double>::max()}};
+            {std::numeric_limits<double>::max(), std::numeric_limits<double>::max()},
+            {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()}};
 };
 
 template <>
@@ -122,7 +130,8 @@ struct TestParams<float>
             {0.0f, 0.0f},
             {0.012345678901234567890123456789f, 0.012345678901234567890123456789f},
             {1.25e-9f, 1.25e-9f},
-            {std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}};
+            {std::numeric_limits<float>::max(), std::numeric_limits<float>::max()},
+            {std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()}};
 };
 
 template <>
