@@ -1,3 +1,12 @@
+# muesli 1.0.0
+API Stable
+
+## API relevant changes
+None.
+
+## Other changes
+* handle `NaN` in JSON: serialize to `null` / deserialize from `null`
+
 # muesli 0.2.0
 
 ## API relevant changes
