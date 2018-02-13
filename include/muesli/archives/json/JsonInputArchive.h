@@ -123,60 +123,67 @@ public:
         boolValue = value;
     }
 
-    void readValue(double& doubleValue) const
+    template <typename T>
+    std::enable_if_t<std::is_arithmetic<T>::value> readValue(T& value)
     {
         const Value* nextValue = getNextValue(true);
-        if (nextValue->IsDouble() || nextValue->IsInt()) {
-            doubleValue = nextValue->GetDouble();
+        if (!nextValue->IsNull()) {
+            readArithmeticValue(value, nextValue);
+        }
+        else {
+            value = std::numeric_limits<T>::signaling_NaN();
+        }
+    }
+
+    void readArithmeticValue(double& doubleValue, const Value* value) const
+    {
+        if (value->IsDouble() || value->IsInt()) {
+            doubleValue = value->GetDouble();
         } else {
             throw std::invalid_argument("Cannot read a Double.");
         }
     }
 
-    void readValue(float& floatValue) const
+    void readArithmeticValue(float& floatValue, const Value* value) const
     {
         double doubleValue;
-        readValue(doubleValue);
+        readArithmeticValue(doubleValue, value);
         floatValue = static_cast<float>(doubleValue);
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readValue(T& value) const
+    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readArithmeticValue(T& intValue, const Value* value) const
     {
-        const Value* nextValue = getNextValue(true);
-        if (nextValue->IsInt()) {
-            value = nextValue->GetInt();
+        if (value->IsInt()) {
+            intValue = value->GetInt();
         } else {
             throw std::invalid_argument("Cannot read an Int.");
         }
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(T& value) const
+    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(T& intValue, const Value* value) const
     {
-        const Value* nextValue = getNextValue(true);
-        if (nextValue->IsUint()) {
-            value = nextValue->GetUint();
+        if (value->IsUint()) {
+            intValue = value->GetUint();
         } else {
             throw std::invalid_argument("Cannot read an Uint.");
         }
     }
 
-    void readValue(std::int64_t& int64Value) const
+    void readArithmeticValue(std::int64_t& int64Value, const Value* value) const
     {
-        const Value* nextValue = getNextValue(true);
-        if (nextValue->IsInt64()) {
-            int64Value = nextValue->GetInt64();
+        if (value->IsInt64()) {
+            int64Value = value->GetInt64();
         } else {
             throw std::invalid_argument("Cannot read an Int64.");
         }
     }
 
-    void readValue(std::uint64_t& uint64Value) const
+    void readArithmeticValue(std::uint64_t& uint64Value, const Value* value) const
     {
-        const Value* nextValue = getNextValue(true);
-        if (nextValue->IsUint64()) {
-            uint64Value = nextValue->GetUint64();
+        if (value->IsUint64()) {
+            uint64Value = value->GetUint64();
         } else {
             throw std::invalid_argument("Cannot read an UInt64.");
         }

@@ -272,7 +272,7 @@ struct GetFullPolymorphicInstancesTypeList
         /* this function will never be called, it just forces instantation of the static object */ \
         static auto dummy()                                                                        \
         {                                                                                          \
-            assert(false);                                                                         \
+            assert(false); /* NOLINT */                                                            \
             using BasesVector = typename TypeListToMplVector<BaseHierarchyTypeList>::type;         \
             using InstanceTypeList =                                                               \
                     typename GetFullPolymorphicInstancesTypeList<T, BasesVector>::type;            \

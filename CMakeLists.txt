@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 
 ######## Project settings ########
-project(muesli-0.3.1)
-set(muesli_MAJOR_VERSION 0)
-set(muesli_MINOR_VERSION 3)
-set(muesli_PATCH_VERSION 1)
+project(muesli-1.0.0)
+set(muesli_MAJOR_VERSION 1)
+set(muesli_MINOR_VERSION 0)
+set(muesli_PATCH_VERSION 0)
 set(
     muesli_VERSION
     ${muesli_MAJOR_VERSION}.${muesli_MINOR_VERSION}.${muesli_PATCH_VERSION}
@@ -159,9 +159,6 @@ target_include_directories(
 target_link_libraries(muesli INTERFACE rapidjson::rapidjson)
 
 add_dependencies(muesli rapidjson::rapidjson)
-
-# defines GNU standard installation directories
-include(GNUInstallDirs)
 
 install(
     TARGETS muesli

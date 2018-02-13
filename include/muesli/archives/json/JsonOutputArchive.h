@@ -19,10 +19,12 @@
 #ifndef MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
 #define MUESLI_ARCHIVES_JSON_JSONOUTPUTARCHIVE_H_
 
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include <boost/lexical_cast.hpp>
@@ -74,34 +76,46 @@ public:
         writer.Bool(boolValue);
     }
 
-    void writeValue(const double& doubleValue)
+    template <typename T>
+    std::enable_if_t<std::is_arithmetic<T>::value> writeValue(const T& value)
+    {
+        if (!std::isnan(value)) {
+            writeArithmeticValue(value);
+        } else {
+            writer.Null();
+        }
+    }
+
+    void writeArithmeticValue(const double& doubleValue)
     {
         writer.Double(doubleValue);
     }
 
-    void writeValue(const float& floatValue)
+    void writeArithmeticValue(const float& floatValue)
     {
         writer.Double(floatValue);
     }
 
-    void writeValue(const std::int64_t& int64Value)
+    void writeArithmeticValue(const std::int64_t& int64Value)
     {
         writer.Int64(int64Value);
     }
 
-    void writeValue(const std::uint64_t& uint64Value)
+    void writeArithmeticValue(const std::uint64_t& uint64Value)
     {
         writer.Uint64(uint64Value);
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> writeValue(const T& value)
+    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> writeArithmeticValue(
+            const T& value)
     {
         writer.Int(value);
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> writeValue(const T& value)
+    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> writeArithmeticValue(
+            const T& value)
     {
         writer.Uint(value);
     }
