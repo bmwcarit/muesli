@@ -74,7 +74,9 @@ void compareValues(const float& expected, const float& actual)
 template <typename T>
 using JsonTest = ::testing::Test;
 
-using PrimitiveTypes = ::testing::Types<std::int8_t,
+using PrimitiveTypes = ::testing::Types<std::uint8_t,
+                                        std::int8_t,
+                                        std::uint32_t,
                                         std::int32_t,
                                         double,
                                         float,

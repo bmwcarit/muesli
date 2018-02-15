@@ -163,7 +163,7 @@ public:
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(
+    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readArithmeticValue(
             T& intValue,
             const Value* value) const
     {
