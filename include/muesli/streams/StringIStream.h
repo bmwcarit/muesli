@@ -91,8 +91,8 @@ public:
     BasicStringIStream(BasicStringIStream&&) = default;
     BasicStringIStream& operator=(BasicStringIStream&&) = default;
     ~BasicStringIStream() = default;
-private:
 
+private:
     void checkInputForNullCharTermination() const
     {
         assert(input[inputLength] == '\0');

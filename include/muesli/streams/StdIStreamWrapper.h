@@ -72,6 +72,7 @@ public:
     StdIStreamWrapper(StdIStreamWrapper&&) = default;
     StdIStreamWrapper& operator=(StdIStreamWrapper&&) = default;
     ~StdIStreamWrapper() = default;
+
 private:
     Stream& stream;
 };

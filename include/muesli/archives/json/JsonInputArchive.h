@@ -129,8 +129,7 @@ public:
         const Value* nextValue = getNextValue(true);
         if (!nextValue->IsNull()) {
             readArithmeticValue(value, nextValue);
-        }
-        else {
+        } else {
             value = std::numeric_limits<T>::signaling_NaN();
         }
     }
@@ -152,7 +151,9 @@ public:
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readArithmeticValue(T& intValue, const Value* value) const
+    std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> readArithmeticValue(
+            T& intValue,
+            const Value* value) const
     {
         if (value->IsInt()) {
             intValue = value->GetInt();
@@ -162,7 +163,9 @@ public:
     }
 
     template <typename T>
-    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(T& intValue, const Value* value) const
+    std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> readValue(
+            T& intValue,
+            const Value* value) const
     {
         if (value->IsUint()) {
             intValue = value->GetUint();
@@ -418,7 +421,8 @@ std::enable_if_t<json::detail::IsPrimitive<T>::value> outro(JsonInputArchive<Inp
 }
 
 template <typename InputStream, typename T>
-std::enable_if_t<json::detail::IsArray<T>::value> load(JsonInputArchive<InputStream>& archive, T& array)
+std::enable_if_t<json::detail::IsArray<T>::value> load(JsonInputArchive<InputStream>& archive,
+                                                       T& array)
 {
     using ValueType = typename T::value_type;
     if (archive.currentValueIsArray()) {

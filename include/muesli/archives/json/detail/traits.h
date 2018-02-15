@@ -68,7 +68,6 @@ struct IsArray<boost::multi_index_container<Ts...>> : std::true_type
 {
 };
 
-
 template <typename T>
 struct IsPrimitive
 {
