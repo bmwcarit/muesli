@@ -29,14 +29,16 @@ using namespace ::testing;
 template <typename Stream>
 using StringIStreamTest = ::testing::Test;
 
-struct RValueReferenceString {
+struct RValueReferenceString
+{
     static auto getStream(std::string str)
     {
         return muesli::StringIStream(std::move(str));
     }
 };
 
-struct LValueReferenceString {
+struct LValueReferenceString
+{
     static auto getStream(std::string str)
     {
         return muesli::StringIStream(str);

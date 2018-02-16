@@ -1,3 +1,11 @@
+# muesli 1.0.1
+
+## API relevant changes
+None.
+
+## Other changes
+* fix deserialization of unsigned integers introduced in 1.0.0
+
 # muesli 1.0.0
 API Stable
 

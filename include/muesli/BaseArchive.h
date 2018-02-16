@@ -45,13 +45,11 @@ public:
     }
 
 protected:
-
     explicit BaseArchive(Derived* self) : self(*self)
     {
     }
 
 private:
-
     template <typename T>
     static T& discardConstQualifier(const T& value)
     {
