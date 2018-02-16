@@ -63,6 +63,7 @@ public:
     StdOStreamWrapper(StdOStreamWrapper&&) = default;
     StdOStreamWrapper& operator=(StdOStreamWrapper&&) = default;
     ~StdOStreamWrapper() = default;
+
 private:
     Stream& stream;
 };

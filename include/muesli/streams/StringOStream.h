@@ -67,6 +67,7 @@ public:
     BasicStringOStream(BasicStringOStream&&) = default;
     BasicStringOStream& operator=(BasicStringOStream&&) = default;
     ~BasicStringOStream() = default;
+
 private:
     StringType buffer;
 };

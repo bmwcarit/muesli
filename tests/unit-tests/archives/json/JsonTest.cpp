@@ -43,16 +43,61 @@ using JsonInputArchiveImpl = muesli::JsonInputArchive<InputStreamImpl>;
 
 using TEnum = muesli::tests::testtypes::TEnum;
 
-template <typename T>
+template <typename T, typename Enable = void>
 struct TestParams
 {
-    std::vector<std::pair<T, T>> params = {
-            {std::numeric_limits<T>::min() - 1, std::numeric_limits<T>::max()},
-            {std::numeric_limits<T>::min(), std::numeric_limits<T>::min()},
-            {0, 0},
-            {std::numeric_limits<T>::max(), std::numeric_limits<T>::max()},
-            {std::numeric_limits<T>::max() + 1, std::numeric_limits<T>::min()},
-            {std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()}};
+    static std::vector<std::pair<T, T>> getParams()
+    {
+        return {{std::numeric_limits<T>::min() - 1, std::numeric_limits<T>::max()},
+                {std::numeric_limits<T>::min(), std::numeric_limits<T>::min()},
+                {0, 0},
+                {std::numeric_limits<T>::max(), std::numeric_limits<T>::max()},
+                {std::numeric_limits<T>::max() + 1, std::numeric_limits<T>::min()},
+                {std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()}};
+    }
+};
+
+template <typename T>
+struct TestParams<T, std::enable_if_t<std::is_floating_point<T>::value>>
+{
+    static std::vector<std::pair<T, T>> getParams()
+    {
+        return {{std::numeric_limits<T>::min(), std::numeric_limits<T>::min()},
+                {std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest()},
+                {T(0.0), T(0.0)},
+                {T(0.012345678901234567890123456789), T(0.012345678901234567890123456789)},
+                {T(1.25e-9), T(1.25e-9)},
+                {std::numeric_limits<T>::max(), std::numeric_limits<T>::max()},
+                {std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()}};
+    }
+};
+
+template <>
+struct TestParams<std::string>
+{
+    static std::vector<std::pair<std::string, std::string>> getParams()
+    {
+        return {{std::string(), std::string()},
+                {std::string("Hello World!"), std::string("Hello World!")}};
+    }
+};
+
+template <>
+struct TestParams<bool>
+{
+    static std::vector<std::pair<bool, bool>> getParams()
+    {
+        return {{true, true}, {false, false}};
+    }
+};
+
+template <>
+struct TestParams<TEnum::Enum>
+{
+    static std::vector<std::pair<TEnum::Enum, TEnum::Enum>> getParams()
+    {
+        return {{TEnum::TLITERALA, TEnum::TLITERALA}, {TEnum::TLITERALB, TEnum::TLITERALB}};
+    }
 };
 
 template <typename T>
@@ -72,119 +117,66 @@ void compareValues(const float& expected, const float& actual)
 }
 
 template <typename T>
+void compareValues(const std::vector<T>& expected, const std::vector<T>& actual)
+{
+    ASSERT_EQ(expected.size(), actual.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        compareValues(expected[i], actual[i]);
+    }
+}
+
+template <typename T>
 using JsonTest = ::testing::Test;
 
-using PrimitiveTypes = ::testing::Types<std::int8_t,
+using PrimitiveTypes = ::testing::Types<std::uint8_t,
+                                        std::int8_t,
+                                        std::uint32_t,
                                         std::int32_t,
+                                        std::uint64_t,
+                                        std::int64_t,
                                         double,
                                         float,
                                         bool,
                                         std::string,
-                                        std::vector<std::int32_t>,
-                                        std::vector<std::string>,
-                                        std::vector<TEnum::Enum>,
-                                        std::vector<bool>>;
+                                        TEnum::Enum>;
 
 TYPED_TEST_CASE(JsonTest, PrimitiveTypes);
 
-TYPED_TEST(JsonTest, serialize)
+template <typename T>
+void serializeDeserialize(const T& input, const T& expected)
+{
+    std::stringstream stream;
+    OutputStreamImpl outputStreamWrapper(stream);
+    JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
+    jsonOutputArchive(input);
+    std::cout << "JSON for value : " << stream.str() << std::endl;
+
+    InputStreamImpl inputStreamWrapper(stream);
+    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    T deserializedValue;
+    jsonInputArchive(deserializedValue);
+    compareValues(expected, deserializedValue);
+}
+
+TYPED_TEST(JsonTest, serializeScalars)
 {
     TestParams<TypeParam> testParams;
-    for (std::pair<TypeParam, TypeParam> param : testParams.params) {
-        TypeParam value;
-        value = param.first;
-
-        std::stringstream stream;
-        OutputStreamImpl outputStreamWrapper(stream);
-        JsonOutputArchiveImpl jsonOutputArchive(outputStreamWrapper);
-        jsonOutputArchive(value);
-        std::cout << "JSON for value : " << stream.str() << std::endl;
-
-        InputStreamImpl inputStreamWrapper(stream);
-        JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
-        TypeParam deserializedValue;
-        jsonInputArchive(deserializedValue);
-        compareValues(param.second, deserializedValue);
+    for (const auto& param : testParams.getParams()) {
+        serializeDeserialize(param.first, param.second);
     }
 }
 
-template <>
-struct TestParams<double>
+TYPED_TEST(JsonTest, serializeVectors)
 {
-    std::vector<std::pair<double, double>> params = {
-            {std::numeric_limits<double>::min(), std::numeric_limits<double>::min()},
-            {std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest()},
-            {0, 0},
-            {0.012345678901234567890123456789, 0.012345678901234567890123456789},
-            {1.25e-9, 1.25e-9},
-            {std::numeric_limits<double>::max(), std::numeric_limits<double>::max()},
-            {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()}};
-};
-
-template <>
-struct TestParams<float>
-{
-    std::vector<std::pair<float, float>> params = {
-            {std::numeric_limits<float>::min(), std::numeric_limits<float>::min()},
-            {std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest()},
-            {0.0f, 0.0f},
-            {0.012345678901234567890123456789f, 0.012345678901234567890123456789f},
-            {1.25e-9f, 1.25e-9f},
-            {std::numeric_limits<float>::max(), std::numeric_limits<float>::max()},
-            {std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()}};
-};
-
-template <>
-struct TestParams<std::string>
-{
-    std::vector<std::pair<std::string, std::string>> params = {
-            {std::string(), std::string()},
-            {std::string(""), std::string("")},
-            {std::string("Hello World!"), std::string("Hello World!")}};
-};
-
-template <>
-struct TestParams<std::vector<std::int32_t>>
-{
-    std::vector<std::pair<std::vector<std::int32_t>, std::vector<std::int32_t>>> params = {
-            {std::vector<std::int32_t>(), std::vector<std::int32_t>()},
-            {{0}, {0}},
-            {{0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}}};
-};
-
-template <>
-struct TestParams<std::vector<std::string>>
-{
-    std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> params = {
-            {std::vector<std::string>(), std::vector<std::string>()},
-            {{"Test String 1"}, {"Test String 1"}},
-            {{"", "Test String 1", "Test String 2"}, {"", "Test String 1", "Test String 2"}}};
-};
-
-template <>
-struct TestParams<std::vector<TEnum::Enum>>
-{
-    std::vector<std::pair<std::vector<TEnum::Enum>, std::vector<TEnum::Enum>>> params = {
-            {std::vector<TEnum::Enum>(), std::vector<TEnum::Enum>()},
-            {{TEnum::TLITERALA}, {TEnum::TLITERALA}},
-            {{TEnum::TLITERALA, TEnum::TLITERALB}, {TEnum::TLITERALA, TEnum::TLITERALB}}};
-};
-
-template <>
-struct TestParams<bool>
-{
-    std::vector<std::pair<bool, bool>> params = {{true, true}, {false, false}};
-};
-
-template <>
-struct TestParams<std::vector<bool>>
-{
-    std::vector<std::pair<std::vector<bool>, std::vector<bool>>> params = {
-            {{true, true}, {true, true}},
-            {{false, true}, {false, true}},
-            {{true, false}, {true, false}},
-            {{false, false}, {false, false}}};
-};
+    TestParams<TypeParam> testParams;
+    std::vector<TypeParam> inputVectorParam;
+    std::vector<TypeParam> expectedVectorParam;
+    for (const auto& param : testParams.getParams()) {
+        inputVectorParam.push_back(param.first);
+        expectedVectorParam.push_back(param.second);
+    }
+    serializeDeserialize(inputVectorParam, expectedVectorParam);
+}
 
 TEST(JsonTest, deserializeDoubleFromInteger)
 {
