@@ -150,20 +150,29 @@ struct RegisteredPolymorphicTypeSaveInstance
 };
 
 template <typename T, typename Base, typename InputArchive>
+std::unique_ptr<Base> loadFunction(InputArchive& archive) {
+    auto value = std::make_unique<T>();
+    archive(SkipIntroOutroWrapper<T>(value.get()));
+    return std::move(value);
+}
+
+template <typename T, typename Base, typename InputArchive>
 const typename ::muesli::TypeLoadRegistry<Base, InputArchive>::Inserter
 RegisteredPolymorphicTypeLoadInstance<T, Base, InputArchive>::instance(
         muesli::RegisteredType<T>::name(),
-        [](InputArchive& archive) -> std::unique_ptr<Base> {
-            auto value = std::make_unique<T>();
-            archive(SkipIntroOutroWrapper<T>(value.get()));
-            return std::move(value);
-        });
+        &loadFunction<T, Base, InputArchive>);
+
+
+template <typename T, typename Base, typename OutputArchive>
+void saveFunction(OutputArchive& archive, const Base* ptr) {
+    archive(*(static_cast<const T*>(ptr)));
+}
 
 template <typename T, typename Base, typename OutputArchive>
 const typename ::muesli::TypeSaveRegistry<Base, OutputArchive>::Inserter
 RegisteredPolymorphicTypeSaveInstance<T, Base, OutputArchive>::instance(
         typeid(T),
-        [](OutputArchive& archive, const Base* ptr) { archive(*(static_cast<const T*>(ptr))); });
+        &saveFunction<T, Base, OutputArchive>);
 
 template <typename T, typename List = TypeList<>, typename Enable = void>
 struct GetRegisteredBaseHierarchy
