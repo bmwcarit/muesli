@@ -39,12 +39,12 @@ class TupleTest : public testing::Test
 {
 public:
     TupleTest()
-            : testStruct(0.123456789, 64, "test string data"),
-              testEnumeration(muesli::tests::testtypes::TEnum::Enum::TLITERALA),
-              simpleTuple(1, "test"),
-              complexTuple(123, testEnumeration, testStruct, "teststring"),
-              serializedSimpleTuple("[1,\"test\"]"),
-              serializedComplexTuple(
+            : _testStruct(0.123456789, 64, "test string data"),
+              _testEnumeration(muesli::tests::testtypes::TEnum::Enum::TLITERALA),
+              _simpleTuple(1, "test"),
+              _complexTuple(123, _testEnumeration, _testStruct, "teststring"),
+              _serializedSimpleTuple("[1,\"test\"]"),
+              _serializedComplexTuple(
                       R"([)"
                       R"(123,)"
                       R"("TLITERALA",)"
@@ -57,17 +57,17 @@ public:
     }
 
 protected:
-    muesli::tests::testtypes::TStruct testStruct;
-    muesli::tests::testtypes::TEnum::Enum testEnumeration;
+    muesli::tests::testtypes::TStruct _testStruct;
+    muesli::tests::testtypes::TEnum::Enum _testEnumeration;
 
-    std::tuple<std::int32_t, std::string> simpleTuple;
+    std::tuple<std::int32_t, std::string> _simpleTuple;
     std::tuple<std::int32_t,
                muesli::tests::testtypes::TEnum::Enum,
                muesli::tests::testtypes::TStruct,
-               std::string> complexTuple;
+               std::string> _complexTuple;
 
-    std::string serializedSimpleTuple;
-    std::string serializedComplexTuple;
+    std::string _serializedSimpleTuple;
+    std::string _serializedComplexTuple;
 };
 
 TEST_F(TupleTest, writeSimpleTuple)
@@ -75,9 +75,9 @@ TEST_F(TupleTest, writeSimpleTuple)
     muesli::StringOStream stream;
     muesli::JsonOutputArchive<muesli::StringOStream> jsonOutputArchive(stream);
 
-    jsonOutputArchive(simpleTuple);
+    jsonOutputArchive(_simpleTuple);
 
-    ASSERT_EQ(serializedSimpleTuple, stream.getString());
+    ASSERT_EQ(_serializedSimpleTuple, stream.getString());
 }
 
 TEST_F(TupleTest, writeComplexTuple)
@@ -85,26 +85,26 @@ TEST_F(TupleTest, writeComplexTuple)
     muesli::StringOStream stream;
     muesli::JsonOutputArchive<muesli::StringOStream> jsonOutputArchive(stream);
 
-    jsonOutputArchive(complexTuple);
+    jsonOutputArchive(_complexTuple);
 
-    ASSERT_EQ(serializedComplexTuple, stream.getString());
+    ASSERT_EQ(_serializedComplexTuple, stream.getString());
 }
 
 TEST_F(TupleTest, readSimpleTuple)
 {
-    muesli::StringIStream stream(serializedSimpleTuple);
+    muesli::StringIStream stream(_serializedSimpleTuple);
     muesli::JsonInputArchive<muesli::StringIStream> jsonInputArchive(stream);
 
     std::tuple<std::int32_t, std::string> readTuple;
 
     jsonInputArchive(readTuple);
 
-    ASSERT_EQ(simpleTuple, readTuple);
+    ASSERT_EQ(_simpleTuple, readTuple);
 }
 
 TEST_F(TupleTest, readComplexTuple)
 {
-    muesli::StringIStream stream(serializedComplexTuple);
+    muesli::StringIStream stream(_serializedComplexTuple);
     muesli::JsonInputArchive<muesli::StringIStream> jsonInputArchive(stream);
 
     std::tuple<std::int32_t,
@@ -114,12 +114,12 @@ TEST_F(TupleTest, readComplexTuple)
 
     jsonInputArchive(readTuple);
 
-    ASSERT_EQ(complexTuple, readTuple);
+    ASSERT_EQ(_complexTuple, readTuple);
 }
 
 TEST_F(TupleTest, throwExceptionForInvalidTupleLength)
 {
-    muesli::StringIStream stream(serializedSimpleTuple);
+    muesli::StringIStream stream(_serializedSimpleTuple);
     muesli::JsonInputArchive<muesli::StringIStream> jsonInputArchive(stream);
 
     std::tuple<std::int32_t, std::string, std::int32_t> readTuple;

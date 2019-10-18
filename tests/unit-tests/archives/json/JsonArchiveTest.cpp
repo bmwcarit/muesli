@@ -68,18 +68,18 @@ class JsonArchiveTest : public ::testing::Test
 public:
     JsonArchiveTest()
             : Test(),
-              stream(),
-              outputStreamWrapper(stream),
-              jsonOutputArchive(outputStreamWrapper),
-              inputStreamWrapper(stream),
-              tStruct(0.123456789, 64, "test string data"),
-              tStructExtended(0.123456789,
-                              64,
-                              "test string data",
-                              muesli::tests::testtypes::TEnum::TLITERALB,
-                              32)
+              _stream(),
+              _outputStreamWrapper(_stream),
+              _jsonOutputArchive(_outputStreamWrapper),
+              _inputStreamWrapper(_stream),
+              _tStruct(0.123456789, 64, "test string data"),
+              _tStructExtended(0.123456789,
+                               64,
+                               "test string data",
+                               muesli::tests::testtypes::TEnum::TLITERALB,
+                               32)
     {
-        expectedSerializedStruct =
+        _expectedSerializedStruct =
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.TStruct",)"
                 R"("tDouble":0.123456789,)"
@@ -87,7 +87,7 @@ public:
                 R"("tString":"test string data")"
                 R"(})";
 
-        expectedSerializedStructExtended =
+        _expectedSerializedStructExtended =
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.TStructExtended",)"
                 R"("tDouble":0.123456789,)"
@@ -96,27 +96,28 @@ public:
                 R"("tEnum":"TLITERALB",)"
                 R"("tInt32":32)"
                 R"(})";
-        expectedSerializedNestedStruct =
+        _expectedSerializedNestedStruct =
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.NestedStruct",)"
-                R"("tStruct":)" +
-                expectedSerializedStruct +
+                R"("_tStruct":)" +
+                _expectedSerializedStruct +
                 R"(})";
-        expectedSerializedNestedExtendedStruct =
+        _expectedSerializedNestedExtendedStruct =
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.NestedStruct",)"
-                R"("tStruct":)" +
-                expectedSerializedStructExtended +
+                R"("_tStruct":)" +
+                _expectedSerializedStructExtended +
                 R"(})";
-        expectedSerializedNestedStructWithNullptr =
+        _expectedSerializedNestedStructWithNullptr =
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.NestedStruct")"
                 R"(})";
 
-        tStructVector = {muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data"),
-                         muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")};
+        _tStructVector = {
+                muesli::tests::testtypes::TStruct(0.123456789, 64, "test string data"),
+                muesli::tests::testtypes::TStruct(0.987654321, -64, "second test string")};
 
-        expectedSerializedStructVector =
+        _expectedSerializedStructVector =
                 R"([)"
                 R"({)"
                 R"("_typeName":"muesli.tests.testtypes.TStruct",)"
@@ -134,67 +135,67 @@ public:
     }
 
 protected:
-    std::stringstream stream;
-    OutputStreamImpl outputStreamWrapper;
-    JsonOutputArchiveImpl jsonOutputArchive;
-    InputStreamImpl inputStreamWrapper;
-    muesli::tests::testtypes::TStruct tStruct;
-    muesli::tests::testtypes::TStructExtended tStructExtended;
-    std::string expectedSerializedStruct;
-    std::string expectedSerializedStructExtended;
-    std::string expectedSerializedNestedStruct;
-    std::string expectedSerializedNestedExtendedStruct;
-    std::string expectedSerializedNestedStructWithNullptr;
-    std::vector<muesli::tests::testtypes::TStruct> tStructVector;
-    std::string expectedSerializedStructVector;
+    std::stringstream _stream;
+    OutputStreamImpl _outputStreamWrapper;
+    JsonOutputArchiveImpl _jsonOutputArchive;
+    InputStreamImpl _inputStreamWrapper;
+    muesli::tests::testtypes::TStruct _tStruct;
+    muesli::tests::testtypes::TStructExtended _tStructExtended;
+    std::string _expectedSerializedStruct;
+    std::string _expectedSerializedStructExtended;
+    std::string _expectedSerializedNestedStruct;
+    std::string _expectedSerializedNestedExtendedStruct;
+    std::string _expectedSerializedNestedStructWithNullptr;
+    std::vector<muesli::tests::testtypes::TStruct> _tStructVector;
+    std::string _expectedSerializedStructVector;
 };
 
 TEST_F(JsonArchiveTest, serializeStruct)
 {
-    jsonOutputArchive(tStruct);
-    EXPECT_EQ(expectedSerializedStruct, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(_tStruct);
+    EXPECT_EQ(_expectedSerializedStruct, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     muesli::tests::testtypes::TStruct tStructDeserialized;
     serialize(jsonInputArchive, tStructDeserialized);
-    EXPECT_EQ(tStruct, tStructDeserialized);
+    EXPECT_EQ(_tStruct, tStructDeserialized);
 }
 
 TEST_F(JsonArchiveTest, serializeStructExtended)
 {
-    jsonOutputArchive(tStructExtended);
-    EXPECT_EQ(expectedSerializedStructExtended, stream.str());
+    _jsonOutputArchive(_tStructExtended);
+    EXPECT_EQ(_expectedSerializedStructExtended, _stream.str());
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     muesli::tests::testtypes::TStructExtended tStructExtendedDeserialized;
     jsonInputArchive(tStructExtendedDeserialized);
-    EXPECT_EQ(tStructExtended, tStructExtendedDeserialized);
+    EXPECT_EQ(_tStructExtended, tStructExtendedDeserialized);
 }
 
 TEST_F(JsonArchiveTest, serializeNestedStruct)
 {
-    NestedStruct tNestedStruct = {tStruct};
-    jsonOutputArchive(tNestedStruct);
-    EXPECT_EQ(expectedSerializedNestedStruct, stream.str());
+    NestedStruct tNestedStruct = {_tStruct};
+    _jsonOutputArchive(tNestedStruct);
+    EXPECT_EQ(_expectedSerializedNestedStruct, _stream.str());
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     NestedStruct tStructDeserialized;
     jsonInputArchive(tStructDeserialized);
-    std::cout << stream.str() << std::endl;
+    std::cout << _stream.str() << std::endl;
     EXPECT_EQ(tNestedStruct, tStructDeserialized);
 }
 
 TEST_F(JsonArchiveTest, serializeVectorOfStruct)
 {
-    jsonOutputArchive(tStructVector);
-    EXPECT_EQ(expectedSerializedStructVector, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(_tStructVector);
+    EXPECT_EQ(_expectedSerializedStructVector, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     std::vector<muesli::tests::testtypes::TStruct> tStructsDeserialized;
     jsonInputArchive(tStructsDeserialized);
-    EXPECT_EQ(tStructVector, tStructsDeserialized);
+    EXPECT_EQ(_tStructVector, tStructsDeserialized);
 }
 
 TEST_F(JsonArchiveTest, serializeVectorOfEnums)
@@ -208,11 +209,11 @@ TEST_F(JsonArchiveTest, serializeVectorOfEnums)
             R"("TLITERALB")"
             R"(])");
 
-    jsonOutputArchive(tEnums);
-    EXPECT_EQ(expectedSerializedEnums, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(tEnums);
+    EXPECT_EQ(expectedSerializedEnums, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     std::vector<muesli::tests::testtypes::TEnum::Enum> tEnumsDeserialized;
     jsonInputArchive(tEnumsDeserialized);
     EXPECT_EQ(tEnums, tEnumsDeserialized);
@@ -228,11 +229,11 @@ TEST_F(JsonArchiveTest, serializeSetOfStrings)
             R"("string_b")"
             R"(])");
 
-    jsonOutputArchive(orderedStringSet);
-    EXPECT_EQ(expectedSerializedStringSet, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(orderedStringSet);
+    EXPECT_EQ(expectedSerializedStringSet, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     std::set<std::string> setOfStringDeserialized;
     jsonInputArchive(setOfStringDeserialized);
     EXPECT_EQ(orderedStringSet, setOfStringDeserialized);
@@ -242,10 +243,10 @@ TEST_F(JsonArchiveTest, serializeUnorderedSetOfStrings)
 {
     const std::unordered_set<std::string> unorderedStringSet = {"string_a", "string_b"};
 
-    jsonOutputArchive(unorderedStringSet);
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(unorderedStringSet);
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     std::unordered_set<std::string> unorderedSetOfStringDeserialized;
     jsonInputArchive(unorderedSetOfStringDeserialized);
     EXPECT_EQ(unorderedStringSet, unorderedSetOfStringDeserialized);
@@ -261,11 +262,11 @@ TEST_F(JsonArchiveTest, clearExistingVectorEntriesDuringDeserialization)
             R"([)"
             R"(])");
 
-    jsonOutputArchive(expectedVector);
-    EXPECT_EQ(expectedSerializedVector, stream.str());
+    _jsonOutputArchive(expectedVector);
+    EXPECT_EQ(expectedSerializedVector, _stream.str());
 
     EXPECT_NE(expectedVector, vectorDeserialized);
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     jsonInputArchive(vectorDeserialized);
     EXPECT_EQ(expectedVector, vectorDeserialized);
 }
@@ -314,11 +315,11 @@ TEST_F(JsonArchiveTest, serializeIntegerMap)
             R"("2":"StringValue2")"
             R"(})");
 
-    jsonOutputArchive(expectedMap);
-    EXPECT_EQ(expectedSerializedMap, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     TIntegerKeyMap mapDeserialized;
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
@@ -337,11 +338,11 @@ TEST_F(JsonArchiveTest, overrideExistingMapEntriesDuringDeserialization)
             R"("existingKey":"overriddenValue")"
             R"(})");
 
-    jsonOutputArchive(expectedMap);
-    EXPECT_EQ(expectedSerializedMap, stream.str());
+    _jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, _stream.str());
 
     EXPECT_NE(expectedMap, mapDeserialized);
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
 }
@@ -357,11 +358,11 @@ TEST_F(JsonArchiveTest, clearExistingMapEntriesDuringDeserialization)
             R"("_typeName":"TStringStringMap")"
             R"(})");
 
-    jsonOutputArchive(expectedMap);
-    EXPECT_EQ(expectedSerializedMap, stream.str());
+    _jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, _stream.str());
 
     EXPECT_NE(expectedMap, mapDeserialized);
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
 }
@@ -394,11 +395,11 @@ TEST_F(JsonArchiveTest, serializeStructMap)
             R"(})"
             R"(})");
 
-    jsonOutputArchive(expectedMap);
-    EXPECT_EQ(expectedSerializedMap, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     TStructMap mapDeserialized;
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
@@ -432,11 +433,11 @@ TEST_F(JsonArchiveTest, serializeEnumKeyMap)
             R"(})"
             R"(})");
 
-    jsonOutputArchive(expectedMap);
-    EXPECT_EQ(expectedSerializedMap, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     TEnumKeyMap mapDeserialized;
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
@@ -456,11 +457,11 @@ TEST_F(JsonArchiveTest, serializeEnumValueMap)
             R"("key1":"TLITERALB")"
             R"(})");
 
-    jsonOutputArchive(expectedMap);
-    EXPECT_EQ(expectedSerializedMap, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(expectedMap);
+    EXPECT_EQ(expectedSerializedMap, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     TEnumValueMap mapDeserialized;
     jsonInputArchive(mapDeserialized);
     EXPECT_EQ(expectedMap, mapDeserialized);
@@ -469,12 +470,12 @@ TEST_F(JsonArchiveTest, serializeEnumValueMap)
 TEST_F(JsonArchiveTest, polymorphismBase)
 {
     NestedStructPolymorphic tNestedStructPolymorphic = {
-            std::make_shared<muesli::tests::testtypes::TStruct>(tStruct)};
-    jsonOutputArchive(tNestedStructPolymorphic);
-    EXPECT_EQ(expectedSerializedNestedStruct, stream.str());
-    std::cout << stream.str() << std::endl;
+            std::make_shared<muesli::tests::testtypes::TStruct>(_tStruct)};
+    _jsonOutputArchive(tNestedStructPolymorphic);
+    EXPECT_EQ(_expectedSerializedNestedStruct, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
     jsonInputArchive(tNestedStructPolymorphicDeserialized);
     EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
@@ -483,11 +484,11 @@ TEST_F(JsonArchiveTest, polymorphismBase)
 TEST_F(JsonArchiveTest, polymorphismDerived)
 {
     NestedStructPolymorphic tNestedStructPolymorphic = {
-            std::make_shared<muesli::tests::testtypes::TStructExtended>(tStructExtended)};
-    jsonOutputArchive(tNestedStructPolymorphic);
-    EXPECT_EQ(expectedSerializedNestedExtendedStruct, stream.str());
+            std::make_shared<muesli::tests::testtypes::TStructExtended>(_tStructExtended)};
+    _jsonOutputArchive(tNestedStructPolymorphic);
+    EXPECT_EQ(_expectedSerializedNestedExtendedStruct, _stream.str());
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
     jsonInputArchive(tNestedStructPolymorphicDeserialized);
     EXPECT_EQ(tNestedStructPolymorphic, tNestedStructPolymorphicDeserialized);
@@ -496,10 +497,10 @@ TEST_F(JsonArchiveTest, polymorphismDerived)
 TEST_F(JsonArchiveTest, nullptrSerializationPolymorphism)
 {
     NestedStructPolymorphic tNestedStructPolymorphicWithNullptr = {nullptr};
-    jsonOutputArchive(tNestedStructPolymorphicWithNullptr);
-    EXPECT_EQ(expectedSerializedNestedStructWithNullptr, stream.str());
+    _jsonOutputArchive(tNestedStructPolymorphicWithNullptr);
+    EXPECT_EQ(_expectedSerializedNestedStructWithNullptr, _stream.str());
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     NestedStructPolymorphic tNestedStructPolymorphicDeserialized;
     jsonInputArchive(tNestedStructPolymorphicDeserialized);
     EXPECT_EQ(tNestedStructPolymorphicWithNullptr, tNestedStructPolymorphicDeserialized);
@@ -540,7 +541,7 @@ TEST_F(JsonArchiveTest, pushPopState)
 {
     StateHistoryTestStruct expectedStateHistoryStruct;
     expectedStateHistoryStruct.stringBeforStruct = "test string data before struct";
-    expectedStateHistoryStruct.tstruct = tStruct;
+    expectedStateHistoryStruct.tstruct = _tStruct;
     expectedStateHistoryStruct.stringAfterStruct = "test string data after struct";
 
     std::string expectedSerializedStateHistoryStruct(
@@ -548,16 +549,16 @@ TEST_F(JsonArchiveTest, pushPopState)
             R"("_typeName":"StateHistoryTestStruct",)"
             R"("stringBeforStruct":"test string data before struct",)"
             R"("tstruct":)" +
-            expectedSerializedStruct +
+            _expectedSerializedStruct +
             R"(,)"
             R"("stringAfterStruct":"test string data after struct")"
             R"(})");
 
-    jsonOutputArchive(expectedStateHistoryStruct);
-    EXPECT_EQ(expectedSerializedStateHistoryStruct, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(expectedStateHistoryStruct);
+    EXPECT_EQ(expectedSerializedStateHistoryStruct, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     StateHistoryTestStruct stateHistoryStructDeserialized;
     jsonInputArchive(stateHistoryStructDeserialized);
     EXPECT_EQ(expectedStateHistoryStruct.stringBeforStruct,
@@ -573,8 +574,8 @@ TEST_F(JsonArchiveTest, pushPopState)
 
 TEST_F(JsonArchiveTest, invalidJsonCausesParseException)
 {
-    stream.str("}invalid-json{");
-    EXPECT_THROW(JsonInputArchiveImpl{inputStreamWrapper}, muesli::exceptions::ParseException);
+    _stream.str("}invalid-json{");
+    EXPECT_THROW(JsonInputArchiveImpl{_inputStreamWrapper}, muesli::exceptions::ParseException);
 }
 
 TEST_F(JsonArchiveTest, deserializeThrowsOnMissingField)
@@ -586,8 +587,8 @@ TEST_F(JsonArchiveTest, deserializeThrowsOnMissingField)
             R"("tInt64":64,)"
             R"("tString":"test string data")"
             R"(})";
-    stream.str(expectedSerializedStruct);
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    _stream.str(expectedSerializedStruct);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     muesli::tests::testtypes::TStruct tStructDeserialized;
     EXPECT_THROW(serialize(jsonInputArchive, tStructDeserialized),
                  muesli::exceptions::ValueNotFoundException);
@@ -610,15 +611,15 @@ TEST_F(JsonArchiveTest, serializeDeserializeBoostMultiIndexContainer)
 {
     TStructMultiIndexContainer multiIndexContainer;
 
-    std::copy(tStructVector.begin(),
-              tStructVector.end(),
+    std::copy(_tStructVector.begin(),
+              _tStructVector.end(),
               std::inserter(multiIndexContainer, multiIndexContainer.begin()));
 
-    jsonOutputArchive(multiIndexContainer);
-    EXPECT_EQ(expectedSerializedStructVector, stream.str());
-    std::cout << stream.str() << std::endl;
+    _jsonOutputArchive(multiIndexContainer);
+    EXPECT_EQ(_expectedSerializedStructVector, _stream.str());
+    std::cout << _stream.str() << std::endl;
 
-    JsonInputArchiveImpl jsonInputArchive(inputStreamWrapper);
+    JsonInputArchiveImpl jsonInputArchive(_inputStreamWrapper);
     TStructMultiIndexContainer multiIndexContainerDeserialized;
     jsonInputArchive(multiIndexContainerDeserialized);
     EXPECT_EQ(multiIndexContainer, multiIndexContainerDeserialized);

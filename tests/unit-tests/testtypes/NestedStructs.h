@@ -52,37 +52,37 @@ namespace testtypes
 
 struct NestedStruct
 {
-    muesli::tests::testtypes::TStruct tStruct;
+    muesli::tests::testtypes::TStruct _tStruct;
 
     template <typename Archive>
     void serialize(Archive& archive)
     {
-        archive(muesli::make_nvp("tStruct", tStruct));
+        archive(muesli::make_nvp("_tStruct", _tStruct));
     }
 
     bool operator==(const NestedStruct& other) const
     {
-        return tStruct == other.tStruct;
+        return _tStruct == other._tStruct;
     }
 };
 
 struct NestedStructPolymorphic
 {
-    std::shared_ptr<muesli::tests::testtypes::TStruct> tStruct;
+    std::shared_ptr<muesli::tests::testtypes::TStruct> _tStruct;
 
     template <typename Archive>
     void serialize(Archive& archive)
     {
-        archive(muesli::make_nvp("tStruct", tStruct));
+        archive(muesli::make_nvp("_tStruct", _tStruct));
     }
 
     bool operator==(const NestedStructPolymorphic& other) const
     {
         // value comparison
-        if (tStruct != nullptr && other.tStruct != nullptr) {
-            return *tStruct == *(other.tStruct);
+        if (_tStruct != nullptr && other._tStruct != nullptr) {
+            return *_tStruct == *(other._tStruct);
         }
-        return tStruct == nullptr && other.tStruct == nullptr;
+        return _tStruct == nullptr && other._tStruct == nullptr;
     }
 };
 
@@ -110,34 +110,34 @@ void copy(boost::optional<T>& ptr, const T& value)
 template <typename TypeInContainer>
 struct NestedNullableContainerStruct
 {
-    TypeInContainer tStructOptional; // Can also be missing
-    muesli::tests::testtypes::TStruct tStruct;
+    TypeInContainer _tStructOptional; // Can also be missing
+    muesli::tests::testtypes::TStruct _tStruct;
 
     NestedNullableContainerStruct()
-            : tStructOptional(), tStruct(0.123456789, 64, "test string data")
+            : _tStructOptional(), _tStruct(0.123456789, 64, "test string data")
     {
     }
 
     void copyToOptional()
     {
-        copy(tStructOptional, tStruct);
+        copy(_tStructOptional, _tStruct);
     }
 
     template <typename Archive>
     void serialize(Archive& archive)
     {
-        archive(muesli::make_nvp("tStructOptional", tStructOptional),
-                muesli::make_nvp("tStruct", tStruct));
+        archive(muesli::make_nvp("tStructOptional", _tStructOptional),
+                muesli::make_nvp("_tStruct", _tStruct));
     }
 
     bool operator==(const NestedNullableContainerStruct<TypeInContainer>& other) const
     {
         // value comparison
-        if (tStruct == other.tStruct) {
-            if (tStructOptional && other.tStructOptional) {
-                return *tStructOptional == *(other.tStructOptional);
+        if (_tStruct == other._tStruct) {
+            if (_tStructOptional && other._tStructOptional) {
+                return *_tStructOptional == *(other._tStructOptional);
             } else {
-                return (!tStructOptional && !other.tStructOptional);
+                return (!_tStructOptional && !other._tStructOptional);
             }
         }
         return false;

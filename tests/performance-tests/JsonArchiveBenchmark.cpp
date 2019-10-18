@@ -19,7 +19,7 @@
 
 #include <sstream>
 
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 
 #include "muesli/archives/json/JsonInputArchive.h"
 #include "muesli/archives/json/JsonOutputArchive.h"

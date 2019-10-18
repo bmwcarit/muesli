@@ -62,7 +62,7 @@ public:
 
     // default constructor
     /** @brief Constructor */
-    TStructExtended() : TStruct(), tEnum(/* should have enum default value here */), tInt32(-1)
+    TStructExtended() : TStruct(), _tEnum(/* should have enum default value here */), _tInt32(-1)
     {
     }
 
@@ -75,7 +75,7 @@ public:
                              const std::string& tString,
                              const muesli::tests::testtypes::TEnum::Enum& tEnum,
                              const std::int32_t& tInt32)
-            : TStruct(tDouble, tInt64, tString), tEnum(tEnum), tInt32(tInt32)
+            : TStruct(tDouble, tInt64, tString), _tEnum(tEnum), _tInt32(tInt32)
     {
     }
 
@@ -124,7 +124,7 @@ public:
      */
     inline const muesli::tests::testtypes::TEnum::Enum& getTEnum() const
     {
-        return tEnum;
+        return _tEnum;
     }
     /**
      * @brief Gets TInt32
@@ -132,7 +132,7 @@ public:
      */
     inline const std::int32_t& getTInt32() const
     {
-        return tInt32;
+        return _tInt32;
     }
 
     // setters
@@ -141,14 +141,14 @@ public:
      */
     inline void setTEnum(const muesli::tests::testtypes::TEnum::Enum& tEnum)
     {
-        this->tEnum = tEnum;
+        this->_tEnum = tEnum;
     }
     /**
      * @brief Sets TInt32
      */
     inline void setTInt32(const std::int32_t& tInt32)
     {
-        this->tInt32 = tInt32;
+        this->_tInt32 = tInt32;
     }
 
 protected:
@@ -168,7 +168,7 @@ protected:
     bool equals(const TStruct& other) const override
     {
         const TStructExtended& otherDerived = static_cast<const TStructExtended&>(other);
-        return this->tEnum == otherDerived.tEnum && this->tInt32 == otherDerived.tInt32 &&
+        return this->_tEnum == otherDerived._tEnum && this->_tInt32 == otherDerived._tInt32 &&
                TStruct::equals(other);
     }
 
@@ -178,12 +178,12 @@ private:
     friend void serialize(Archive& archive, TStructExtended& tStructExtended);
 
     // members
-    muesli::tests::testtypes::TEnum::Enum tEnum;
+    muesli::tests::testtypes::TEnum::Enum _tEnum;
     std::string getTEnumInternal() const
     {
-        return muesli::tests::testtypes::TEnum::getLiteral(this->tEnum);
+        return muesli::tests::testtypes::TEnum::getLiteral(this->_tEnum);
     }
-    std::int32_t tInt32;
+    std::int32_t _tInt32;
 };
 
 // printing TStructExtended with google-test and google-mock
@@ -197,8 +197,8 @@ template <typename Archive>
 void serialize(Archive& archive, TStructExtended& tStructExtended)
 {
     archive(muesli::BaseClass<TStruct>(&tStructExtended),
-            muesli::make_nvp("tEnum", tStructExtended.tEnum),
-            muesli::make_nvp("tInt32", tStructExtended.tInt32));
+            muesli::make_nvp("tEnum", tStructExtended._tEnum),
+            muesli::make_nvp("tInt32", tStructExtended._tInt32));
 }
 
 std::size_t hash_value(const TStructExtended& tStructExtendedValue);

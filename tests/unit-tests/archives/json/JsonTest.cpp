@@ -35,6 +35,8 @@
 
 #include "testtypes/TEnum.h"
 
+#pragma GCC diagnostic ignored "-Woverflow"
+
 using OutputStreamImpl = muesli::StdOStreamWrapper<std::ostream>;
 using InputStreamImpl = muesli::StdIStreamWrapper<std::istream>;
 

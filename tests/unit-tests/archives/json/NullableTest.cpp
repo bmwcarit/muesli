@@ -50,34 +50,34 @@ class NullablePtrHandling : public ::testing::Test
 public:
     NullablePtrHandling()
             : Test(),
-              expectedDeserializedStruct(),
-              stream(),
-              outputStreamWrapper(),
-              jsonOutputArchive(),
-              inputStreamWrapper(),
-              jsonInputArchive(),
-              expectedSerializedStruct(),
-              expectedDeserialization()
+              _expectedDeserializedStruct(),
+              _stream(),
+              _outputStreamWrapper(),
+              _jsonOutputArchive(),
+              _inputStreamWrapper(),
+              _jsonInputArchive(),
+              _expectedSerializedStruct(),
+              _expectedDeserialization()
     {
     }
 
     void InitStreams()
     {
-        outputStreamWrapper = std::make_shared<OutputStreamImpl>(stream);
-        jsonOutputArchive = std::make_shared<JsonOutputArchiveImpl>(*outputStreamWrapper);
-        inputStreamWrapper = std::make_shared<InputStreamImpl>(stream);
-        jsonInputArchive = std::make_shared<JsonInputArchiveImpl>(*inputStreamWrapper);
+        _outputStreamWrapper = std::make_shared<OutputStreamImpl>(_stream);
+        _jsonOutputArchive = std::make_shared<JsonOutputArchiveImpl>(*_outputStreamWrapper);
+        _inputStreamWrapper = std::make_shared<InputStreamImpl>(_stream);
+        _jsonInputArchive = std::make_shared<JsonInputArchiveImpl>(*_inputStreamWrapper);
     }
 
 protected:
-    T expectedDeserializedStruct;
-    std::stringstream stream;
-    std::shared_ptr<OutputStreamImpl> outputStreamWrapper;
-    std::shared_ptr<JsonOutputArchiveImpl> jsonOutputArchive;
-    std::shared_ptr<InputStreamImpl> inputStreamWrapper;
-    std::shared_ptr<JsonInputArchiveImpl> jsonInputArchive;
-    std::string expectedSerializedStruct;
-    std::string expectedDeserialization;
+    T _expectedDeserializedStruct;
+    std::stringstream _stream;
+    std::shared_ptr<OutputStreamImpl> _outputStreamWrapper;
+    std::shared_ptr<JsonOutputArchiveImpl> _jsonOutputArchive;
+    std::shared_ptr<InputStreamImpl> _inputStreamWrapper;
+    std::shared_ptr<JsonInputArchiveImpl> _jsonInputArchive;
+    std::string _expectedSerializedStruct;
+    std::string _expectedDeserialization;
 };
 
 using NullableTypesToTest =
@@ -90,18 +90,18 @@ TYPED_TEST(NullablePtrHandling, AllowNullableToBeMissing)
     const std::string canBeDeserializedtStruct(
             R"({)"
             R"("_typeName":"muesli.tests.testtypes.NestedPtrStruct",)"
-            R"("tStruct":{)"
+            R"("_tStruct":{)"
             R"("_typeName":"muesli.tests.testtypes.TStruct",)"
             R"("tDouble":0.123456789,)"
             R"("tInt64":64,)"
             R"("tString":"test string data")"
             R"(})"
             R"(})");
-    this->stream << canBeDeserializedtStruct;
+    this->_stream << canBeDeserializedtStruct;
     this->InitStreams();
     TypeParam temp;
-    this->jsonInputArchive->operator()(temp);
-    EXPECT_EQ(temp, this->expectedDeserializedStruct);
+    this->_jsonInputArchive->operator()(temp);
+    EXPECT_EQ(temp, this->_expectedDeserializedStruct);
 }
 
 TYPED_TEST(NullablePtrHandling, AllowNullableToBeNull)
@@ -109,7 +109,7 @@ TYPED_TEST(NullablePtrHandling, AllowNullableToBeNull)
     const std::string canBeDeserializedtStruct(
             R"({)"
             R"("_typeName":"muesli.tests.testtypes.NestedPtrStruct",)"
-            R"("tStruct":{)"
+            R"("_tStruct":{)"
             R"("_typeName":"muesli.tests.testtypes.TStruct",)"
             R"("tDouble":0.123456789,)"
             R"("tInt64":64,)"
@@ -117,11 +117,11 @@ TYPED_TEST(NullablePtrHandling, AllowNullableToBeNull)
             R"(},)"
             R"("tStructOptional":null)"
             R"(})");
-    this->stream << canBeDeserializedtStruct;
+    this->_stream << canBeDeserializedtStruct;
     this->InitStreams();
     TypeParam temp;
-    this->jsonInputArchive->operator()(temp);
-    EXPECT_EQ(temp, this->expectedDeserializedStruct);
+    this->_jsonInputArchive->operator()(temp);
+    EXPECT_EQ(temp, this->_expectedDeserializedStruct);
 }
 
 TYPED_TEST(NullablePtrHandling, AllowNullableToHaveAValue)
@@ -129,7 +129,7 @@ TYPED_TEST(NullablePtrHandling, AllowNullableToHaveAValue)
     const std::string canBeDeserializedtStruct(
             R"({)"
             R"("_typeName":"muesli.tests.testtypes.NestedPtrStruct",)"
-            R"("tStruct":{)"
+            R"("_tStruct":{)"
             R"("_typeName":"muesli.tests.testtypes.TStruct",)"
             R"("tDouble":0.123456789,)"
             R"("tInt64":64,)"
@@ -142,12 +142,12 @@ TYPED_TEST(NullablePtrHandling, AllowNullableToHaveAValue)
             R"("tString":"test string data")"
             R"(})"
             R"(})");
-    this->stream << canBeDeserializedtStruct;
+    this->_stream << canBeDeserializedtStruct;
     this->InitStreams();
     TypeParam temp;
-    this->jsonInputArchive->operator()(temp);
-    this->expectedDeserializedStruct.copyToOptional();
-    EXPECT_EQ(temp, this->expectedDeserializedStruct);
+    this->_jsonInputArchive->operator()(temp);
+    this->_expectedDeserializedStruct.copyToOptional();
+    EXPECT_EQ(temp, this->_expectedDeserializedStruct);
 }
 
 TEST(NullableHandling, ExpectThrowOnNonNullableObjectIfMissing)
@@ -170,7 +170,7 @@ TEST(NullableHandling, serializeBoostOptional)
     const std::string expectedSerializedtStruct(
             R"({)"
             R"("_typeName":"muesli.tests.testtypes.NestedBoostOptionalStruct",)"
-            R"("tStruct":{)"
+            R"("_tStruct":{)"
             R"("_typeName":"muesli.tests.testtypes.TStruct",)"
             R"("tDouble":0.123456789,)"
             R"("tInt64":64,)"

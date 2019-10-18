@@ -37,6 +37,7 @@
 #define MUESLI_TESTS_UNIT_TESTS_TESTTYPES_TSTRUCT_H_
 
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <string>
 #include <typeinfo>
@@ -74,7 +75,7 @@ public:
 
     // default constructor
     /** @brief Constructor */
-    TStruct() : tDouble(-1), tInt64(-1), tString("")
+    TStruct() : _tDouble(-1), _tInt64(-1), _tString("")
     {
     }
 
@@ -83,7 +84,7 @@ public:
      * @brief Parameterized constructor
      */
     explicit TStruct(const double& tDouble, const std::int64_t& tInt64, const std::string& tString)
-            : tDouble(tDouble), tInt64(tInt64), tString(tString)
+            : _tDouble(tDouble), _tInt64(tInt64), _tString(tString)
     {
     }
 
@@ -138,7 +139,7 @@ public:
      */
     inline const double& getTDouble() const
     {
-        return tDouble;
+        return _tDouble;
     }
     /**
      * @brief Gets TInt64
@@ -146,7 +147,7 @@ public:
      */
     inline const std::int64_t& getTInt64() const
     {
-        return tInt64;
+        return _tInt64;
     }
     /**
      * @brief Gets TString
@@ -154,7 +155,7 @@ public:
      */
     inline const std::string& getTString() const
     {
-        return tString;
+        return _tString;
     }
 
     // setters
@@ -163,21 +164,21 @@ public:
      */
     inline void setTDouble(const double& tDouble)
     {
-        this->tDouble = tDouble;
+        this->_tDouble = tDouble;
     }
     /**
      * @brief Sets TInt64
      */
     inline void setTInt64(const std::int64_t& tInt64)
     {
-        this->tInt64 = tInt64;
+        this->_tInt64 = tInt64;
     }
     /**
      * @brief Sets TString
      */
     inline void setTString(const std::string& tString)
     {
-        this->tString = tString;
+        this->_tString = tString;
     }
 
     std::string toString() const
@@ -201,8 +202,9 @@ protected:
      */
     virtual bool equals(const TStruct& other) const
     {
-        return this->tDouble == other.tDouble && this->tInt64 == other.tInt64 &&
-               this->tString == other.tString;
+        return std::equal_to<double>()(this->_tDouble, other._tDouble) &&
+               std::equal_to<std::int64_t>()(this->_tInt64, other._tInt64) &&
+               std::equal_to<std::string>()(this->_tString, other._tString);
     }
 
     // printing TStruct with google-test and google-mock
@@ -219,9 +221,9 @@ private:
     friend void serialize(Archive& archive, TStruct& tStruct);
 
     // members
-    double tDouble;
-    std::int64_t tInt64;
-    std::string tString;
+    double _tDouble;
+    std::int64_t _tInt64;
+    std::string _tString;
 };
 
 // printing TStruct with google-test and google-mock
@@ -234,9 +236,9 @@ inline void PrintTo(const TStruct& tStruct, ::std::ostream* os)
 template <typename Archive>
 void serialize(Archive& archive, TStruct& tStruct)
 {
-    archive(muesli::make_nvp("tDouble", tStruct.tDouble),
-            muesli::make_nvp("tInt64", tStruct.tInt64),
-            muesli::make_nvp("tString", tStruct.tString));
+    archive(muesli::make_nvp("tDouble", tStruct._tDouble),
+            muesli::make_nvp("tInt64", tStruct._tInt64),
+            muesli::make_nvp("tString", tStruct._tString));
 }
 
 } // namespace testtypes
