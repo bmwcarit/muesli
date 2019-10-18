@@ -20,6 +20,7 @@
 #ifndef MUESLI_STREAMS_STDISTREAMWRAPPER_H_
 #define MUESLI_STREAMS_STDISTREAMWRAPPER_H_
 
+#include <cstdint>
 #include <iosfwd>
 
 #include "muesli/StreamRegistry.h"
@@ -37,28 +38,28 @@ class StdIStreamWrapper
 public:
     using Char = typename Stream::char_type;
 
-    explicit StdIStreamWrapper(Stream& stream) : stream(stream)
+    explicit StdIStreamWrapper(Stream& stream) : _stream(stream)
     {
     }
 
     Char get()
     {
-        return stream.get();
+        return _stream.get();
     }
 
     void get(Char* s, std::size_t size)
     {
-        stream.get(s, size);
+        _stream.get(s, static_cast<std::int64_t>(size));
     }
 
     std::size_t tell() const
     {
-        return stream.tellg();
+        return static_cast<std::size_t>(_stream.tellg());
     }
 
     Char peek() const
     {
-        typename Stream::int_type res = stream.peek();
+        typename Stream::int_type res = _stream.peek();
         if (res != Stream::traits_type::eof()) {
             return static_cast<Char>(res);
         }
@@ -74,7 +75,7 @@ public:
     ~StdIStreamWrapper() = default;
 
 private:
-    Stream& stream;
+    Stream& _stream;
 };
 } // namespace muesli
 

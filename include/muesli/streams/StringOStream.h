@@ -32,9 +32,9 @@ class BasicStringOStream
 public:
     using Char = typename StringType::value_type;
 
-    explicit BasicStringOStream(std::size_t initialSize = 4096) : buffer()
+    explicit BasicStringOStream(std::size_t initialSize = 4096) : _buffer()
     {
-        buffer.reserve(initialSize);
+        _buffer.reserve(initialSize);
     }
 
     void put(Char c)
@@ -42,12 +42,12 @@ public:
         // If the string implementation uses an exponential growth strategy
         // (most std::basic_string implementations do), this operation is
         // fast enough.
-        buffer += c;
+        _buffer += c;
     }
 
     void write(const Char* s, std::size_t size)
     {
-        buffer.append(s, size);
+        _buffer.append(s, size);
     }
 
     void flush()
@@ -57,7 +57,7 @@ public:
 
     const std::string& getString() const
     {
-        return buffer;
+        return _buffer;
     }
 
     // non-copyable
@@ -69,7 +69,7 @@ public:
     ~BasicStringOStream() = default;
 
 private:
-    StringType buffer;
+    StringType _buffer;
 };
 
 using StringOStream = BasicStringOStream<std::string>;

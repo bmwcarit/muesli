@@ -35,20 +35,20 @@ struct OutputStream
     BOOST_CONCEPT_USAGE(OutputStream)
     {
         // insert a single character `c` into `stream`
-        stream.put(c);
+        _stream.put(_c);
 
         // insert `size` characters pointed to by `s` into `stream`
-        stream.write(s, size);
+        _stream.write(_s, _size);
 
-        stream.flush();
+        _stream.flush();
     }
 
 private:
-    Stream stream;
-    Char c;
+    Stream _stream;
+    Char _c;
 
-    const Char* s;
-    std::size_t size;
+    const Char* _s;
+    std::size_t _size;
 };
 
 } // namespace concepts

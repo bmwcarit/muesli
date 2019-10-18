@@ -34,22 +34,22 @@ class RapidJsonOutputStreamAdapter
 public:
     using Ch = typename OutputStream::Char;
 
-    explicit RapidJsonOutputStreamAdapter(OutputStream& outputStream) : outputStream(outputStream)
+    explicit RapidJsonOutputStreamAdapter(OutputStream& outputStream) : _outputStream(outputStream)
     {
     }
 
     void Flush()
     {
-        outputStream.flush();
+        _outputStream.flush();
     }
 
     void Put(Ch c)
     {
-        outputStream.put(c);
+        _outputStream.put(c);
     }
 
 private:
-    OutputStream& outputStream;
+    OutputStream& _outputStream;
 };
 
 } // namespace detail

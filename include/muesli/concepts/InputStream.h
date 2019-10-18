@@ -36,22 +36,22 @@ struct InputStream
     BOOST_CONCEPT_USAGE(InputStream)
     {
         // extract single character from stream
-        c = stream.get();
+        _c = _stream.get();
 
         // extract `size` characters from stream
-        stream.get(s, size);
+        _stream.get(_s, _size);
 
-        c = stream.peek();
+        _c = _stream.peek();
 
-        pos = stream.tell();
+        _pos = _stream.tell();
     }
 
 private:
-    Stream stream;
-    Char* s;
-    Char c;
-    std::size_t size;
-    std::size_t pos;
+    Stream _stream;
+    Char* _s;
+    Char _c;
+    std::size_t _size;
+    std::size_t _pos;
 };
 
 } // namespace concepts

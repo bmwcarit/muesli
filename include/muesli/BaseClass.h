@@ -32,13 +32,13 @@ struct BaseClass
 {
     template <typename Derived>
     explicit BaseClass(const Derived* derived)
-            : wrapped(const_cast<Base*>(static_cast<const Base*>(derived)))
+            : _wrapped(const_cast<Base*>(static_cast<const Base*>(derived)))
     {
         static_assert(
                 std::is_base_of<Base, Derived>::value, "Base must be a base class of Derived");
     }
 
-    Base* wrapped;
+    Base* _wrapped;
 };
 
 } // namespace muesli

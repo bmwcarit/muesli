@@ -36,13 +36,13 @@ public:
     using Char = typename StringType::value_type;
 
     explicit BasicStringIStream(const StringType& input)
-            : currentCharIndex(0), inputLength(input.length()), input(input)
+            : _currentCharIndex(0), _inputLength(input.length()), _input(input)
     {
         checkInputForNullCharTermination();
     }
 
     explicit BasicStringIStream(StringType&& input)
-            : currentCharIndex(0), inputLength(input.length()), input(std::move(input))
+            : _currentCharIndex(0), _inputLength(input.length()), _input(std::move(input))
     {
         checkInputForNullCharTermination();
     }
@@ -51,14 +51,14 @@ public:
     {
         // No bound check because we assume that the string implementation returns
         // \0 for length + 1
-        return input[currentCharIndex];
+        return _input[_currentCharIndex];
     }
 
     Char get()
     {
         // No bound check because we assume that the string implementation returns
         // \0 for length + 1
-        return input[currentCharIndex++];
+        return _input[_currentCharIndex++];
     }
 
     void get(Char* destination, std::size_t destinationSize)
@@ -68,11 +68,11 @@ public:
         }
 
         std::size_t copyableCharacterCount =
-                std::min(destinationSize, inputLength - currentCharIndex);
+                std::min(destinationSize, _inputLength - _currentCharIndex);
 
-        input.copy(destination, copyableCharacterCount, currentCharIndex);
+        _input.copy(destination, copyableCharacterCount, _currentCharIndex);
 
-        currentCharIndex += copyableCharacterCount;
+        _currentCharIndex += copyableCharacterCount;
 
         if (copyableCharacterCount < destinationSize) {
             destination[copyableCharacterCount] = '\0';
@@ -81,7 +81,7 @@ public:
 
     std::size_t tell() const
     {
-        return currentCharIndex;
+        return _currentCharIndex;
     }
 
     // non-copyable
@@ -95,13 +95,13 @@ public:
 private:
     void checkInputForNullCharTermination() const
     {
-        assert(input[inputLength] == '\0');
+        assert(_input[_inputLength] == '\0');
     }
 
-    std::size_t currentCharIndex;
-    const std::size_t inputLength;
+    std::size_t _currentCharIndex;
+    const std::size_t _inputLength;
 
-    const StringType input;
+    const StringType _input;
 };
 
 using StringIStream = BasicStringIStream<std::string>;

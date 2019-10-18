@@ -36,23 +36,23 @@ class RapidJsonInputStreamAdapter
 public:
     using Ch = typename InputStream::Char;
 
-    explicit RapidJsonInputStreamAdapter(InputStream& inputStream) : inputStream(inputStream)
+    explicit RapidJsonInputStreamAdapter(InputStream& inputStream) : _inputStream(inputStream)
     {
     }
 
     Ch Peek() const
     {
-        return inputStream.peek();
+        return _inputStream.peek();
     }
 
     std::size_t Tell() const
     {
-        return inputStream.tell();
+        return _inputStream.tell();
     }
 
     Ch Take()
     {
-        return inputStream.get();
+        return _inputStream.get();
     }
 
     // this method has to be implemented but is not currently not used
@@ -78,7 +78,7 @@ public:
     }
 
 private:
-    InputStream& inputStream;
+    InputStream& _inputStream;
 };
 
 } // namespace detail

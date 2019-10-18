@@ -156,7 +156,7 @@ RegisteredPolymorphicTypeLoadInstance<T, Base, InputArchive>::instance(
         [](InputArchive& archive) -> std::unique_ptr<Base> {
             auto value = std::make_unique<T>();
             archive(SkipIntroOutroWrapper<T>(value.get()));
-            return std::move(value);
+            return value;
         });
 
 template <typename T, typename Base, typename OutputArchive>

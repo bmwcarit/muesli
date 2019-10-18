@@ -110,15 +110,15 @@ public:
                  only pass r-values in cases where this makes sense, such as the result of some
                  size() call.
         @internal */
-    NameValuePair(char const* n, T&& v) : name(n), value(std::forward<T>(v))
+    NameValuePair(char const* n, T&& v) : _name(n), _value(std::forward<T>(v))
     {
     }
 
     NameValuePair(NameValuePair&&) = default;
     NameValuePair& operator=(NameValuePair&&) = default;
 
-    char const* name;
-    Type value;
+    char const* _name;
+    Type _value;
 };
 
 // ######################################################################

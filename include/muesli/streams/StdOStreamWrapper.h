@@ -20,6 +20,7 @@
 #ifndef MUESLI_STREAMS_STDOSTREAMWRAPPER_H_
 #define MUESLI_STREAMS_STDOSTREAMWRAPPER_H_
 
+#include <cstdint>
 #include <iosfwd>
 
 #include "muesli/StreamRegistry.h"
@@ -37,23 +38,23 @@ class StdOStreamWrapper
 public:
     using Char = typename Stream::char_type;
 
-    explicit StdOStreamWrapper(Stream& stream) : stream(stream)
+    explicit StdOStreamWrapper(Stream& stream) : _stream(stream)
     {
     }
 
     void put(Char c)
     {
-        stream.put(c);
+        _stream.put(c);
     }
 
     void write(const Char* s, std::size_t size)
     {
-        stream.write(s, size);
+        _stream.write(s, static_cast<std::int64_t>(size));
     }
 
     void flush()
     {
-        stream.flush();
+        _stream.flush();
     }
 
     // non-copyable
@@ -65,7 +66,7 @@ public:
     ~StdOStreamWrapper() = default;
 
 private:
-    Stream& stream;
+    Stream& _stream;
 };
 } // namespace muesli
 

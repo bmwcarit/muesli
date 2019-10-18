@@ -69,41 +69,42 @@ class JsonInputArchive
 public:
     explicit JsonInputArchive(InputStream& stream)
             : Parent(this),
-              document(),
-              nextKey(),
-              nextKeyValid(false),
-              nextIndex(0),
-              nextIndexValid(false),
-              stack(),
-              stateHistoryStack(),
-              isRoot(true)
+              _document(),
+              _nextKey(),
+              _nextKeyValid(false),
+              _nextIndex(0),
+              _nextIndexValid(false),
+              _stack(),
+              _stateHistoryStack(),
+              _isRoot(true)
     {
         using AdaptedStream = json::detail::RapidJsonInputStreamAdapter<InputStream>;
         AdaptedStream adaptedStream(stream);
-        document.ParseStream<0>(adaptedStream);
-        if (document.HasParseError()) {
-            throw exceptions::ParseException(std::string("could not parse JSON: ") +
-                                             rapidjson::GetParseError_En(document.GetParseError()));
+        _document.ParseStream<0>(adaptedStream);
+        if (_document.HasParseError()) {
+            throw exceptions::ParseException(
+                    std::string("could not parse JSON: ") +
+                    rapidjson::GetParseError_En(_document.GetParseError()));
         }
-        stack.push(&document);
+        _stack.push(&_document);
     }
 
     void setNextKey(const std::string& nextKey)
     {
-        this->nextKey = nextKey;
-        this->nextKeyValid = true;
+        this->_nextKey = nextKey;
+        this->_nextKeyValid = true;
     }
 
     void setNextKey(std::string&& nextKey)
     {
-        this->nextKey = std::move(nextKey);
-        this->nextKeyValid = true;
+        this->_nextKey = std::move(nextKey);
+        this->_nextKeyValid = true;
     }
 
     void setNextIndex(const std::size_t nextIndex)
     {
-        this->nextIndex = nextIndex;
-        this->nextIndexValid = true;
+        this->_nextIndex = nextIndex;
+        this->_nextIndexValid = true;
     }
 
     void readValue(bool& boolValue)
@@ -205,22 +206,22 @@ public:
     std::size_t getArraySize() const
     {
         assert(currentValueIsArray());
-        return stack.top()->Size();
+        return _stack.top()->Size();
     }
 
     inline bool currentValueIsArray() const
     {
-        return stack.top()->IsArray();
+        return _stack.top()->IsArray();
     }
 
     rapidjson::Document::ConstMemberIterator getMemberBegin() const
     {
-        return stack.top()->MemberBegin();
+        return _stack.top()->MemberBegin();
     }
 
     rapidjson::Document::ConstMemberIterator getMemberEnd() const
     {
-        return stack.top()->MemberEnd();
+        return _stack.top()->MemberEnd();
     }
 
     void pushNode()
@@ -228,13 +229,13 @@ public:
         // TODO: benchmark following if condition "if(isRoot)"
         // It is required to skip the root object
         // but can cause slow-downs
-        if (isRoot) {
-            isRoot = false;
+        if (_isRoot) {
+            _isRoot = false;
             return;
         }
         const Value* nextValue = getNextValue(true);
         if (!nextValue->IsNull()) {
-            stack.push(nextValue);
+            _stack.push(nextValue);
         } else {
             throw exceptions::ValueNotFoundException(
                     "Could not find a value for a not nullable object.");
@@ -243,64 +244,64 @@ public:
 
     void pushNullableNode()
     {
-        stack.push(getNextValue());
+        _stack.push(getNextValue());
     }
 
     void popNode()
     {
-        stack.pop();
-        nextKeyValid = false;
-        nextIndexValid = false;
+        _stack.pop();
+        _nextKeyValid = false;
+        _nextIndexValid = false;
     }
 
     void pushState()
     {
-        stateHistoryStack.push(stack);
+        _stateHistoryStack.push(_stack);
     }
 
     void popState()
     {
-        assert(!stateHistoryStack.empty());
-        stack = stateHistoryStack.top();
-        nextKeyValid = false;
-        nextIndexValid = false;
-        stateHistoryStack.pop();
+        assert(!_stateHistoryStack.empty());
+        _stack = _stateHistoryStack.top();
+        _nextKeyValid = false;
+        _nextIndexValid = false;
+        _stateHistoryStack.pop();
     }
 
     bool currentValueIsNull() const
     {
-        return stack.top() == nullptr || stack.top()->IsNull();
+        return _stack.top() == nullptr || _stack.top()->IsNull();
     }
 
 private:
     const Value* getNextValue(bool throwOnNotFound = false) const
     {
-        if (stack.top()->IsArray() && nextIndexValid) {
-            return &(stack.top()->operator[](nextIndex));
-        } else if (stack.top()->IsObject() && nextKeyValid) {
-            Value::ConstMemberIterator it = stack.top()->FindMember(nextKey);
-            if (it != stack.top()->MemberEnd()) {
+        if (_stack.top()->IsArray() && _nextIndexValid) {
+            return &(_stack.top()->operator[](_nextIndex));
+        } else if (_stack.top()->IsObject() && _nextKeyValid) {
+            Value::ConstMemberIterator it = _stack.top()->FindMember(_nextKey);
+            if (it != _stack.top()->MemberEnd()) {
                 return &(it->value);
             }
             if (throwOnNotFound) {
                 throw exceptions::ValueNotFoundException("Could not find value for key \"" +
-                                                         nextKey + "\".");
+                                                         _nextKey + "\".");
             }
             return nullptr;
         }
-        return stack.top();
+        return _stack.top();
     }
 
 private:
-    rapidjson::Document document;
-    std::string nextKey;
-    bool nextKeyValid;
-    std::size_t nextIndex;
-    bool nextIndexValid;
+    rapidjson::Document _document;
+    std::string _nextKey;
+    bool _nextKeyValid;
+    std::size_t _nextIndex;
+    bool _nextIndexValid;
     using ValueStack = std::stack<const Value*>;
-    ValueStack stack;
-    std::stack<ValueStack> stateHistoryStack;
-    bool isRoot;
+    ValueStack _stack;
+    std::stack<ValueStack> _stateHistoryStack;
+    bool _isRoot;
 };
 
 namespace detail
@@ -470,8 +471,8 @@ std::enable_if_t<json::detail::IsMap<Map>::value> load(JsonInputArchive<InputStr
 template <typename InputStream, typename T>
 void load(JsonInputArchive<InputStream>& archive, NameValuePair<T>& nameValuePair)
 {
-    archive.setNextKey(nameValuePair.name);
-    archive(nameValuePair.value);
+    archive.setNextKey(nameValuePair._name);
+    archive(nameValuePair._value);
 }
 
 template <typename InputStream, typename... Ts>

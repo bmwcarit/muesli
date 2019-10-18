@@ -62,18 +62,18 @@ class JsonOutputArchive
 
 public:
     explicit JsonOutputArchive(OutputStream& stream)
-            : Parent(this), outputStream(stream), writer(outputStream)
+            : Parent(this), _outputStream(stream), _writer(_outputStream)
     {
     }
 
     void writeKey(const std::string& key)
     {
-        writer.Key(key.c_str(), static_cast<rapidjson::SizeType>(key.size()));
+        _writer.Key(key.c_str(), static_cast<rapidjson::SizeType>(key.size()));
     }
 
     void writeValue(bool boolValue)
     {
-        writer.Bool(boolValue);
+        _writer.Bool(boolValue);
     }
 
     template <typename T>
@@ -82,84 +82,84 @@ public:
         if (!std::isnan(value)) {
             writeArithmeticValue(value);
         } else {
-            writer.Null();
+            _writer.Null();
         }
     }
 
     void writeArithmeticValue(const double& doubleValue)
     {
-        writer.Double(doubleValue);
+        _writer.Double(doubleValue);
     }
 
     void writeArithmeticValue(const float& floatValue)
     {
-        writer.Double(floatValue);
+        _writer.Double(floatValue);
     }
 
     void writeArithmeticValue(const std::int64_t& int64Value)
     {
-        writer.Int64(int64Value);
+        _writer.Int64(int64Value);
     }
 
     void writeArithmeticValue(const std::uint64_t& uint64Value)
     {
-        writer.Uint64(uint64Value);
+        _writer.Uint64(uint64Value);
     }
 
     template <typename T>
     std::enable_if_t<json::detail::IsSignedIntegerUpTo32bit<T>::value> writeArithmeticValue(
             const T& value)
     {
-        writer.Int(value);
+        _writer.Int(value);
     }
 
     template <typename T>
     std::enable_if_t<json::detail::IsUnsignedIntegerUpTo32bit<T>::value> writeArithmeticValue(
             const T& value)
     {
-        writer.Uint(value);
+        _writer.Uint(value);
     }
 
     void writeValue(const std::string& stringValue)
     {
-        writer.String(stringValue);
+        _writer.String(stringValue);
     }
 
     void writeValue(const char* value)
     {
-        writer.String(value);
+        _writer.String(value);
     }
 
     void writeValue(const std::nullptr_t& value)
     {
         std::ignore = value;
-        writer.Null();
+        _writer.Null();
     }
 
     void startObject()
     {
-        writer.StartObject();
+        _writer.StartObject();
     }
 
     void endObject()
     {
-        writer.EndObject();
+        _writer.EndObject();
     }
 
     void startArray()
     {
-        writer.StartArray();
+        _writer.StartArray();
     }
 
     void endArray()
     {
-        writer.EndArray();
+        _writer.EndArray();
     }
 
 private:
     using AdaptedStream = json::detail::RapidJsonOutputStreamAdapter<OutputStream>;
-    AdaptedStream outputStream;
-    rapidjson::Writer<AdaptedStream> writer;
+    AdaptedStream _outputStream;
+    rapidjson::Writer<AdaptedStream> _writer;
 };
 
 template <typename OutputStream, typename... Ts>
@@ -195,7 +195,7 @@ std::enable_if_t<!json::detail::IsNullable<std::decay_t<T>>::value> intro(
         JsonOutputArchive<OutputStream>& archive,
         const NameValuePair<T>& nameValuePair)
 {
-    archive.writeKey(nameValuePair.name);
+    archive.writeKey(nameValuePair._name);
 }
 
 template <typename OutputStream, typename T>
@@ -203,8 +203,8 @@ std::enable_if_t<json::detail::IsNullable<std::decay_t<T>>::value> intro(
         JsonOutputArchive<OutputStream>& archive,
         const NameValuePair<T>& nameValuePair)
 {
-    if (nameValuePair.value) {
-        archive.writeKey(nameValuePair.name);
+    if (nameValuePair._value) {
+        archive.writeKey(nameValuePair._name);
     }
 }
 
@@ -327,7 +327,7 @@ auto save(JsonOutputArchive<OutputStream>& archive, const Map& map)
 template <typename OutputStream, typename T>
 void save(JsonOutputArchive<OutputStream>& archive, const NameValuePair<T>& nameValuePair)
 {
-    archive(nameValuePair.value);
+    archive(nameValuePair._value);
 }
 
 template <typename OutputStream, typename T>

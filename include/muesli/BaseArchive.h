@@ -41,11 +41,11 @@ public:
     void operator()(Ts&&... args)
     {
         // call handle() for each of the args
-        detail::Expansion{0, (self.handle(std::forward<Ts>(args)), 0)...};
+        detail::Expansion{0, (_self.handle(std::forward<Ts>(args)), 0)...};
     }
 
 protected:
-    explicit BaseArchive(Derived* self) : self(*self)
+    explicit BaseArchive(Derived* self) : _self(*self)
     {
     }
 
@@ -59,29 +59,29 @@ private:
     template <typename T>
     std::enable_if_t<SkipIntroOutroTraits<std::decay_t<T>>::value> handle(T&& arg)
     {
-        self.dispatch(std::forward<T>(arg));
+        _self.dispatch(std::forward<T>(arg));
     }
 
     template <typename T>
     std::enable_if_t<!SkipIntroOutroTraits<std::decay_t<T>>::value> handle(T&& arg)
     {
-        intro(self, std::forward<T>(arg));
-        self.dispatch(std::forward<T>(arg));
-        outro(self, std::forward<T>(arg));
+        intro(_self, std::forward<T>(arg));
+        _self.dispatch(std::forward<T>(arg));
+        outro(_self, std::forward<T>(arg));
     }
 
     template <typename T>
     void handle(BaseClass<T>&& arg)
     {
         // do no call intro/outro when serializing base classes
-        self.dispatch(*arg.wrapped);
+        _self.dispatch(*arg._wrapped);
     }
 
     template <typename T>
     void handle(SkipIntroOutroWrapper<T>&& arg)
     {
         // do no call intro/outro for the wrapped element
-        self.dispatch(*arg.wrapped);
+        _self.dispatch(*arg._wrapped);
     }
 
     template <typename T>
@@ -96,45 +96,45 @@ private:
     template <typename T>
     void dispatch(T&& arg, const dispatch_targets::member::serialize&)
     {
-        discardConstQualifier(arg).serialize(self);
+        discardConstQualifier(arg).serialize(_self);
     }
 
     // free function 'serialize' exists
     template <typename T>
     void dispatch(T&& arg, const dispatch_targets::free::serialize&)
     {
-        serialize(self, discardConstQualifier(arg));
+        serialize(_self, discardConstQualifier(arg));
     }
 
     // 'arg' has 'load' member function
     template <typename T>
     void dispatch(T&& arg, const dispatch_targets::member::load&)
     {
-        arg.load(self);
+        arg.load(_self);
     }
 
     // 'arg' has 'save' member function
     template <typename T>
     void dispatch(T&& arg, const dispatch_targets::member::save&)
     {
-        discardConstQualifier(arg).save(self);
+        discardConstQualifier(arg).save(_self);
     }
 
     // free function 'save' exists
     template <typename T>
     void dispatch(T&& arg, const dispatch_targets::free::save&)
     {
-        save(self, arg);
+        save(_self, arg);
     }
 
     // free function 'load' exists
     template <typename T>
     void dispatch(T&& arg, const dispatch_targets::free::load&)
     {
-        load(self, arg);
+        load(_self, arg);
     }
 
-    Derived& self;
+    Derived& _self;
 };
 
 template <typename ArchiveType, typename T>
