@@ -50,13 +50,67 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 include(SetCppStandard)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(GNU_CXX_FLAGS "-pipe -g")
-    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wall -Wunused-value -Wunused -Wcast-qual -Wpointer-arith")
-    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wextra -Wcast-align -Wdisabled-optimization -Wformat-y2k")
-    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wno-format-extra-args -Wformat-nonliteral -Wformat=2 -Winit-self")
-    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Winvalid-pch -Wunsafe-loop-optimizations -Wmissing-include-dirs")
-    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wmissing-braces -Wpacked -Wredundant-decls -Wstack-protector")
-    set(GNU_CXX_FLAGS "${GNU_CXX_FLAGS} -Wswitch-enum -Wuninitialized -Weffc++ -Wformat-security")
+    set(GNU_CXX_FLAGS " \
+        -pipe -g \
+        -Wunused-value \
+        -Wunused \
+        -Wpointer-arith \
+        -Wformat-y2k \
+        -Wno-format-extra-args \
+        -Wformat-nonliteral \
+        -Winit-self \
+        -Winvalid-pch \
+        -Wunsafe-loop-optimizations \
+        -Wstack-protector \
+        -Wswitch-enum \
+        -Wfatal-errors \
+        -D_GLIBCXX_ASSERTIONS \
+        -fstack-protector-strong \
+        -Wall \
+        -Wextra \
+        -fwrapv \
+        -Wformat=2 \
+        -Wformat-signedness \
+        -Wmissing-include-dirs \
+        -Wmissing-braces \
+        -Wpacked \
+        -Wimplicit-fallthrough=5 \
+        -Wunused-parameter \
+        -Wuninitialized \
+        -Weffc++ \
+        -Walloca \
+        -Wduplicated-branches \
+        -Wduplicated-cond \
+        -Wfloat-equal \
+        -Wshadow \
+        -Wcast-qual \
+        -Wsign-conversion \
+        -Wlogical-op \
+        -Wformat-security \
+        -Walloc-zero \
+        -Wcast-align \
+        -Wdisabled-optimization \
+        -Wredundant-decls \
+        -Werror=all \
+        -Werror=extra \
+        -Werror=format \
+        -Werror=format-signedness \
+        -Werror=missing-include-dirs \
+        -Werror=implicit-fallthrough \
+        -Werror=unused-parameter \
+        -Werror=uninitialized \
+        -Werror=alloca \
+        -Werror=duplicated-branches \
+        -Werror=duplicated-cond \
+        -Werror=float-equal \
+        -Werror=cast-qual \
+        -Werror=sign-conversion \
+        -Werror=logical-op \
+        -Werror=format-security \
+        -Werror=alloc-zero \
+        -Werror=cast-align \
+        -Werror=redundant-decls \
+    ")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GNU_CXX_FLAGS} -pthread")
 
     # check GNU CXX compiler version
