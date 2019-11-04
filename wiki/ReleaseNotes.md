@@ -1,3 +1,11 @@
+# muesli 1.0.2
+
+## API relevant changes
+None.
+
+## Other changes
+* introduce compiler flags and fix warnings
+
 # muesli 1.0.1
 
 ## API relevant changes
